@@ -1,0 +1,71 @@
+{
+    "limitClass": "ChainDecayLimit",
+    "id": 2004016781,
+    "reference": "2004.01678",
+    "source": "https://doi.org/10.17182/hepdata.93626.v1/t3",
+    "citeKey": "ATLAS:2020pcy",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 139.0,
+    "process": {
+        "production": [
+            "ggH"
+        ],
+        "chain": "Z",
+        "decay": [
+            "gg"
+        ]
+    },
+    "analysis": {
+        "massResolution": {
+            "daughter": {
+                "absolute": 0.2,
+                "relative": 0
+            },
+            "mother": {
+                "absolute": 10,
+                "relative": 0
+            }
+        },
+        "grid": {
+            "massMother": [
+                125.0
+            ],
+            "massDaughter": [
+                0.5,
+                0.75,
+                1.0,
+                1.5,
+                2.0,
+                2.5,
+                3.0,
+                3.5,
+                4.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                16.8357,
+                19.974,
+                18.2498,
+                21.5549,
+                27.3248,
+                40.2001,
+                78.3756,
+                120.548,
+                338.932
+            ],
+            "expected": [
+                16.1114,
+                18.9243,
+                17.2897,
+                20.4401,
+                25.8669,
+                38.3056,
+                74.6227,
+                114.834,
+                323.132
+            ]
+        }
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "id": 2021021,
+    "reference": "ATLAS-CONF-2021-021",
+    "source": "Fig. 2 (combined result)",
+    "citeKey": "ATLAS:2021zwx",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 139.0,
+    "referenceMass": 125,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 5,
+    "subMeasurements": {
+        "cc": {
+            "obs": [
+                -24.6204993518133,
+                -9.0,
+                6.62049935181331
+            ],
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "HW",
+                        "cc"
+                    ],
+                    [
+                        "HZ",
+                        "cc"
+                    ]
+                ]
+            }
+        }
+    }
+}

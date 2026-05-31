@@ -1,0 +1,110 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 180311145,
+    "reference": "1803.11145",
+    "source": "Tab. 2",
+    "citeKey": "ATLAS:2018jnf",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 36.7,
+    "process": {
+        "production": [
+            "ggH",
+            "vbfH"
+        ],
+        "firstDecay": [
+            "gamgam"
+        ],
+        "secondDecay": [
+            "gg"
+        ]
+    },
+    "constraints": {
+        "mother": [
+            {
+                "modelLike": "SMHiggs",
+                "process": {
+                    "channels": [
+                        [
+                            "ggH",
+                            "none"
+                        ],
+                        [
+                            "vbfH",
+                            "none"
+                        ]
+                    ]
+                }
+            }
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 1.3,
+                "relative": 0
+            },
+            "secondDaughter": {
+                "absolute": 6,
+                "relative": 0.3
+            },
+            "mother": {
+                "absolute": 30,
+                "relative": 0
+            }
+        },
+        "grid": {
+            "massMother": [
+                125.0
+            ],
+            "massFirstDaughter": [
+                20.0,
+                25.0,
+                25.1,
+                30.0,
+                35.0,
+                35.1,
+                40.0,
+                44.9,
+                45.0,
+                50.0,
+                54.9,
+                55.0,
+                60.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                4.8,
+                1.9,
+                5.1,
+                3.1,
+                2.7,
+                2.7,
+                3.2,
+                6.3,
+                9.2,
+                9.0,
+                9.7,
+                5.5,
+                8.0
+            ],
+            "expected": [
+                4.6,
+                2.0,
+                4.7,
+                2.6,
+                2.2,
+                3.2,
+                4.0,
+                7.5,
+                8.4,
+                8.8,
+                9.1,
+                6.8,
+                9.5
+            ]
+        }
+    }
+}

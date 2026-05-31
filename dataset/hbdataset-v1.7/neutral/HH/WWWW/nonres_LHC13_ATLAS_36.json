@@ -1,0 +1,44 @@
+{
+    "limitClass": "PairProductionLimit",
+    "id": 1811110283,
+    "reference": "1811.11028",
+    "source": "p.10",
+    "citeKey": "ATLAS:2018ili",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 36.1,
+    "process": {
+        "firstDecay": [
+            "WW"
+        ],
+        "secondDecay": [
+            "WW"
+        ]
+    },
+    "analysis": {
+        "equalParticleMasses": true,
+        "massResolution": {
+            "firstParticle": {
+                "absolute": 20,
+                "relative": 0
+            },
+            "secondParticle": {
+                "absolute": 20,
+                "relative": 0
+            }
+        },
+        "grid": {
+            "massFirstParticle": [
+                125.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                5.3
+            ],
+            "expected": [
+                3.8
+            ]
+        }
+    }
+}

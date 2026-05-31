@@ -1,0 +1,66 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 1110102,
+    "reference": "hep-ex/0111010",
+    "source": "Tab 8",
+    "citeKey": "OPAL:2001few",
+    "collider": "LEP",
+    "experiment": "OPAL",
+    "luminosity": 0.11,
+    "process": {
+        "channels": [
+            [
+                "eeHbb",
+                "tautau"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "CPValue": "odd"
+        }
+    ],
+    "analysis": {
+        "massResolution": {
+            "absolute": 1,
+            "relative": 0
+        },
+        "grid": {
+            "mass": [
+                4.0,
+                5.0,
+                6.0,
+                7.0,
+                8.0,
+                9.0,
+                10.0,
+                11.0,
+                12.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                72.25,
+                121.0,
+                92.16,
+                132.25,
+                114.49,
+                121.0,
+                127.69,
+                151.29,
+                184.96
+            ],
+            "expected": [
+                90.25,
+                106.09,
+                121.0,
+                123.21,
+                166.41,
+                179.56,
+                207.36,
+                240.25,
+                275.56
+            ]
+        }
+    }
+}

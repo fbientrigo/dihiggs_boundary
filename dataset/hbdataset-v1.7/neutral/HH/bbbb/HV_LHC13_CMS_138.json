@@ -1,0 +1,73 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 240310341,
+    "reference": "2403.10341",
+    "source": "Fig. 3 (lower)",
+    "citeKey": "CMS:2024zfv",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 138.0,
+    "process": {
+        "production": [
+            "HZ",
+            "HW"
+        ],
+        "firstDecay": [
+            "bb"
+        ],
+        "secondDecay": [
+            "bb"
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 5,
+                "relative": 0.1
+            },
+            "secondDaughter": {
+                "absolute": 5,
+                "relative": 0.1
+            },
+            "mother": {
+                "absolute": 10,
+                "relative": 0
+            }
+        },
+        "grid": {
+            "massMother": [
+                125.0
+            ],
+            "massFirstDaughter": [
+                15.0,
+                20.0,
+                25.0,
+                30.0,
+                40.0,
+                50.0,
+                60.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                5.09658441702102,
+                2.46544095836059,
+                1.22114265478409,
+                0.947348978690262,
+                0.798272221612404,
+                0.877357631238736,
+                0.80299921266901
+            ],
+            "expected": [
+                10.5357107140355,
+                2.13971605378895,
+                1.04120353107275,
+                0.812537333556916,
+                0.709363707995013,
+                0.726315606212137,
+                0.676637627600042
+            ]
+        }
+    }
+}

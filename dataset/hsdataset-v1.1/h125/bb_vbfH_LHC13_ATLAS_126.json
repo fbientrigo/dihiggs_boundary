@@ -1,0 +1,29 @@
+{
+    "id": 201108280,
+    "reference": "2011.08280",
+    "source": "p. 20 (combined result)",
+    "citeKey": "ATLAS:2020bhl",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 126.0,
+    "referenceMass": 125,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 10,
+    "subMeasurements": {
+        "vbfH_bb": {
+            "obs": [
+                1.41293909217521,
+                2.16,
+                2.94032044699598
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "vbfH",
+                        "bb"
+                    ]
+                ]
+            }
+        }
+    }
+}

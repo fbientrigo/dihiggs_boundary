@@ -1,0 +1,74 @@
+{
+    "limitClass": "ChainDecayLimit",
+    "id": 1502044782,
+    "reference": "1502.04478",
+    "source": "Aux Tab 4",
+    "citeKey": "ATLAS:2015kpj",
+    "collider": "LHC8",
+    "experiment": "ATLAS",
+    "luminosity": 20.3,
+    "process": {
+        "production": [
+            "H"
+        ],
+        "chain": "Z",
+        "decay": [
+            "tautau"
+        ]
+    },
+    "analysis": {
+        "massResolution": {
+            "daughter": {
+                "absolute": 20,
+                "relative": 0.0
+            },
+            "mother": {
+                "absolute": 5,
+                "relative": 0.15
+            }
+        },
+        "grid": {
+            "massMother": [
+                220.0,
+                240.0,
+                260.0,
+                300.0,
+                340.0,
+                350.0,
+                400.0,
+                500.0,
+                800.0,
+                1000.0
+            ],
+            "massDaughter": [
+                125.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.098,
+                0.079,
+                0.12,
+                0.066,
+                0.039,
+                0.038,
+                0.042,
+                0.018,
+                0.013,
+                0.013
+            ],
+            "expected": [
+                0.11,
+                0.094,
+                0.083,
+                0.07,
+                0.052,
+                0.049,
+                0.047,
+                0.031,
+                0.022,
+                0.021
+            ]
+        }
+    }
+}

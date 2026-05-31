@@ -1,0 +1,72 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 12051,
+    "reference": "CMS-PAS-HIG-12-051",
+    "source": "Fig. 4 (left)",
+    "citeKey": "CMS:2012vga",
+    "collider": "LHC8",
+    "experiment": "CMS",
+    "luminosity": 17,
+    "process": {
+        "channels": [
+            [
+                "HZ",
+                "tautau"
+            ],
+            [
+                "HW",
+                "tautau"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "modelLike": "SMHiggsInterp",
+            "process": "signal"
+        }
+    ],
+    "normalization": {
+        "reference": "SMHiggsInterp",
+        "process": "signal"
+    },
+    "analysis": {
+        "massResolution": {
+            "absolute": 5,
+            "relative": 0.15
+        },
+        "grid": {
+            "mass": [
+                110.0,
+                115.0,
+                120.0,
+                125.0,
+                130.0,
+                135.0,
+                140.0,
+                145.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                2.72,
+                3.07,
+                3.64,
+                4.68,
+                5.04,
+                5.24,
+                5.46,
+                5.05
+            ],
+            "expected": [
+                3.05,
+                2.4,
+                3.48,
+                3.7,
+                3.72,
+                3.92,
+                3.83,
+                3.48
+            ]
+        }
+    }
+}

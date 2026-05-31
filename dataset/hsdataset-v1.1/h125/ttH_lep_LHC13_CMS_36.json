@@ -1,0 +1,392 @@
+{
+    "id": 180305485,
+    "reference": "1803.05485",
+    "source": "Fig. 6, Aux. Fig. 1",
+    "citeKey": "CMS:2018fdh",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 35.9,
+    "referenceMass": 125,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 20,
+    "subMeasurements": {
+        "1l2tauh": {
+            "obs": [
+                -3.24,
+                -1.52,
+                0.24
+            ],
+            "channelWeights": [
+                1.0,
+                1.63,
+                64.57,
+                1.0,
+                1.63,
+                64.57,
+                1.0,
+                1.63,
+                64.57
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "Htt",
+                        "WW"
+                    ],
+                    [
+                        "Htt",
+                        "ZZ"
+                    ],
+                    [
+                        "Htt",
+                        "tautau"
+                    ],
+                    [
+                        "Ht",
+                        "WW"
+                    ],
+                    [
+                        "Ht",
+                        "ZZ"
+                    ],
+                    [
+                        "Ht",
+                        "tautau"
+                    ],
+                    [
+                        "HtW",
+                        "WW"
+                    ],
+                    [
+                        "HtW",
+                        "ZZ"
+                    ],
+                    [
+                        "HtW",
+                        "tautau"
+                    ]
+                ]
+            },
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "2lss": {
+            "obs": [
+                1.1,
+                1.61,
+                2.19
+            ],
+            "channelWeights": [
+                1.0,
+                0.31,
+                0.78,
+                1.0,
+                0.31,
+                0.78,
+                1.0,
+                0.31,
+                0.78
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "Htt",
+                        "WW"
+                    ],
+                    [
+                        "Htt",
+                        "ZZ"
+                    ],
+                    [
+                        "Htt",
+                        "tautau"
+                    ],
+                    [
+                        "Ht",
+                        "WW"
+                    ],
+                    [
+                        "Ht",
+                        "ZZ"
+                    ],
+                    [
+                        "Ht",
+                        "tautau"
+                    ],
+                    [
+                        "HtW",
+                        "WW"
+                    ],
+                    [
+                        "HtW",
+                        "ZZ"
+                    ],
+                    [
+                        "HtW",
+                        "tautau"
+                    ]
+                ]
+            },
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "2lss1tauh": {
+            "obs": [
+                0.27,
+                0.94,
+                1.74
+            ],
+            "channelWeights": [
+                1.0,
+                0.19,
+                4.47,
+                1.0,
+                0.19,
+                4.47,
+                1.0,
+                0.19,
+                4.47
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "Htt",
+                        "WW"
+                    ],
+                    [
+                        "Htt",
+                        "ZZ"
+                    ],
+                    [
+                        "Htt",
+                        "tautau"
+                    ],
+                    [
+                        "Ht",
+                        "WW"
+                    ],
+                    [
+                        "Ht",
+                        "ZZ"
+                    ],
+                    [
+                        "Ht",
+                        "tautau"
+                    ],
+                    [
+                        "HtW",
+                        "WW"
+                    ],
+                    [
+                        "HtW",
+                        "ZZ"
+                    ],
+                    [
+                        "HtW",
+                        "tautau"
+                    ]
+                ]
+            },
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "3l": {
+            "obs": [
+                0.11,
+                0.82,
+                1.59
+            ],
+            "channelWeights": [
+                1.0,
+                0.52,
+                0.75,
+                1.0,
+                0.52,
+                0.75,
+                1.0,
+                0.52,
+                0.75
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "Htt",
+                        "WW"
+                    ],
+                    [
+                        "Htt",
+                        "ZZ"
+                    ],
+                    [
+                        "Htt",
+                        "tautau"
+                    ],
+                    [
+                        "Ht",
+                        "WW"
+                    ],
+                    [
+                        "Ht",
+                        "ZZ"
+                    ],
+                    [
+                        "Ht",
+                        "tautau"
+                    ],
+                    [
+                        "HtW",
+                        "WW"
+                    ],
+                    [
+                        "HtW",
+                        "ZZ"
+                    ],
+                    [
+                        "HtW",
+                        "tautau"
+                    ]
+                ]
+            },
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "3l1tauh": {
+            "obs": [
+                0.27,
+                1.34,
+                2.76
+            ],
+            "channelWeights": [
+                1.0,
+                0.86,
+                5.24,
+                1.0,
+                0.86,
+                5.24,
+                1.0,
+                0.86,
+                5.24
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "Htt",
+                        "WW"
+                    ],
+                    [
+                        "Htt",
+                        "ZZ"
+                    ],
+                    [
+                        "Htt",
+                        "tautau"
+                    ],
+                    [
+                        "Ht",
+                        "WW"
+                    ],
+                    [
+                        "Ht",
+                        "ZZ"
+                    ],
+                    [
+                        "Ht",
+                        "tautau"
+                    ],
+                    [
+                        "HtW",
+                        "WW"
+                    ],
+                    [
+                        "HtW",
+                        "ZZ"
+                    ],
+                    [
+                        "HtW",
+                        "tautau"
+                    ]
+                ]
+            },
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "4l": {
+            "obs": [
+                -1.0,
+                0.57,
+                2.86
+            ],
+            "channelWeights": [
+                1.0,
+                1.23,
+                0.75,
+                1.0,
+                1.23,
+                0.75,
+                1.0,
+                1.23,
+                0.75
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "Htt",
+                        "WW"
+                    ],
+                    [
+                        "Htt",
+                        "ZZ"
+                    ],
+                    [
+                        "Htt",
+                        "tautau"
+                    ],
+                    [
+                        "Ht",
+                        "WW"
+                    ],
+                    [
+                        "Ht",
+                        "ZZ"
+                    ],
+                    [
+                        "Ht",
+                        "tautau"
+                    ],
+                    [
+                        "HtW",
+                        "WW"
+                    ],
+                    [
+                        "HtW",
+                        "ZZ"
+                    ],
+                    [
+                        "HtW",
+                        "tautau"
+                    ]
+                ]
+            },
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        }
+    }
+}

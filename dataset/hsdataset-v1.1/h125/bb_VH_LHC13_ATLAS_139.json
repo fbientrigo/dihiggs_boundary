@@ -1,0 +1,160 @@
+{
+    "id": 200702873,
+    "reference": "2007.02873",
+    "source": "https://doi.org/10.17182/hepdata.94800.v2",
+    "citeKey": "ATLAS:2020fcp",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 139.0,
+    "referenceMass": 125,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 10,
+    "subMeasurements": {
+        "HW_pTW_med": {
+            "obs": [
+                0.00775944841211073,
+                0.019,
+                0.0302405515878893
+            ],
+            "ref": [
+                0.0229,
+                0.024,
+                0.0251
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "HW",
+                        "bb"
+                    ]
+                ]
+            }
+        },
+        "HW_pTW_high": {
+            "obs": [
+                0.00498640563788214,
+                0.0072,
+                0.00941359436211787
+            ],
+            "ref": [
+                0.0068,
+                0.0071,
+                0.0074
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "HW",
+                        "bb"
+                    ]
+                ]
+            }
+        },
+        "HZ_pTZ_low": {
+            "obs": [
+                0.00568451412788364,
+                0.0425,
+                0.0793154858721164
+            ],
+            "ref": [
+                0.0465,
+                0.0506,
+                0.0547
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "qqHZ",
+                        "bb"
+                    ],
+                    [
+                        "ggHZ",
+                        "bb"
+                    ]
+                ]
+            },
+            "channelWeights": [
+                1.0,
+                2.2273
+            ]
+        },
+        "HZ_pTZ_med": {
+            "obs": [
+                0.0140703810377286,
+                0.0205,
+                0.0269296189622714
+            ],
+            "ref": [
+                0.0164,
+                0.0188,
+                0.0212
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "qqHZ",
+                        "bb"
+                    ],
+                    [
+                        "ggHZ",
+                        "bb"
+                    ]
+                ]
+            },
+            "channelWeights": [
+                1.0,
+                2.435
+            ]
+        },
+        "HZ_pTZ_high": {
+            "obs": [
+                0.00371477004536473,
+                0.0054,
+                0.00708522995463527
+            ],
+            "ref": [
+                0.0044,
+                0.0049,
+                0.0054
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "qqHZ",
+                        "bb"
+                    ],
+                    [
+                        "ggHZ",
+                        "bb"
+                    ]
+                ]
+            },
+            "channelWeights": [
+                1.0,
+                3.041
+            ]
+        }
+    },
+    "correlations": {
+        "experimental": {
+            "HZ_pTZ_low": {
+                "HZ_pTZ_med": -0.0105,
+                "HZ_pTZ_high": 0.0303,
+                "HW_pTW_med": -0.0856,
+                "HW_pTW_high": 0.0468
+            },
+            "HZ_pTZ_med": {
+                "HZ_pTZ_high": 0.0648,
+                "HW_pTW_med": 0.0211,
+                "HW_pTW_high": 0.0366
+            },
+            "HZ_pTZ_high": {
+                "HW_pTW_med": 0.036,
+                "HW_pTW_high": -0.0562
+            },
+            "HW_pTW_med": {
+                "HW_pTW_high": -0.0306
+            }
+        }
+    }
+}

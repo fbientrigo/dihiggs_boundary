@@ -1,0 +1,85 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 1505016092,
+    "reference": "1505.01609",
+    "source": "Fig.6 (bottom)",
+    "citeKey": "ATLAS:2015unc",
+    "collider": "LHC8",
+    "experiment": "ATLAS",
+    "luminosity": 20.3,
+    "process": {
+        "production": [
+            "ggH"
+        ],
+        "firstDecay": [
+            "mumu"
+        ],
+        "secondDecay": [
+            "tautau"
+        ]
+    },
+    "constraints": {
+        "firstDaughter": [
+            {
+                "mumuTautauRatio": "odd"
+            }
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 0.1,
+                "relative": 0.03
+            },
+            "secondDaughter": {
+                "absolute": 5,
+                "relative": 0.15
+            },
+            "mother": {
+                "absolute": 20,
+                "relative": 0
+            }
+        },
+        "grid": {
+            "massMother": [
+                100.0,
+                150.0,
+                200.0,
+                250.0,
+                300.0,
+                350.0,
+                400.0,
+                450.0,
+                500.0
+            ],
+            "massFirstDaughter": [
+                5.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.0232552201737319,
+                0.0115361253455634,
+                0.00892197399601498,
+                0.00755332205305637,
+                0.00723413078532509,
+                0.00716023926350383,
+                0.00714546095913958,
+                0.00713078318745808,
+                0.00711610541577658
+            ],
+            "expected": [
+                0.0302563162004425,
+                0.0120206928764185,
+                0.009220354998417,
+                0.00767858577576287,
+                0.00717491703518533,
+                0.00716023926350383,
+                0.00714546095913958,
+                0.00713078318745808,
+                0.00711610541577658
+            ]
+        }
+    }
+}

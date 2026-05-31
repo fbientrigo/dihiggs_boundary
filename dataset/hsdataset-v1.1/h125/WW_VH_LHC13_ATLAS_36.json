@@ -1,0 +1,44 @@
+{
+    "id": 190310052,
+    "reference": "1903.10052",
+    "source": "p. 16",
+    "citeKey": "ATLAS:2019vrd",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 36.1,
+    "referenceMass": 125,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 10,
+    "subMeasurements": {
+        "HW_WW": {
+            "obs": [
+                0.364877073952153,
+                0.67,
+                1.02749125863439
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "HW",
+                        "WW"
+                    ]
+                ]
+            }
+        },
+        "HZ_WW": {
+            "obs": [
+                0.289800079936064,
+                0.54,
+                0.883802268753422
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "HZ",
+                        "WW"
+                    ]
+                ]
+            }
+        }
+    }
+}

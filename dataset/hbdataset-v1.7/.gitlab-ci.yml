@@ -1,0 +1,7 @@
+test:validate:
+  image: python:alpine
+  stage: test
+  before_script:
+    - pip install jsonschema==4.9.1 # newer versions of jsonschema are buggy resulting in errors when running the validation script
+  script:
+    - python validateJsonFiles.py

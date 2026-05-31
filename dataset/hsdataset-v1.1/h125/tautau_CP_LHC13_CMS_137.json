@@ -1,0 +1,85 @@
+{
+    "id": 211004836,
+    "reference": "2110.04836",
+    "source": "Aux. Tab. 2, Aux. Fig. 30",
+    "citeKey": "CMS:2021sdq",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 137.0,
+    "referenceMass": 125.38,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 18.75,
+    "subMeasurements": {
+        "alphaCP": {
+            "coupling": "alphaCPTauYuk",
+            "obsCoupling": [
+                -0.3490658503988659,
+                -0.017453292519943295,
+                0.3141592653589793
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "tautau"
+                    ],
+                    [
+                        "vbfH",
+                        "tautau"
+                    ]
+                ]
+            }
+        },
+        "ggH": {
+            "obs": [
+                0.27,
+                0.59,
+                0.87
+            ],
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "tautau"
+                    ]
+                ]
+            }
+        },
+        "vbfH": {
+            "obs": [
+                0.92,
+                1.39,
+                1.95
+            ],
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "vbfH",
+                        "tautau"
+                    ]
+                ]
+            }
+        }
+    },
+    "correlations": {
+        "experimental": {
+            "alphaCP": {
+                "ggH": 0.029,
+                "vbfH": -0.026
+            },
+            "ggH": {
+                "vbfH": -0.763
+            }
+        }
+    }
+}

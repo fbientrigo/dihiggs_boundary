@@ -1,0 +1,57 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 170701404,
+    "reference": "1707.01404",
+    "source": "p. 17",
+    "citeKey": "ATLAS:2017tas",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 36.1,
+    "process": {
+        "channels": [
+            [
+                "brtHc",
+                "gamgam"
+            ],
+            [
+                "brtHu",
+                "gamgam"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "topDecayConsistency": [
+                "brtHu",
+                "brtHc"
+            ]
+        }
+    ],
+    "analysis": {
+        "massResolution": {
+            "absolute": 3,
+            "relative": 0
+        },
+        "acceptances": [
+            {
+                "constantAcceptance": 1
+            },
+            {
+                "constantAcceptance": 0.92
+            }
+        ],
+        "grid": {
+            "mass": [
+                125.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                5.09232515e-06
+            ],
+            "expected": [
+                3.7035092e-06
+            ]
+        }
+    }
+}

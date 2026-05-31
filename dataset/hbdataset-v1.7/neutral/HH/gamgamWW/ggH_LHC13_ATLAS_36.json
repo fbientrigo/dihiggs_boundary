@@ -1,0 +1,63 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 180708567,
+    "reference": "1807.08567",
+    "source": "https://doi.org/10.17182/hepdata.83967",
+    "citeKey": "ATLAS:2018hqk",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 36.1,
+    "process": {
+        "production": [
+            "ggH"
+        ],
+        "firstDecay": [
+            "gamgam"
+        ],
+        "secondDecay": [
+            "WW"
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 3.4,
+                "relative": 0
+            },
+            "secondDaughter": {
+                "absolute": 40,
+                "relative": 0
+            },
+            "mother": {
+                "absolute": 5,
+                "relative": 0.1
+            }
+        },
+        "grid": {
+            "massMother": [
+                260.0,
+                300.0,
+                400.0,
+                500.0
+            ],
+            "massFirstDaughter": [
+                125.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.0391,
+                0.0312,
+                0.009,
+                0.006
+            ],
+            "expected": [
+                0.0172,
+                0.014,
+                0.0063,
+                0.0043
+            ]
+        }
+    }
+}

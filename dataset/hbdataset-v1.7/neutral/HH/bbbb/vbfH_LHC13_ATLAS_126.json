@@ -1,0 +1,81 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 200105178,
+    "reference": "2001.05178",
+    "source": "https://doi.org/10.17182/hepdata.91237.v4/t4",
+    "citeKey": "ATLAS:2020jgy",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 126.0,
+    "process": {
+        "production": [
+            "vbfH"
+        ],
+        "firstDecay": [
+            "bb"
+        ],
+        "secondDecay": [
+            "bb"
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 23.2,
+                "relative": 0
+            },
+            "secondDaughter": {
+                "absolute": 36.2,
+                "relative": 0
+            },
+            "mother": {
+                "absolute": 15,
+                "relative": 0.15
+            }
+        },
+        "grid": {
+            "massMother": [
+                260.0,
+                280.0,
+                300.0,
+                400.0,
+                500.0,
+                600.0,
+                700.0,
+                800.0,
+                900.0,
+                1000.0
+            ],
+            "massFirstDaughter": [
+                125.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                3.12526379033711,
+                3.8047686456227,
+                2.59449913745272,
+                0.409250499092288,
+                0.14845361241583,
+                0.0894160754319284,
+                0.0378298780673543,
+                0.0398360079648656,
+                0.012323369370426,
+                0.0106038294582736
+            ],
+            "expected": [
+                3.48550740193306,
+                3.33418788966364,
+                2.21849307666205,
+                0.544807562166974,
+                0.140142502840426,
+                0.0598973069399777,
+                0.0338176182723319,
+                0.0243601487554933,
+                0.0183417590629597,
+                0.0149026792386547
+            ]
+        }
+    }
+}

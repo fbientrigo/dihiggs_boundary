@@ -1,0 +1,142 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 1509046701,
+    "reference": "1509.04670",
+    "source": "Tab. 6",
+    "citeKey": "ATLAS:2015sxd",
+    "collider": "LHC8",
+    "experiment": "ATLAS",
+    "luminosity": 20.3,
+    "process": {
+        "production": [
+            "H"
+        ],
+        "firstDecay": [
+            "bb",
+            "tautau",
+            "WW",
+            "gamgam"
+        ],
+        "secondDecay": [
+            "bb",
+            "tautau",
+            "WW",
+            "gamgam"
+        ]
+    },
+    "constraints": {
+        "firstDaughter": [
+            {
+                "modelLike": "SMHiggs",
+                "process": {
+                    "channels": [
+                        [
+                            "none",
+                            "bb"
+                        ],
+                        [
+                            "none",
+                            "tautau"
+                        ],
+                        [
+                            "none",
+                            "WW"
+                        ],
+                        [
+                            "none",
+                            "gamgam"
+                        ]
+                    ]
+                }
+            }
+        ],
+        "secondDaughter": [
+            {
+                "modelLike": "SMHiggs",
+                "process": {
+                    "channels": [
+                        [
+                            "none",
+                            "bb"
+                        ],
+                        [
+                            "none",
+                            "tautau"
+                        ],
+                        [
+                            "none",
+                            "WW"
+                        ],
+                        [
+                            "none",
+                            "gamgam"
+                        ]
+                    ]
+                }
+            }
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 10,
+                "relative": 0
+            },
+            "secondDaughter": {
+                "absolute": 10,
+                "relative": 0
+            },
+            "mother": {
+                "absolute": 10,
+                "relative": 0.05
+            }
+        },
+        "grid": {
+            "massMother": [
+                260.0,
+                300.0,
+                350.0,
+                400.0,
+                499.0,
+                500.0,
+                600.0,
+                700.0,
+                800.0,
+                900.0,
+                1000.0
+            ],
+            "massFirstDaughter": [
+                125.4
+            ]
+        },
+        "limit": {
+            "observed": [
+                1.56970780288632,
+                1.49495981227269,
+                1.12121985920452,
+                0.620408322093166,
+                0.45596274274317,
+                0.134546383104542,
+                0.0590509125847712,
+                0.0298991962454538,
+                0.0366265154006809,
+                0.0112121985920452,
+                0.00822227896749979
+            ],
+            "expected": [
+                0.822227896749979,
+                0.896975887363613,
+                0.665257116461346,
+                0.418588747436353,
+                0.284042364331811,
+                0.119596784981815,
+                0.0500811537111351,
+                0.0298991962454538,
+                0.0209294373718176,
+                0.0164445579349996,
+                0.0134546383104542
+            ]
+        }
+    }
+}

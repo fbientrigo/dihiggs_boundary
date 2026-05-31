@@ -1,0 +1,44 @@
+{
+    "limitClass": "PairProductionLimit",
+    "id": 1708041881,
+    "reference": "1708.04188",
+    "source": "p. 11",
+    "citeKey": "CMS:2017rpp",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 35.9,
+    "process": {
+        "firstDecay": [
+            "bb"
+        ],
+        "secondDecay": [
+            "WW"
+        ]
+    },
+    "analysis": {
+        "equalParticleMasses": true,
+        "massResolution": {
+            "firstParticle": {
+                "absolute": 30,
+                "relative": 0.0
+            },
+            "secondParticle": {
+                "absolute": 30,
+                "relative": 0.0
+            }
+        },
+        "grid": {
+            "massFirstParticle": [
+                125.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                1.52620493879918
+            ],
+            "expected": [
+                1.71698055614908
+            ]
+        }
+    }
+}

@@ -1,0 +1,121 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 1806073551,
+    "reference": "1806.07355",
+    "source": "Fig. 9 (bottom)",
+    "citeKey": "ATLAS:2018pvw",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 36.1,
+    "process": {
+        "production": [
+            "HZ",
+            "HW"
+        ],
+        "firstDecay": [
+            "bb"
+        ],
+        "secondDecay": [
+            "bb"
+        ]
+    },
+    "constraints": {
+        "mother": [
+            {
+                "modelLike": "SMHiggs",
+                "process": {
+                    "channels": [
+                        [
+                            "ggHZ",
+                            "none"
+                        ],
+                        [
+                            "qqHZ",
+                            "none"
+                        ],
+                        [
+                            "bbHZ",
+                            "none"
+                        ],
+                        [
+                            "HW",
+                            "none"
+                        ]
+                    ]
+                }
+            }
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 5,
+                "relative": 0.1
+            },
+            "secondDaughter": {
+                "absolute": 5,
+                "relative": 0.1
+            },
+            "mother": {
+                "absolute": 15,
+                "relative": 0
+            }
+        },
+        "grid": {
+            "massMother": [
+                125.0
+            ],
+            "massFirstDaughter": [
+                20.0,
+                23.0,
+                24.0,
+                26.0,
+                27.0,
+                28.0,
+                30.0,
+                32.0,
+                34.0,
+                36.0,
+                39.0,
+                40.0,
+                50.0,
+                60.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                2.998,
+                2.221,
+                2.029,
+                1.644,
+                1.499,
+                1.353,
+                1.148,
+                1.045,
+                1.051,
+                1.127,
+                1.239,
+                1.256,
+                1.273,
+                1.29
+            ],
+            "expected": [
+                2.181,
+                1.637,
+                1.456,
+                1.19,
+                1.056,
+                0.9649,
+                0.7822,
+                0.6794,
+                0.6509,
+                0.6623,
+                0.7009,
+                0.7137,
+                0.7423,
+                0.7423
+            ]
+        }
+    }
+}

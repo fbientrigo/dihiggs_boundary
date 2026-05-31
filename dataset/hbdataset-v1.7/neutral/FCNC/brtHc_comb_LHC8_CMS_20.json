@@ -1,0 +1,87 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 1610048572,
+    "reference": "1610.04857",
+    "source": "abstract",
+    "citeKey": "CMS:2016obj",
+    "collider": "LHC8",
+    "experiment": "CMS",
+    "luminosity": 19.7,
+    "process": {
+        "channels": [
+            [
+                "brtHc",
+                "WW"
+            ],
+            [
+                "brtHc",
+                "tautau"
+            ],
+            [
+                "brtHc",
+                "gamgam"
+            ],
+            [
+                "brtHc",
+                "bb"
+            ],
+            [
+                "brtHc",
+                "ZZ"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "modelLike": "SMHiggs",
+            "process": {
+                "channels": [
+                    [
+                        "none",
+                        "WW"
+                    ],
+                    [
+                        "none",
+                        "tautau"
+                    ],
+                    [
+                        "none",
+                        "gamgam"
+                    ],
+                    [
+                        "none",
+                        "bb"
+                    ],
+                    [
+                        "none",
+                        "ZZ"
+                    ]
+                ]
+            }
+        },
+        {
+            "topDecayConsistency": [
+                "brtHc"
+            ]
+        }
+    ],
+    "analysis": {
+        "massResolution": {
+            "absolute": 3,
+            "relative": 0
+        },
+        "grid": {
+            "mass": [
+                125.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.0035644783354
+            ],
+            "expected": [
+                0.003831814210555
+            ]
+        }
+    }
+}

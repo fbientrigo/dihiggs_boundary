@@ -1,0 +1,51 @@
+{
+    "id": 181108856,
+    "reference": "1811.08856",
+    "source": "p. 24",
+    "citeKey": "ATLAS:2018ynr",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 36.1,
+    "referenceMass": 125,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 10,
+    "subMeasurements": {
+        "H_tautau": {
+            "obs": [
+                1.45987805331433,
+                3.1,
+                4.98679622641132
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "tautau"
+                    ]
+                ]
+            }
+        },
+        "vbfH_tautau": {
+            "obs": [
+                0.152720779386421,
+                0.28,
+                0.422126704035519
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "vbfH",
+                        "tautau"
+                    ]
+                ]
+            }
+        }
+    },
+    "correlations": {
+        "experimental": {
+            "H_tautau": {
+                "vbfH_tautau": -0.52
+            }
+        }
+    }
+}

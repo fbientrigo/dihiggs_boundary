@@ -1,0 +1,54 @@
+{
+    "id": 191201662,
+    "reference": "1912.01662",
+    "source": "Fig. 7",
+    "citeKey": "CMS:2019hve",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 35.9,
+    "referenceMass": 125,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 10,
+    "subMeasurements": {
+        "ZH": {
+            "obs": [
+                12.0,
+                36.0,
+                60.0
+            ],
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "HZ",
+                        "cc"
+                    ]
+                ]
+            }
+        },
+        "WH": {
+            "obs": [
+                1.0,
+                37.0,
+                73.0
+            ],
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "HW",
+                        "cc"
+                    ]
+                ]
+            }
+        }
+    }
+}

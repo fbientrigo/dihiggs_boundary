@@ -1,0 +1,52 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 1911102672,
+    "reference": "1911.10267",
+    "source": "Fig. 9 (bottom)/ Tab. 6",
+    "citeKey": "CMS:2019pex",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 35.9,
+    "process": {
+        "channels": [
+            [
+                "ggH",
+                "etau"
+            ]
+        ]
+    },
+    "analysis": {
+        "massResolution": {
+            "absolute": 5,
+            "relative": 0.15
+        },
+        "grid": {
+            "mass": [
+                200.0,
+                300.0,
+                450.0,
+                600.0,
+                750.0,
+                900.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.0941,
+                0.046,
+                0.0052,
+                0.0058,
+                0.0023,
+                0.0023
+            ],
+            "expected": [
+                0.0916,
+                0.0302,
+                0.0078,
+                0.0059,
+                0.003,
+                0.0023
+            ]
+        }
+    }
+}

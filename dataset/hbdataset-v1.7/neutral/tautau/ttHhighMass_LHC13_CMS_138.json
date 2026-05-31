@@ -1,0 +1,54 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 2402110982,
+    "reference": "2402.11098",
+    "source": "https://doi.org/10.17182/hepdata.132367.v2/t62",
+    "citeKey": "CMS:2024ulc",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 138.0,
+    "process": {
+        "channels": [
+            [
+                "Htt",
+                "tautau"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "CPValue": "even"
+        }
+    ],
+    "analysis": {
+        "massResolution": {
+            "absolute": 5,
+            "relative": 0.15
+        },
+        "grid": {
+            "mass": [
+                150.0,
+                200.0,
+                250.0,
+                300.0,
+                350.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.019525,
+                0.0096145,
+                0.0071556,
+                0.0056116,
+                0.0044375
+            ],
+            "expected": [
+                0.032521,
+                0.016828,
+                0.011801,
+                0.0090387,
+                0.0070696
+            ]
+        }
+    }
+}

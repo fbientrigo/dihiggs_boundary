@@ -1,0 +1,90 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 170702909,
+    "reference": "1707.02909",
+    "source": "Fig. 5 (upper)",
+    "citeKey": "CMS:2017hea",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 35.9,
+    "process": {
+        "production": [
+            "H"
+        ],
+        "firstDecay": [
+            "bb"
+        ],
+        "secondDecay": [
+            "tautau"
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 35,
+                "relative": 0
+            },
+            "secondDaughter": {
+                "absolute": 45,
+                "relative": 0
+            },
+            "mother": {
+                "absolute": 15,
+                "relative": 0.15
+            }
+        },
+        "grid": {
+            "massMother": [
+                250.0,
+                270.0,
+                280.0,
+                300.0,
+                350.0,
+                400.0,
+                450.0,
+                500.0,
+                550.0,
+                600.0,
+                650.0,
+                750.0,
+                900.0
+            ],
+            "massFirstDaughter": [
+                125.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.228588643088,
+                0.541352628469,
+                0.440405834007,
+                0.324770280932,
+                0.164261640503,
+                0.0859558777615,
+                0.0314585814841,
+                0.0221488182401,
+                0.0308112746482,
+                0.0314352544548,
+                0.0203815118284,
+                0.00948426221283,
+                0.00521011241072
+            ],
+            "expected": [
+                0.160645,
+                0.356445,
+                0.30957,
+                0.334961,
+                0.229492,
+                0.105957,
+                0.0600586,
+                0.0415039,
+                0.0288086,
+                0.0200195,
+                0.0141602,
+                0.0102539,
+                0.00634766
+            ]
+        }
+    }
+}

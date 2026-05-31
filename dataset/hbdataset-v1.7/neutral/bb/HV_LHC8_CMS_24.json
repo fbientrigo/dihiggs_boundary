@@ -1,0 +1,66 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 13103687,
+    "reference": "1310.3687",
+    "source": "Fig. 6 (left)",
+    "citeKey": "CMS:2013poe",
+    "collider": "LHC8",
+    "experiment": "CMS",
+    "luminosity": 24.0,
+    "process": {
+        "channels": [
+            [
+                "HZ",
+                "bb"
+            ],
+            [
+                "HW",
+                "bb"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "modelLike": "SMHiggsInterp",
+            "process": "signal"
+        }
+    ],
+    "normalization": {
+        "reference": "SMHiggsInterp",
+        "process": "signal"
+    },
+    "analysis": {
+        "massResolution": {
+            "absolute": 5,
+            "relative": 0.1
+        },
+        "grid": {
+            "mass": [
+                110.0,
+                115.0,
+                120.0,
+                125.0,
+                130.0,
+                135.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                1.12622158,
+                1.08853571,
+                1.74005433,
+                1.89213761,
+                2.29665519,
+                3.07332491
+            ],
+            "expected": [
+                0.734513274,
+                0.791342766,
+                0.911625467,
+                0.950063211,
+                1.24681927,
+                1.52465234
+            ]
+        }
+    }
+}

@@ -1,0 +1,53 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 150601010,
+    "reference": "1506.01010",
+    "source": "Fig. 11",
+    "citeKey": "CMS:2015ebl",
+    "collider": "LHC8",
+    "experiment": "CMS",
+    "luminosity": 19.8,
+    "process": {
+        "channels": [
+            [
+                "vbfH",
+                "bb"
+            ]
+        ]
+    },
+    "normalization": {
+        "reference": "SMHiggsInterp",
+        "process": "signal"
+    },
+    "analysis": {
+        "massResolution": {
+            "absolute": 5,
+            "relative": 0.1
+        },
+        "grid": {
+            "mass": [
+                115.0,
+                120.0,
+                125.0,
+                130.0,
+                135.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                5.06,
+                5.33,
+                5.53,
+                5.08,
+                5.88
+            ],
+            "expected": [
+                2.19,
+                2.28,
+                2.58,
+                2.83,
+                3.75
+            ]
+        }
+    }
+}

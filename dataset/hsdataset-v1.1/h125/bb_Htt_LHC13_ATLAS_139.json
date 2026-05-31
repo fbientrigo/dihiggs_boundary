@@ -1,0 +1,34 @@
+{
+    "id": 211106712,
+    "reference": "2111.06712",
+    "source": "p. 20 (combined result)",
+    "citeKey": "ATLAS:2021qou",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 139.0,
+    "referenceMass": 125,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 10,
+    "subMeasurements": {
+        "Htt_bb": {
+            "obs": [
+                0.0154771154326265,
+                0.35448,
+                0.713974194869681
+            ],
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "Htt",
+                        "bb"
+                    ]
+                ]
+            }
+        }
+    }
+}

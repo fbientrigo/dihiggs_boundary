@@ -1,0 +1,70 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 151103610,
+    "reference": "1511.03610",
+    "source": "https://doi.org/10.17182/hepdata.73991",
+    "citeKey": "CMS:2015qnd",
+    "collider": "LHC8",
+    "experiment": "CMS",
+    "luminosity": 19.7,
+    "process": {
+        "channels": [
+            [
+                "bbH",
+                "tautau"
+            ]
+        ]
+    },
+    "analysis": {
+        "massResolution": {
+            "absolute": 5,
+            "relative": 0.15
+        },
+        "grid": {
+            "mass": [
+                25.0,
+                30.0,
+                35.0,
+                40.0,
+                45.0,
+                50.0,
+                55.0,
+                60.0,
+                65.0,
+                70.0,
+                75.0,
+                80.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                35.8,
+                38.7,
+                37.4,
+                31.3,
+                20.3,
+                13.2,
+                10.5,
+                10.6,
+                8.3,
+                7.1,
+                7.9,
+                8.0
+            ],
+            "expected": [
+                41.3,
+                29.1,
+                24.3,
+                20.6,
+                16.8,
+                13.7,
+                13.3,
+                12.0,
+                11.2,
+                10.2,
+                10.5,
+                10.9
+            ]
+        }
+    }
+}

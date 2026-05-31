@@ -1,0 +1,584 @@
+{
+    "id": 210306956,
+    "reference": "2103.06956",
+    "source": "https://doi.org/10.17182/hepdata.102459.v2/t4, https://doi.org/10.17182/hepdata.102459.v2/t5, http://dgillber.web.cern.ch/dgillber/ggF_uncertainty_2017/corr2017.pdf",
+    "citeKey": "CMS:2021kom",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 137.0,
+    "referenceMass": 125.38,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 2.5,
+    "subMeasurements": {
+        "ggH_0J_low_pTH": {
+            "ref": [
+                0.011033,
+                0.015211,
+                0.019346
+            ],
+            "obs": [
+                0.005416,
+                0.009409,
+                0.013332
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "ggH_0J_high_pTH": {
+            "ref": [
+                0.039637,
+                0.044251,
+                0.049092
+            ],
+            "obs": [
+                0.051328,
+                0.058498,
+                0.066595
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "ggH_1J_low_pTH": {
+            "ref": [
+                0.013931,
+                0.016202,
+                0.018454
+            ],
+            "obs": [
+                0.007899,
+                0.013387,
+                0.018965
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "ggH_1J_med_pTH": {
+            "ref": [
+                0.009677,
+                0.011229,
+                0.012789
+            ],
+            "obs": [
+                0.010693,
+                0.013658,
+                0.016572
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "ggH_1J_high_pTH": {
+            "ref": [
+                0.001645,
+                0.002003,
+                0.002361
+            ],
+            "obs": [
+                0.001688,
+                0.002562,
+                0.003465
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "ggH_2J_low_pTH": {
+            "ref": [
+                0.002141,
+                0.002819,
+                0.003497
+            ],
+            "obs": [
+                7.69999999999998e-05,
+                0.003622,
+                0.00727
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "ggH_2J_med_pTH": {
+            "ref": [
+                0.003461,
+                0.004535,
+                0.00561
+            ],
+            "obs": [
+                0.0,
+                7.8e-05,
+                0.00285
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "ggH_2J_high_pTH": {
+            "ref": [
+                0.001621,
+                0.002119,
+                0.002605
+            ],
+            "obs": [
+                0.0,
+                0.000817,
+                0.001738
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "ggH_VBF_like": {
+            "ref": [
+                0.001701,
+                0.002217,
+                0.002734
+            ],
+            "obs": [
+                0.003262,
+                0.005856,
+                0.008302
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "ggH_BSM": {
+            "ref": [
+                0.001075,
+                0.001429,
+                0.001791
+            ],
+            "obs": [
+                0.00087,
+                0.001344,
+                0.00184
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "qqH_VBF_like": {
+            "ref": [
+                0.002365,
+                0.002957,
+                0.003549
+            ],
+            "obs": [
+                0.0,
+                0.000489,
+                0.001933
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "vbfH",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "qqH_VH_like": {
+            "ref": [
+                0.001177,
+                0.00122,
+                0.001268
+            ],
+            "obs": [
+                0.000333,
+                0.001569,
+                0.00277
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "HZ",
+                        "gamgam"
+                    ],
+                    [
+                        "HW",
+                        "gamgam"
+                    ]
+                ]
+            },
+            "channelWeights": [
+                0.69911,
+                0.6741
+            ]
+        },
+        "qqH_BSM": {
+            "ref": [
+                0.000345,
+                0.000369,
+                0.000398
+            ],
+            "obs": [
+                0.000304,
+                0.000523,
+                0.000764
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "vbfH",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "WH_lep": {
+            "ref": [
+                0.000856,
+                0.000883,
+                0.00091
+            ],
+            "obs": [
+                0.000754,
+                0.001189,
+                0.001675
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "HW",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "ZH_lep": {
+            "ref": [
+                0.000518,
+                0.000539,
+                0.000564
+            ],
+            "obs": [
+                0.000359,
+                0.000712,
+                0.001122
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "HZ",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "ttH": {
+            "ref": [
+                0.001018,
+                0.001132,
+                0.001213
+            ],
+            "obs": [
+                0.000742,
+                0.001133,
+                0.001555
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "Htt",
+                        "gamgam"
+                    ]
+                ]
+            }
+        },
+        "tH": {
+            "ref": [
+                0.000177,
+                0.000204,
+                0.000218
+            ],
+            "obs": [
+                0.000585,
+                0.001273,
+                0.002033
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "Ht",
+                        "gamgam"
+                    ],
+                    [
+                        "HtW",
+                        "gamgam"
+                    ]
+                ]
+            }
+        }
+    },
+    "correlations": {
+        "experimental": {
+            "ggH_0J_low_pTH": {
+                "ggH_0J_high_pTH": -0.037,
+                "ggH_1J_low_pTH": 0.005,
+                "ggH_1J_med_pTH": 0.012,
+                "ggH_1J_high_pTH": 0.007,
+                "ggH_2J_low_pTH": -0.022,
+                "ggH_2J_med_pTH": 0.001,
+                "ggH_VBF_like": 0.007,
+                "ggH_BSM": 0.007,
+                "qqH_VBF_like": -0.001,
+                "qqH_VH_like": 0.004,
+                "qqH_BSM": 0.002,
+                "WH_lep": 0.005,
+                "ZH_lep": 0.003,
+                "ttH": 0.005,
+                "tH": 0.002
+            },
+            "ggH_0J_high_pTH": {
+                "ggH_1J_low_pTH": -0.336,
+                "ggH_1J_med_pTH": -0.001,
+                "ggH_1J_high_pTH": 0.027,
+                "ggH_2J_low_pTH": -0.011,
+                "ggH_2J_med_pTH": -0.004,
+                "ggH_2J_high_pTH": -0.003,
+                "ggH_VBF_like": 0.017,
+                "ggH_BSM": 0.021,
+                "qqH_VBF_like": -0.004,
+                "qqH_VH_like": 0.01,
+                "qqH_BSM": 0.005,
+                "WH_lep": 0.011,
+                "ZH_lep": 0.009,
+                "ttH": 0.003,
+                "tH": 0.011
+            },
+            "ggH_1J_low_pTH": {
+                "ggH_1J_med_pTH": -0.008,
+                "ggH_1J_high_pTH": 0.003,
+                "ggH_2J_low_pTH": -0.339,
+                "ggH_2J_med_pTH": 0.015,
+                "ggH_VBF_like": 0.009,
+                "ggH_BSM": 0.002,
+                "qqH_VBF_like": -0.003,
+                "qqH_VH_like": 0.019,
+                "qqH_BSM": 0.005,
+                "WH_lep": -0.007,
+                "ttH": 0.009,
+                "tH": 0.011
+            },
+            "ggH_1J_med_pTH": {
+                "ggH_1J_high_pTH": 0.01,
+                "ggH_2J_low_pTH": 0.017,
+                "ggH_2J_med_pTH": -0.391,
+                "ggH_2J_high_pTH": 0.021,
+                "ggH_VBF_like": -0.03,
+                "ggH_BSM": 0.016,
+                "qqH_VBF_like": -0.016,
+                "qqH_VH_like": 0.048,
+                "qqH_BSM": 0.001,
+                "WH_lep": -0.011,
+                "ZH_lep": 0.001,
+                "ttH": -0.001,
+                "tH": 0.017
+            },
+            "ggH_1J_high_pTH": {
+                "ggH_2J_low_pTH": 0.001,
+                "ggH_2J_med_pTH": 0.009,
+                "ggH_2J_high_pTH": -0.254,
+                "ggH_VBF_like": -0.027,
+                "ggH_BSM": 0.009,
+                "qqH_VBF_like": -0.036,
+                "qqH_VH_like": 0.045,
+                "qqH_BSM": 0.003,
+                "WH_lep": 0.003,
+                "ZH_lep": 0.002,
+                "ttH": -0.003,
+                "tH": 0.015
+            },
+            "ggH_2J_low_pTH": {
+                "ggH_2J_high_pTH": 0.027,
+                "ggH_VBF_like": -0.058,
+                "ggH_BSM": 0.022,
+                "qqH_VBF_like": 0.042,
+                "qqH_VH_like": -0.088,
+                "ZH_lep": 0.002,
+                "ttH": 0.009,
+                "tH": -0.013
+            },
+            "ggH_2J_med_pTH": {
+                "ggH_2J_high_pTH": -0.005,
+                "ggH_VBF_like": -0.069,
+                "ggH_BSM": 0.029,
+                "qqH_VBF_like": 0.052,
+                "qqH_VH_like": -0.185,
+                "qqH_BSM": -0.002,
+                "WH_lep": 0.002,
+                "ZH_lep": 0.001,
+                "ttH": 0.011,
+                "tH": -0.026
+            },
+            "ggH_2J_high_pTH": {
+                "ggH_VBF_like": -0.108,
+                "ggH_BSM": 0.025,
+                "qqH_VBF_like": 0.065,
+                "qqH_VH_like": -0.308,
+                "qqH_BSM": 0.001,
+                "WH_lep": 0.003,
+                "ZH_lep": 0.001,
+                "ttH": 0.016,
+                "tH": -0.048
+            },
+            "ggH_VBF_like": {
+                "ggH_BSM": -0.04,
+                "qqH_VBF_like": -0.759,
+                "qqH_VH_like": 0.051,
+                "qqH_BSM": -0.004,
+                "WH_lep": 0.007,
+                "ttH": 0.024,
+                "tH": -0.033
+            },
+            "ggH_BSM": {
+                "qqH_VBF_like": 0.025,
+                "qqH_VH_like": -0.183,
+                "qqH_BSM": -0.316,
+                "WH_lep": 0.027,
+                "ZH_lep": 0.007,
+                "ttH": 0.055,
+                "tH": -0.126
+            },
+            "qqH_VBF_like": {
+                "qqH_VH_like": -0.027,
+                "qqH_BSM": 0.002,
+                "WH_lep": -0.007,
+                "ZH_lep": -0.002,
+                "ttH": -0.003,
+                "tH": 0.024
+            },
+            "qqH_VH_like": {
+                "qqH_BSM": 0.046,
+                "WH_lep": 0.017,
+                "ZH_lep": 0.003,
+                "ttH": 0.045,
+                "tH": -0.079
+            },
+            "qqH_BSM": {
+                "WH_lep": -0.001,
+                "ZH_lep": -0.002,
+                "ttH": 0.006,
+                "tH": 0.01
+            },
+            "WH_lep": {
+                "ZH_lep": -0.162,
+                "ttH": 0.088,
+                "tH": -0.18
+            },
+            "ZH_lep": {
+                "ttH": 0.012,
+                "tH": -0.028
+            },
+            "ttH": {
+                "tH": -0.594
+            }
+        },
+        "theoretical": {
+            "ggH_0J_low_pTH": {
+                "ggH_0J_high_pTH": 1.0,
+                "ggH_1J_low_pTH": -0.16,
+                "ggH_1J_med_pTH": -0.16,
+                "ggH_1J_high_pTH": -0.12,
+                "ggH_2J_low_pTH": 0.12,
+                "ggH_2J_med_pTH": 0.13,
+                "ggH_2J_high_pTH": 0.11,
+                "ggH_BSM": 0.06
+            },
+            "ggH_0J_high_pTH": {
+                "ggH_1J_low_pTH": -0.16,
+                "ggH_1J_med_pTH": -0.16,
+                "ggH_1J_high_pTH": -0.12,
+                "ggH_2J_low_pTH": 0.12,
+                "ggH_2J_med_pTH": 0.13,
+                "ggH_2J_high_pTH": 0.11,
+                "ggH_BSM": 0.06
+            },
+            "ggH_1J_low_pTH": {
+                "ggH_1J_med_pTH": 0.74,
+                "ggH_1J_high_pTH": 0.36,
+                "ggH_2J_low_pTH": 0.09,
+                "ggH_2J_high_pTH": -0.15,
+                "ggH_BSM": -0.09
+            },
+            "ggH_1J_med_pTH": {
+                "ggH_1J_high_pTH": 0.77,
+                "ggH_2J_low_pTH": -0.09,
+                "ggH_2J_med_pTH": -0.01,
+                "ggH_2J_high_pTH": 0.06,
+                "ggH_BSM": 0.21
+            },
+            "ggH_1J_high_pTH": {
+                "ggH_2J_low_pTH": -0.17,
+                "ggH_2J_med_pTH": -0.01,
+                "ggH_2J_high_pTH": 0.35,
+                "ggH_BSM": 0.57
+            },
+            "ggH_2J_low_pTH": {
+                "ggH_2J_med_pTH": 0.97,
+                "ggH_2J_high_pTH": 0.75,
+                "ggH_BSM": 0.47
+            },
+            "ggH_2J_med_pTH": {
+                "ggH_2J_high_pTH": 0.87,
+                "ggH_BSM": 0.61
+            },
+            "ggH_2J_high_pTH": {
+                "ggH_BSM": 0.87
+            }
+        }
+    }
+}

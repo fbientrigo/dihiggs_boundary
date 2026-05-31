@@ -1,0 +1,65 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 200508900,
+    "reference": "2005.08900",
+    "source": "https://doi.org/10.17182/hepdata.94261.v1/t3",
+    "citeKey": "CMS:2020osd",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 35.9,
+    "process": {
+        "channels": [
+            [
+                "brtHpb",
+                "cs"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "topDecayConsistency": [
+                "brtHpb"
+            ]
+        }
+    ],
+    "analysis": {
+        "massResolution": {
+            "absolute": 5,
+            "relative": 0.15
+        },
+        "grid": {
+            "mass": [
+                80.0,
+                90.0,
+                100.0,
+                120.0,
+                140.0,
+                150.0,
+                155.0,
+                160.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.0168,
+                0.006,
+                0.0025,
+                0.0025,
+                0.0028,
+                0.0026,
+                0.0028,
+                0.0029
+            ],
+            "expected": [
+                0.0239,
+                0.0099,
+                0.0051,
+                0.0035,
+                0.0031,
+                0.0029,
+                0.0029,
+                0.0032
+            ]
+        }
+    }
+}

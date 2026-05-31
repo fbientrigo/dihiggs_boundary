@@ -1,0 +1,96 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 180706325,
+    "reference": "1807.06325",
+    "source": "https://doi.org/10.17182/hepdata.88058.v1/t1",
+    "citeKey": "CMS:2018nak",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 60.7,
+    "process": {
+        "channels": [
+            [
+                "H",
+                "mumu"
+            ],
+            [
+                "vbfH",
+                "mumu"
+            ],
+            [
+                "HZ",
+                "mumu"
+            ],
+            [
+                "HW",
+                "mumu"
+            ],
+            [
+                "Htt",
+                "mumu"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "modelLike": "SMHiggsInterp",
+            "process": "signal"
+        }
+    ],
+    "normalization": {
+        "reference": "SMHiggsInterp",
+        "process": "signal"
+    },
+    "analysis": {
+        "massResolution": {
+            "absolute": 0.1,
+            "relative": 0.03
+        },
+        "grid": {
+            "mass": [
+                120.0,
+                121.0,
+                122.0,
+                123.0,
+                124.0,
+                125.0,
+                125.09,
+                126.0,
+                127.0,
+                128.0,
+                129.0,
+                130.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                1.5,
+                1.26,
+                1.43,
+                2.08,
+                2.81,
+                2.93,
+                2.92,
+                2.63,
+                2.3,
+                2.0,
+                1.73,
+                1.5
+            ],
+            "expected": [
+                2.07,
+                2.07,
+                2.07,
+                2.08,
+                2.11,
+                2.16,
+                2.16,
+                2.21,
+                2.23,
+                2.29,
+                2.34,
+                2.33
+            ]
+        }
+    }
+}

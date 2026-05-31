@@ -1,0 +1,64 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 190310228,
+    "reference": "1903.10228",
+    "source": "https://doi.org/10.17182/hepdata.88348.v1/t4",
+    "citeKey": "CMS:2019hvr",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 35.9,
+    "process": {
+        "channels": [
+            [
+                "bbH",
+                "tautau"
+            ]
+        ]
+    },
+    "analysis": {
+        "massResolution": {
+            "absolute": 5,
+            "relative": 0.15
+        },
+        "grid": {
+            "mass": [
+                25.0,
+                30.0,
+                35.0,
+                40.0,
+                45.0,
+                50.0,
+                55.0,
+                60.0,
+                65.0,
+                70.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                245.8,
+                133.1,
+                151.1,
+                108.5,
+                68.83,
+                57.61,
+                58.16,
+                49.73,
+                49.63,
+                44.34
+            ],
+            "expected": [
+                175.0,
+                95.0,
+                91.25,
+                69.69,
+                54.69,
+                55.47,
+                42.03,
+                39.38,
+                33.59,
+                33.91
+            ]
+        }
+    }
+}

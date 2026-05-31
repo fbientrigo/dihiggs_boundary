@@ -1,0 +1,50 @@
+{
+    "id": 200707830,
+    "reference": "2007.07830",
+    "source": "Fig. 2 (combined result)",
+    "citeKey": "ATLAS:2020fzp",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 139.0,
+    "referenceMass": 125,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 3,
+    "subMeasurements": {
+        "mumu": {
+            "obs": [
+                0.6,
+                1.2,
+                1.8
+            ],
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "mumu"
+                    ],
+                    [
+                        "vbfH",
+                        "mumu"
+                    ],
+                    [
+                        "HZ",
+                        "mumu"
+                    ],
+                    [
+                        "HW",
+                        "mumu"
+                    ],
+                    [
+                        "Htt",
+                        "mumu"
+                    ]
+                ]
+            }
+        }
+    }
+}

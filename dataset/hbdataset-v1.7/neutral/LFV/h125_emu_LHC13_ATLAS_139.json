@@ -1,0 +1,97 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 1909102352,
+    "reference": "1909.10235",
+    "source": "p. 7",
+    "citeKey": "ATLAS:2019old",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 139.0,
+    "process": {
+        "channels": [
+            [
+                "ggH",
+                "emu"
+            ],
+            [
+                "vbfH",
+                "emu"
+            ],
+            [
+                "HZ",
+                "emu"
+            ],
+            [
+                "HW",
+                "emu"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "modelLike": "SMHiggsInterp",
+            "process": {
+                "channels": [
+                    [
+                        "ggH",
+                        "none"
+                    ],
+                    [
+                        "vbfH",
+                        "none"
+                    ],
+                    [
+                        "HZ",
+                        "none"
+                    ],
+                    [
+                        "HW",
+                        "none"
+                    ]
+                ]
+            }
+        }
+    ],
+    "normalization": {
+        "reference": "SMHiggsInterp",
+        "process": {
+            "channels": [
+                [
+                    "ggH",
+                    "none"
+                ],
+                [
+                    "vbfH",
+                    "none"
+                ],
+                [
+                    "HZ",
+                    "none"
+                ],
+                [
+                    "HW",
+                    "none"
+                ]
+            ]
+        }
+    },
+    "analysis": {
+        "massResolution": {
+            "relative": 0,
+            "absolute": 6
+        },
+        "grid": {
+            "mass": [
+                125.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                6.2e-05
+            ],
+            "expected": [
+                5.9e-05
+            ]
+        }
+    }
+}

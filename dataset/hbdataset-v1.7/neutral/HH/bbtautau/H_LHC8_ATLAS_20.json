@@ -1,0 +1,81 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 1509046702,
+    "reference": "1509.04670",
+    "source": "Tab. 6",
+    "citeKey": "ATLAS:2015sxd",
+    "collider": "LHC8",
+    "experiment": "ATLAS",
+    "luminosity": 20.3,
+    "process": {
+        "production": [
+            "H"
+        ],
+        "firstDecay": [
+            "bb"
+        ],
+        "secondDecay": [
+            "tautau"
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 30,
+                "relative": 0
+            },
+            "secondDaughter": {
+                "absolute": 20,
+                "relative": 0
+            },
+            "mother": {
+                "absolute": 30,
+                "relative": 0.05
+            }
+        },
+        "grid": {
+            "massMother": [
+                260.0,
+                300.0,
+                350.0,
+                400.0,
+                500.0,
+                600.0,
+                700.0,
+                800.0,
+                900.0,
+                1000.0
+            ],
+            "massFirstDaughter": [
+                125.4
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.154210785853062,
+                0.0624186514167155,
+                0.102807190568708,
+                0.0550752806618078,
+                0.0367168537745385,
+                0.0290063144818854,
+                0.0223972808024685,
+                0.0187255954250146,
+                0.0176240898117785,
+                0.0168897527362877
+            ],
+            "expected": [
+                0.0954638198138001,
+                0.113822246701069,
+                0.0807770783039847,
+                0.0356153481613024,
+                0.0242331234911954,
+                0.0176240898117785,
+                0.0113822246701069,
+                0.0113822246701069,
+                0.0110150561323616,
+                0.0102807190568708
+            ]
+        }
+    }
+}

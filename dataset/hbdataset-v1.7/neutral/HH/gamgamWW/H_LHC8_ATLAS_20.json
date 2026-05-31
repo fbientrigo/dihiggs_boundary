@@ -1,0 +1,66 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 1509046703,
+    "reference": "1509.04670",
+    "source": "Tab. 6",
+    "citeKey": "ATLAS:2015sxd",
+    "collider": "LHC8",
+    "experiment": "ATLAS",
+    "luminosity": 20.3,
+    "process": {
+        "production": [
+            "H"
+        ],
+        "firstDecay": [
+            "WW"
+        ],
+        "secondDecay": [
+            "gamgam"
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 50,
+                "relative": 0
+            },
+            "secondDaughter": {
+                "absolute": 1.7,
+                "relative": 0
+            },
+            "mother": {
+                "absolute": 25,
+                "relative": 0.1
+            }
+        },
+        "grid": {
+            "massMother": [
+                260.0,
+                300.0,
+                350.0,
+                400.0,
+                500.0
+            ],
+            "massFirstDaughter": [
+                125.4
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.00931414671997212,
+                0.00752104895569941,
+                0.00662450007356306,
+                0.0057279511914267,
+                0.00542910156404792
+            ],
+            "expected": [
+                0.00557852637773731,
+                0.00463216922437116,
+                0.0038850451559242,
+                0.00343677071485602,
+                0.00293868800255805
+            ]
+        }
+    }
+}

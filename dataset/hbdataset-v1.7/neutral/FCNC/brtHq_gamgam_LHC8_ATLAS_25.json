@@ -1,0 +1,49 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 14036293,
+    "reference": "1403.6293",
+    "source": "p. 17",
+    "citeKey": "ATLAS:2014lfm",
+    "collider": "LHC8",
+    "experiment": "ATLAS",
+    "luminosity": 25.0,
+    "process": {
+        "channels": [
+            [
+                "brtHu",
+                "gamgam"
+            ],
+            [
+                "brtHc",
+                "gamgam"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "topDecayConsistency": [
+                "brtHu",
+                "brtHc"
+            ]
+        }
+    ],
+    "analysis": {
+        "massResolution": {
+            "absolute": 3,
+            "relative": 0
+        },
+        "grid": {
+            "mass": [
+                125.5
+            ]
+        },
+        "limit": {
+            "observed": [
+                1.82745461455295e-05
+            ],
+            "expected": [
+                1.17974918154684e-05
+            ]
+        }
+    }
+}

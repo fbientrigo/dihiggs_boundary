@@ -1,0 +1,99 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 1701020321,
+    "reference": "1701.02032",
+    "source": "Fig. 4",
+    "citeKey": "CMS:2017dmg",
+    "collider": "LHC8",
+    "experiment": "CMS",
+    "luminosity": 19.7,
+    "process": {
+        "production": [
+            "H",
+            "vbfH",
+            "HW",
+            "HZ"
+        ],
+        "firstDecay": [
+            "tautau"
+        ],
+        "secondDecay": [
+            "tautau"
+        ]
+    },
+    "constraints": {
+        "mother": [
+            {
+                "modelLike": "SMHiggs",
+                "process": {
+                    "channels": [
+                        [
+                            "H",
+                            "none"
+                        ],
+                        [
+                            "vbfH",
+                            "none"
+                        ],
+                        [
+                            "HW",
+                            "none"
+                        ],
+                        [
+                            "HZ",
+                            "none"
+                        ]
+                    ]
+                }
+            }
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 5,
+                "relative": 0.15
+            },
+            "secondDaughter": {
+                "absolute": 5,
+                "relative": 0.15
+            },
+            "mother": {
+                "absolute": 20,
+                "relative": 0
+            }
+        },
+        "grid": {
+            "massMother": [
+                125.0
+            ],
+            "massFirstDaughter": [
+                5.0,
+                7.0,
+                9.0,
+                11.0,
+                13.0,
+                15.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                546.892216223707,
+                10.1669590196907,
+                4.76245045434931,
+                3.37651919211066,
+                3.58846070447699,
+                5.269447797657
+            ],
+            "expected": [
+                460.453324905675,
+                8.47558263668884,
+                3.88975010931148,
+                2.84250969526608,
+                2.81341968376482,
+                4.21805166768285
+            ]
+        }
+    }
+}

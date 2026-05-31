@@ -1,0 +1,55 @@
+{
+    "limitClass": "PairProductionLimit",
+    "id": 2101119611,
+    "reference": "2101.11961",
+    "source": "https://www.hepdata.net/record/ins1688938",
+    "citeKey": "ATLAS:2021jol",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 139.0,
+    "process": {
+        "firstDecay": [
+            "WWsamesign"
+        ],
+        "secondDecay": [
+            "WZ"
+        ]
+    },
+    "analysis": {
+        "equalParticleMasses": true,
+        "grid": {
+            "massFirstParticle": [
+                200.0,
+                220.0,
+                300.0,
+                400.0,
+                450.0,
+                500.0,
+                550.0,
+                600.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                39.594,
+                33.232,
+                27.063,
+                19.383,
+                16.299,
+                15.087,
+                13.508,
+                12.823
+            ],
+            "expected": [
+                43.922,
+                36.747,
+                23.846,
+                17.626,
+                15.022,
+                11.962,
+                10.587,
+                10.219
+            ]
+        }
+    }
+}

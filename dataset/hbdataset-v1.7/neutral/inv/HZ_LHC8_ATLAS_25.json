@@ -1,0 +1,58 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 14023244,
+    "reference": "1402.3244",
+    "source": "Fig. 3",
+    "citeKey": "ATLAS:2014hzd",
+    "collider": "LHC8",
+    "experiment": "ATLAS",
+    "luminosity": 24.8,
+    "process": {
+        "channels": [
+            [
+                "HZ",
+                "inv"
+            ]
+        ]
+    },
+    "analysis": {
+        "massResolution": {
+            "absolute": 5,
+            "relative": 0.25
+        },
+        "grid": {
+            "mass": [
+                110.0,
+                125.2,
+                125.5,
+                155.9,
+                166.4,
+                208.3,
+                332.1,
+                400.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.4141,
+                0.2954,
+                0.2941,
+                0.1702,
+                0.1435,
+                0.08575,
+                0.03025,
+                0.0264
+            ],
+            "expected": [
+                0.3129,
+                0.2452,
+                0.2436,
+                0.167,
+                0.1494,
+                0.1017,
+                0.04437,
+                0.03905
+            ]
+        }
+    }
+}

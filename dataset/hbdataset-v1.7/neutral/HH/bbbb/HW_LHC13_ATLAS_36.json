@@ -1,0 +1,102 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 1806073552,
+    "reference": "1806.07355",
+    "source": "Fig. 9 (top-left)",
+    "citeKey": "ATLAS:2018pvw",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 36.1,
+    "process": {
+        "production": [
+            "HW"
+        ],
+        "firstDecay": [
+            "bb"
+        ],
+        "secondDecay": [
+            "bb"
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 5,
+                "relative": 0.1
+            },
+            "secondDaughter": {
+                "absolute": 5,
+                "relative": 0.1
+            },
+            "mother": {
+                "absolute": 15,
+                "relative": 0
+            }
+        },
+        "grid": {
+            "massMother": [
+                125.0
+            ],
+            "massFirstDaughter": [
+                20.0,
+                22.5,
+                25.0,
+                27.5,
+                30.0,
+                32.5,
+                35.0,
+                37.5,
+                40.0,
+                42.5,
+                45.0,
+                47.5,
+                50.0,
+                52.5,
+                55.0,
+                57.5,
+                60.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                2.87,
+                2.27,
+                1.8,
+                1.45,
+                1.23,
+                1.2,
+                1.33,
+                1.51,
+                1.61,
+                1.61,
+                1.57,
+                1.53,
+                1.5,
+                1.5,
+                1.51,
+                1.52,
+                1.55
+            ],
+            "expected": [
+                2.4,
+                1.93,
+                1.54,
+                1.23,
+                1.01,
+                0.93,
+                0.946,
+                0.993,
+                1.01,
+                0.973,
+                0.923,
+                0.869,
+                0.846,
+                0.846,
+                0.859,
+                0.896,
+                0.943
+            ]
+        }
+    }
+}

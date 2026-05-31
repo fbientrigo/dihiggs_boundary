@@ -1,0 +1,132 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 190707235,
+    "reference": "1907.07235",
+    "source": "https://www.hepdata.net/record/ins1744267",
+    "citeKey": "CMS:2019spf",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 35.9,
+    "process": {
+        "production": [
+            "H",
+            "vbfH",
+            "Htt",
+            "HZ",
+            "HW"
+        ],
+        "firstDecay": [
+            "tautau"
+        ],
+        "secondDecay": [
+            "tautau"
+        ]
+    },
+    "constraints": {
+        "mother": [
+            {
+                "modelLike": "SMHiggs",
+                "process": {
+                    "channels": [
+                        [
+                            "H",
+                            "none"
+                        ],
+                        [
+                            "vbfH",
+                            "none"
+                        ],
+                        [
+                            "Htt",
+                            "none"
+                        ],
+                        [
+                            "HZ",
+                            "none"
+                        ],
+                        [
+                            "HW",
+                            "none"
+                        ]
+                    ]
+                }
+            }
+        ],
+        "firstDaughter": [
+            {
+                "mumuTautauRatio": "odd"
+            }
+        ],
+        "secondDaughter": [
+            {
+                "mumuTautauRatio": "odd"
+            }
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 5,
+                "relative": 0.15
+            },
+            "secondDaughter": {
+                "absolute": 5,
+                "relative": 0.15
+            },
+            "mother": {
+                "absolute": 20,
+                "relative": 0
+            }
+        },
+        "grid": {
+            "massMother": [
+                125.0
+            ],
+            "massFirstDaughter": [
+                4.0,
+                5.0,
+                6.0,
+                7.0,
+                8.0,
+                9.0,
+                10.0,
+                11.0,
+                12.0,
+                13.0,
+                14.0,
+                15.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                11.0908419649089,
+                7.8878832940085,
+                5.97566916212765,
+                3.10734796430638,
+                1.81660342528681,
+                1.05171777253447,
+                1.19513383242553,
+                1.33854989231659,
+                1.72099271869276,
+                2.34246231155404,
+                3.63320685057361,
+                7.69666188082041
+            ],
+            "expected": [
+                7.84007794071148,
+                6.02347451542467,
+                4.35028715002893,
+                2.43807301814808,
+                1.76879807198978,
+                1.29074453901957,
+                1.38635524561361,
+                1.62538201209872,
+                2.00782483847489,
+                2.72490513793021,
+                4.15906573684084,
+                9.13082247973105
+            ]
+        }
+    }
+}

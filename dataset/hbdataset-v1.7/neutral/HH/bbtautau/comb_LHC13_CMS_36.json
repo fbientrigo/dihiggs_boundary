@@ -1,0 +1,84 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 180510191,
+    "reference": "1805.10191",
+    "source": "https://www.hepdata.net/record/ins1673011",
+    "citeKey": "CMS:2018zvv",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 35.9,
+    "process": {
+        "production": [
+            "H",
+            "vbfH",
+            "HZ",
+            "HW"
+        ],
+        "firstDecay": [
+            "bb"
+        ],
+        "secondDecay": [
+            "tautau"
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 5,
+                "relative": 0.1
+            },
+            "secondDaughter": {
+                "absolute": 5,
+                "relative": 0.15
+            },
+            "mother": {
+                "absolute": 40,
+                "relative": 0
+            }
+        },
+        "grid": {
+            "massMother": [
+                125.0
+            ],
+            "massFirstDaughter": [
+                15.0,
+                20.0,
+                25.0,
+                30.0,
+                35.0,
+                40.0,
+                45.0,
+                50.0,
+                55.0,
+                60.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                5.72410504893957,
+                3.64734296920033,
+                2.42683131413719,
+                1.45231425621855,
+                1.60842621209872,
+                1.1069756871503,
+                1.71723151468187,
+                2.35587133419166,
+                3.42027103337463,
+                4.35694276865565
+            ],
+            "expected": [
+                3.70884161848646,
+                2.001071434464,
+                1.72196218001157,
+                1.5611195588017,
+                1.57531155479081,
+                1.60369554676902,
+                2.10514607171744,
+                2.84786052848068,
+                4.21502280876459,
+                5.06181190278127
+            ]
+        }
+    }
+}

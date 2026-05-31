@@ -1,0 +1,97 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 150207400,
+    "reference": "1502.07400",
+    "source": "Tab. 7",
+    "citeKey": "CMS:2015qee",
+    "collider": "LHC8",
+    "experiment": "CMS",
+    "luminosity": 19.7,
+    "process": {
+        "channels": [
+            [
+                "ggH",
+                "mutau"
+            ],
+            [
+                "vbfH",
+                "mutau"
+            ],
+            [
+                "HZ",
+                "mutau"
+            ],
+            [
+                "HW",
+                "mutau"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "modelLike": "SMHiggsInterp",
+            "process": {
+                "channels": [
+                    [
+                        "ggH",
+                        "none"
+                    ],
+                    [
+                        "vbfH",
+                        "none"
+                    ],
+                    [
+                        "HZ",
+                        "none"
+                    ],
+                    [
+                        "HW",
+                        "none"
+                    ]
+                ]
+            }
+        }
+    ],
+    "normalization": {
+        "reference": "SMHiggsInterp",
+        "process": {
+            "channels": [
+                [
+                    "ggH",
+                    "none"
+                ],
+                [
+                    "vbfH",
+                    "none"
+                ],
+                [
+                    "HZ",
+                    "none"
+                ],
+                [
+                    "HW",
+                    "none"
+                ]
+            ]
+        }
+    },
+    "analysis": {
+        "massResolution": {
+            "relative": 0,
+            "absolute": 10
+        },
+        "grid": {
+            "mass": [
+                125.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.0151
+            ],
+            "expected": [
+                0.0075
+            ]
+        }
+    }
+}

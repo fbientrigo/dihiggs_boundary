@@ -1,0 +1,66 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 151006534,
+    "reference": "1510.06534",
+    "source": "Fig. 8",
+    "citeKey": "CMS:2015twz",
+    "collider": "LHC8",
+    "experiment": "CMS",
+    "luminosity": 19.7,
+    "process": {
+        "production": [
+            "ggH"
+        ],
+        "firstDecay": [
+            "tautau"
+        ],
+        "secondDecay": [
+            "tautau"
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 5,
+                "relative": 0.15
+            },
+            "secondDaughter": {
+                "absolute": 5,
+                "relative": 0.15
+            },
+            "mother": {
+                "absolute": 20,
+                "relative": 0
+            }
+        },
+        "grid": {
+            "massMother": [
+                125.0
+            ],
+            "massFirstDaughter": [
+                4.0,
+                5.0,
+                6.0,
+                7.0,
+                8.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                7.121,
+                10.36,
+                8.625,
+                4.959,
+                4.489
+            ],
+            "expected": [
+                10.62,
+                10.27,
+                5.335,
+                3.079,
+                2.914
+            ]
+        }
+    }
+}

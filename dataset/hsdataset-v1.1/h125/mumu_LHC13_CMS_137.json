@@ -1,0 +1,106 @@
+{
+    "id": 200904363,
+    "reference": "2009.04363",
+    "source": "Fig. 11 (left)",
+    "citeKey": "CMS:2020xwi",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 137.0,
+    "referenceMass": 125.38,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 1.7,
+    "subMeasurements": {
+        "VBF": {
+            "obs": [
+                0.75,
+                1.36,
+                2.05
+            ],
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "vbfH",
+                        "mumu"
+                    ]
+                ]
+            }
+        },
+        "ggH": {
+            "obs": [
+                -0.01,
+                0.63,
+                1.28
+            ],
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "H",
+                        "mumu"
+                    ]
+                ]
+            }
+        },
+        "ttH": {
+            "obs": [
+                0.37,
+                2.32,
+                4.59
+            ],
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "Htt",
+                        "mumu"
+                    ],
+                    [
+                        "Ht",
+                        "mumu"
+                    ],
+                    [
+                        "HtW",
+                        "mumu"
+                    ]
+                ]
+            }
+        },
+        "VH": {
+            "obs": [
+                2.65,
+                5.48,
+                8.58
+            ],
+            "ref": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "process": {
+                "channels": [
+                    [
+                        "HW",
+                        "mumu"
+                    ],
+                    [
+                        "HZ",
+                        "mumu"
+                    ]
+                ]
+            }
+        }
+    }
+}

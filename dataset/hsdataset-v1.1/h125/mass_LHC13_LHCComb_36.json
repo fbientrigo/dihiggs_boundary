@@ -1,0 +1,97 @@
+{
+    "id": 1812251,
+    "reference": "",
+    "source": "Page 5",
+    "citeKey": "ParticleDataGroup:2020ssz",
+    "collider": "LHC13",
+    "experiment": "LHCComb",
+    "luminosity": 36,
+    "referenceMass": 125.25,
+    "referenceModel": "SMHiggsEW",
+    "massResolution": 0.17,
+    "subMeasurements": {
+        "gamgam_4l_comb": {
+            "process": {
+                "channels": [
+                    [
+                        "ggH",
+                        "gamgam"
+                    ],
+                    [
+                        "ggH",
+                        "ZZ"
+                    ],
+                    [
+                        "bbH",
+                        "gamgam"
+                    ],
+                    [
+                        "bbH",
+                        "ZZ"
+                    ],
+                    [
+                        "vbfH",
+                        "gamgam"
+                    ],
+                    [
+                        "vbfH",
+                        "ZZ"
+                    ],
+                    [
+                        "HW",
+                        "gamgam"
+                    ],
+                    [
+                        "HW",
+                        "ZZ"
+                    ],
+                    [
+                        "HZ",
+                        "gamgam"
+                    ],
+                    [
+                        "HZ",
+                        "ZZ"
+                    ],
+                    [
+                        "Htt",
+                        "gamgam"
+                    ],
+                    [
+                        "Htt",
+                        "ZZ"
+                    ],
+                    [
+                        "schanHt",
+                        "gamgam"
+                    ],
+                    [
+                        "schanHt",
+                        "ZZ"
+                    ],
+                    [
+                        "tchanHt",
+                        "gamgam"
+                    ],
+                    [
+                        "tchanHt",
+                        "ZZ"
+                    ],
+                    [
+                        "HtW",
+                        "gamgam"
+                    ],
+                    [
+                        "HtW",
+                        "ZZ"
+                    ]
+                ]
+            },
+            "obsMass": [
+                125.08,
+                125.25,
+                125.42
+            ]
+        }
+    }
+}

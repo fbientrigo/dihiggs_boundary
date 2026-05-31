@@ -1,0 +1,69 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 14096212,
+    "reference": "1409.6212",
+    "source": "Fig. 19",
+    "citeKey": "ATLAS:2014vuz",
+    "collider": "LHC8",
+    "experiment": "ATLAS",
+    "luminosity": 25.0,
+    "process": {
+        "channels": [
+            [
+                "HZ",
+                "bb"
+            ],
+            [
+                "HW",
+                "bb"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "modelLike": "SMHiggsInterp",
+            "process": "signal"
+        }
+    ],
+    "normalization": {
+        "reference": "SMHiggsInterp",
+        "process": "signal"
+    },
+    "analysis": {
+        "massResolution": {
+            "absolute": 5,
+            "relative": 0.1
+        },
+        "grid": {
+            "mass": [
+                110.0,
+                115.0,
+                120.0,
+                125.0,
+                130.0,
+                135.0,
+                140.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.811,
+                0.811,
+                0.929,
+                1.208,
+                1.771,
+                2.201,
+                2.655
+            ],
+            "expected": [
+                0.532,
+                0.577,
+                0.647,
+                0.756,
+                1.012,
+                1.267,
+                1.739
+            ]
+        }
+    }
+}

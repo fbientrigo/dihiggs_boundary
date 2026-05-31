@@ -1,0 +1,65 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 1807079151,
+    "reference": "1807.07915",
+    "source": "Fig. 8b",
+    "citeKey": "ATLAS:2018gfm",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 36.1,
+    "process": {
+        "channels": [
+            [
+                "brtHpb",
+                "taunu"
+            ]
+        ]
+    },
+    "constraints": [
+        {
+            "topDecayConsistency": [
+                "brtHpb"
+            ]
+        }
+    ],
+    "analysis": {
+        "massResolution": {
+            "absolute": 5,
+            "relative": 0.2
+        },
+        "grid": {
+            "mass": [
+                90.0,
+                100.0,
+                110.0,
+                120.0,
+                130.0,
+                140.0,
+                150.0,
+                160.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.002485,
+                0.00241,
+                0.001401,
+                0.0009357,
+                0.001148,
+                0.0006642,
+                0.0004214,
+                0.0003069
+            ],
+            "expected": [
+                0.003998,
+                0.003326,
+                0.00246,
+                0.001711,
+                0.001265,
+                0.0007027,
+                0.0004813,
+                0.0003765
+            ]
+        }
+    }
+}

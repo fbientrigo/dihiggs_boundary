@@ -1,0 +1,61 @@
+{
+    "limitClass": "ChannelLimit",
+    "id": 1508077742,
+    "reference": "1508.07774",
+    "source": "Fig. 8 (right)/Tab. 10",
+    "citeKey": "CMS:2015lsf",
+    "collider": "LHC8",
+    "experiment": "CMS",
+    "luminosity": 19.7,
+    "process": {
+        "channels": [
+            [
+                "Hpmtb",
+                "taunu"
+            ]
+        ]
+    },
+    "analysis": {
+        "massResolution": {
+            "absolute": 5,
+            "relative": 0.2
+        },
+        "grid": {
+            "mass": [
+                180.0,
+                190.0,
+                200.0,
+                220.0,
+                250.0,
+                300.0,
+                400.0,
+                500.0,
+                600.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.377,
+                0.373,
+                0.361,
+                0.332,
+                0.267,
+                0.153,
+                0.054,
+                0.032,
+                0.025
+            ],
+            "expected": [
+                0.409,
+                0.358,
+                0.291,
+                0.221,
+                0.159,
+                0.096,
+                0.049,
+                0.033,
+                0.028
+            ]
+        }
+    }
+}

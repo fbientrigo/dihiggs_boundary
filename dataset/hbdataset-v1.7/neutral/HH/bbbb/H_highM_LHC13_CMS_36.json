@@ -1,0 +1,78 @@
+{
+    "limitClass": "PairDecayLimit",
+    "id": 180801473,
+    "reference": "1808.01473",
+    "source": "Tab. 5",
+    "citeKey": "CMS:2018vjd",
+    "collider": "LHC13",
+    "experiment": "CMS",
+    "luminosity": 35.9,
+    "process": {
+        "production": [
+            "H"
+        ],
+        "firstDecay": [
+            "bb"
+        ],
+        "secondDecay": [
+            "bb"
+        ]
+    },
+    "analysis": {
+        "equalDaughterMasses": true,
+        "massResolution": {
+            "firstDaughter": {
+                "absolute": 30,
+                "relative": 0
+            },
+            "secondDaughter": {
+                "absolute": 30,
+                "relative": 0
+            },
+            "mother": {
+                "absolute": 15,
+                "relative": 0.15
+            }
+        },
+        "grid": {
+            "massMother": [
+                750.0,
+                800.0,
+                900.0,
+                1000.0,
+                1200.0,
+                1600.0,
+                2000.0,
+                2500.0,
+                3000.0
+            ],
+            "massFirstDaughter": [
+                125.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.067,
+                0.0443,
+                0.0312,
+                0.022,
+                0.0085,
+                0.0044,
+                0.0035,
+                0.0017,
+                0.0016
+            ],
+            "expected": [
+                0.0645,
+                0.0398,
+                0.0286,
+                0.0175,
+                0.0091,
+                0.0043,
+                0.003,
+                0.002,
+                0.0024
+            ]
+        }
+    }
+}

@@ -1,0 +1,136 @@
+{
+    "limitClass": "PairProductionLimit",
+    "id": 240609971,
+    "reference": "2406.09971",
+    "source": "Fig. Aux 5a",
+    "citeKey": "ATLAS:2024ish",
+    "collider": "LHC13",
+    "experiment": "ATLAS",
+    "luminosity": 139,
+    "process": {
+        "firstDecay": [
+            "bb"
+        ],
+        "secondDecay": [
+            "bb",
+            "tautau",
+            "gamgam"
+        ]
+    },
+    "constraints": {
+        "secondParticle": [
+            {
+            "topDominatedHgg": true
+            },
+            {
+                "modelLike": "SMHiggsInterp",
+                "process": {
+                    "channels": [
+                        [
+                            "none",
+                            "bb"
+                        ],
+                        [
+                            "none",
+                            "tautau"
+                        ],
+                        [
+                            "none",
+                            "WW"
+                        ],
+                        [
+                            "none",
+                            "gamgam"
+
+                        ]
+
+                    ]
+
+                }
+
+            }
+        ]
+    },
+    "analysis": {
+        "equalParticleMasses": true,
+        "massResolution": {
+            "firstParticle": {
+                "absolute": 10,
+                "relative": 0.0
+            },
+            "secondParticle": {
+                "absolute": 10,
+                "relative": 0.0
+            }
+        },
+        "acceptances": [
+            {
+            "denominator": [
+                [
+                    {
+                        "effLam": 0
+                    },
+                    {
+                        "constantAcceptance": 14.503984888441675
+                    }
+                ],
+                [
+                    {
+                        "effLam": 1
+                    },
+                    {
+                        "constantAcceptance": -11.559060100569445
+                    }
+                ],
+                [
+                    {
+                        "effLam": 2
+                    },
+                    {
+                        "constantAcceptance": 2.7708928817955654
+                    }                       
+                ]
+            ],
+            "couplingDepAcceptance": [
+                [
+                    {
+                        "effLam": 0
+                    },
+                    {
+                        "constantAcceptance": 10.394260781113084
+                    }
+                ],
+                [
+                    {
+                        "effLam": 1
+                    },
+                    {
+                        "constantAcceptance":-5.678443111445292
+                    }
+                ],
+                [
+                    {
+                        "effLam": 2
+                    },
+                    {
+                        "constantAcceptance": 1
+                    }                       
+                ]
+            ]
+            }
+        ],
+        "grid": {
+            "massFirstParticle": [
+                125.0
+            ]
+        },
+        "limit": {
+            "observed": [
+                0.04
+            ],
+            "expected": [
+                0.032743
+            ]
+        }
+    }
+}
