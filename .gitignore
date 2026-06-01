@@ -1,69 +1,53 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-*.so.*
-
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# Build directories
+# Build outputs
 build/
-Build/
-build-*/
+cmake-build-*/
+*.o
+*.so
+*.a
+*.dll
+*.dylib
+*.exe
 
-# CMake generated files
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-install_manifest.txt
-compile_commands.json
+# Runtime data
+data/runs/*
+!data/runs/.gitkeep
+scratch/*
+!scratch/.gitkeep
 
-# Temporary files
-*.tmp
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
 *.log
-*.bak
-*.swp
+logs/
+*.stderr
+*.stdout
 
-# vcpkg
-vcpkg_installed/
+# Temporary shard files
+*.tmp
+*.partial
 
-# debug information files
-*.dwo
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
 
-# test output & cache
-Testing/
-.cache/
+# Large generated data
+*.parquet
+*.duckdb
+*.h5
+*.hdf5
+*.csv
+*.jsonl
+
+# Keep small fixtures if needed
+!tests/fixtures/*.csv
+!tests/fixtures/*.json
+!tests/fixtures/*.jsonl

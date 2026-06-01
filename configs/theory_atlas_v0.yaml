@@ -1,0 +1,97 @@
+run:
+  name: theory_atlas_v0_smoke
+  mode: theory_only
+  model_contract_version: type1_lambda6_alignment_v0
+  atlas_schema_version: atlas_schema_v0
+  seed: 123456
+  n_points: 1000
+  n_shards: 10
+  workers: 1
+  threads_per_worker: 1
+
+paths:
+  root_env: DHB_ROOT
+  twohdmc_root_env: DHB_2HDMC_ROOT
+  higgstools_root_env: DHB_HIGGSTOOLS_ROOT
+  hb_dataset_root_env: DHB_HB_DATASET_ROOT
+  hs_dataset_root_env: DHB_HS_DATASET_ROOT
+  runs_root_env: DHB_RUNS_ROOT
+
+model:
+  family: "CP-conserving 2HDM"
+  yukawa_type: "I"
+  mh_GeV: 125.09
+  sin_beta_minus_alpha: 1.0
+  mHp_relation: mHp_equals_mA
+  lambda7: 0.0
+  lambda6: scanned_nonzero
+  input_coordinates:
+    - mH_GeV
+    - mA_GeV
+    - tan_beta
+    - lambda6
+    - M_GeV
+
+sampling:
+  sampler: latin_hypercube
+  ranges:
+    mH_GeV:
+      min: 130.0
+      max: 350.0
+      scale: linear
+
+    mA_GeV:
+      min: 200.0
+      max: 700.0
+      scale: linear
+
+    tan_beta:
+      min: 10.0
+      max: 1000000.0
+      scale: log10
+
+    abs_lambda6:
+      min: 1.0e-16
+      max: 12.0
+      scale: log10
+      sign: positive_only_initially
+
+    M_GeV:
+      min: 0.0
+      max: 1000.0
+      scale: linear
+
+evaluation:
+  theory_2hdmc:
+    enabled: true
+    constraints:
+      positivity: true
+      unitarity: true
+      perturbativity: true
+      stability: true
+      oblique: true
+    decays:
+      H2: true
+      ctau_mm: true
+
+  experiment_higgstools:
+    enabled: false
+    mode: later_enrichment
+
+output:
+  transient_format: csv_shards
+  final_format:
+    - parquet
+    - duckdb
+  float_precision: 17
+  preserve_failed_points: true
+  no_shared_csv: true
+
+acceptance:
+  theory_ok_definition:
+    - set_param_phys_ok
+    - positivity_ok
+    - unitarity_ok
+    - perturbativity_ok
+    - stability_ok
+    
