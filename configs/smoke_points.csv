@@ -1,0 +1,4 @@
+point_id,mH,mA,tan_beta,lambda6,M
+smoke_mid_constructible,200,300,100,0.1,100
+smoke_high_tanb_small_l6,200,300,10000,1e-6,100
+smoke_extreme_boundary_probe,130,700,1000000,12,1000
