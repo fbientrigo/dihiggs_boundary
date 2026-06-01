@@ -51,3 +51,7 @@ Thumbs.db
 !tests/fixtures/*.csv
 !tests/fixtures/*.json
 !tests/fixtures/*.jsonl
+
+# Libs
+# 2HDMC local build artifacts
+lib/2HDMC-1.8.0/lib/
