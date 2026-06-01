@@ -58,3 +58,6 @@ lib/2HDMC-1.8.0/lib/
 # Track reproducible smoke/config inputs.
 !configs/
 !configs/smoke_points.csv
+
+# Local run outputs and generated summaries.
+runs/
