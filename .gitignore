@@ -59,5 +59,6 @@ lib/2HDMC-1.8.0/lib/
 !configs/
 !configs/smoke_points.csv
 
-# Local run outputs and generated summaries.
 runs/
+campaigns/
+
