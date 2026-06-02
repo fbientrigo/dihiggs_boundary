@@ -19,12 +19,13 @@ set -euo pipefail
 
 # Help text / usage check
 if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
-  echo "Usage: $0 [campaign_id] [n_points_per_batch] [max_seconds] [base_seed]"
+  echo "Usage: $0 [campaign_id] [n_points_per_batch] [max_seconds] [base_seed] [n_workers]"
   echo "Defaults:"
   echo "  campaign_id:        refined_lhs_v1"
   echo "  n_points_per_batch: 5000"
   echo "  max_seconds:        3600"
   echo "  base_seed:          12345"
+  echo "  n_workers:          1"
   echo ""
   echo "Soft Stop: touch campaigns/<campaign_id>/STOP_REQUESTED"
   echo "  Gracefully stops the campaign loop before starting the next batch."
@@ -37,6 +38,7 @@ CAMPAIGN_ID="${1:-refined_lhs_v1}"
 N_POINTS="${2:-5000}"
 MAX_SECONDS="${3:-3600}"
 BASE_SEED="${4:-12345}"
+N_WORKERS="${5:-1}"
 
 # Source environment setup
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -63,11 +65,10 @@ echo "Campaign Directory:   ${CAMPAIGN_DIR}"
 echo "Soft Stop File:       ${STOP_FILE}"
 echo "====================================="
 
-# If STOP_REQUESTED file exists at the start, remove it to allow starting fresh if desired, 
-# or keep it if the user wants it. Let's print a warning if it exists.
+# If STOP_REQUESTED file exists at the start, exit cleanly with a message.
 if [ -f "${STOP_FILE}" ]; then
-  echo "[DHB] WARNING: STOP_REQUESTED exists at ${STOP_FILE}. Removing it to start run."
-  rm -f "${STOP_FILE}"
+  echo "[DHB] STOP_REQUESTED file exists at ${STOP_FILE} before starting. Exiting cleanly without starting campaign."
+  exit 0
 fi
 
 while true; do
@@ -92,7 +93,11 @@ while true; do
   
   # Run batch
   set +e
-  ./scripts/run_lhs_batch.sh "${CAMPAIGN_ID}" "${N_POINTS}" "${BASE_SEED}"
+  if [ "${N_WORKERS}" -gt 1 ]; then
+    ./scripts/run_lhs_batch_sharded.sh "${CAMPAIGN_ID}" "${N_POINTS}" "${BASE_SEED}" "${N_WORKERS}"
+  else
+    ./scripts/run_lhs_batch.sh "${CAMPAIGN_ID}" "${N_POINTS}" "${BASE_SEED}"
+  fi
   BATCH_EXIT_CODE=$?
   set -e
 
