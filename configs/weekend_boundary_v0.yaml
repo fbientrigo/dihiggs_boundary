@@ -1,0 +1,43 @@
+campaign_name: "weekend_boundary_v0"
+output_root: "/home/fabian/cern_db/dihiggs_lake"
+grid_size: 20 # Conservative default for weekend run: 20x20=400 points per pair
+
+fixed_parameters:
+  mH: 300.0
+  mA: 400.0
+  tan_beta: 10.0
+  lambda6: 0.001
+  M: 300.0
+
+variable_pairs:
+  - x: mH
+    y: mA
+    x_min: 130.0
+    x_max: 500.0
+    y_min: 130.0
+    y_max: 500.0
+    x_log: false
+    y_log: false
+
+  - x: mH
+    y: lambda6
+    x_min: 130.0
+    x_max: 500.0
+    y_min: 1e-6
+    y_max: 0.1
+    x_log: false
+    y_log: true
+
+  - x: mA
+    y: tan_beta
+    x_min: 130.0
+    x_max: 500.0
+    y_min: 1.0
+    y_max: 1000.0
+    x_log: false
+    y_log: true
+
+flags:
+  theory_ok: true
+  stu_ok: true
+  physics_ok: true
