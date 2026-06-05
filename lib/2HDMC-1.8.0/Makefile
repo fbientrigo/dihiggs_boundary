@@ -49,6 +49,7 @@ endif
 all: lib $(PROG)
 
 $(OBJDIR)/%.o : %.cpp %.h
+	@ mkdir -p $(OBJDIR)
 	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 lib: $(addprefix $(LIBDIR)/, $(LIB))
