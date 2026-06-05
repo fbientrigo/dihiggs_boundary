@@ -44,6 +44,8 @@ required_columns=(
   stability_ok
   triple_ok
   theory_ok
+  stu_ok
+  physics_ok
   lambda1
   lambda2
   lambda3
@@ -53,6 +55,9 @@ required_columns=(
   lambda7_derived
   m12_sq_derived
   tan_beta_derived
+  stu_S
+  stu_T
+  stu_U
   width_bb_H2
   width_tautau_H2
   width_WW_H2
@@ -127,6 +132,16 @@ NR == 1 {
 
   if ($(col["theory_ok"]) != "0" && $(col["theory_ok"]) != "1") {
     printf("[DHB][FAIL] Row %d invalid theory_ok=%s\n", NR, $(col["theory_ok"])) > "/dev/stderr"
+    exit 1
+  }
+
+  if ($(col["stu_ok"]) != "0" && $(col["stu_ok"]) != "1") {
+    printf("[DHB][FAIL] Row %d invalid stu_ok=%s\n", NR, $(col["stu_ok"])) > "/dev/stderr"
+    exit 1
+  }
+
+  if ($(col["physics_ok"]) != "0" && $(col["physics_ok"]) != "1") {
+    printf("[DHB][FAIL] Row %d invalid physics_ok=%s\n", NR, $(col["physics_ok"])) > "/dev/stderr"
     exit 1
   }
 

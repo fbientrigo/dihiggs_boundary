@@ -112,6 +112,8 @@ struct OutputRecord {
     bool stability_ok;
     bool triple_ok;
     bool theory_ok;
+    bool stu_ok;
+    bool physics_ok;
 
     double lambda1;
     double lambda2;
@@ -122,6 +124,9 @@ struct OutputRecord {
     double lambda7_derived;
     double m12_sq_derived;
     double tan_beta_derived;
+    double stu_S;
+    double stu_T;
+    double stu_U;
 
     double width_bb_H2;
     double width_tautau_H2;
@@ -164,6 +169,8 @@ struct OutputRecord {
           stability_ok(false),
           triple_ok(false),
           theory_ok(false),
+          stu_ok(false),
+          physics_ok(false),
           lambda1(nan_value()),
           lambda2(nan_value()),
           lambda3(nan_value()),
@@ -173,6 +180,9 @@ struct OutputRecord {
           lambda7_derived(nan_value()),
           m12_sq_derived(nan_value()),
           tan_beta_derived(nan_value()),
+          stu_S(nan_value()),
+          stu_T(nan_value()),
+          stu_U(nan_value()),
           width_bb_H2(nan_value()),
           width_tautau_H2(nan_value()),
           width_WW_H2(nan_value()),
@@ -249,6 +259,9 @@ std::string first_constraint_failure(const OutputRecord& r) {
     }
     if (!r.stability_ok) {
         return "stability";
+    }
+    if (!r.stu_ok) {
+        return "stu";
     }
     return "none";
 }
@@ -344,7 +357,20 @@ OutputRecord evaluate_point(const InputPoint& p) {
     r.stability_ok = check.check_stability();
 
     r.triple_ok = r.positivity_ok && r.unitarity_ok && r.perturbativity_ok;
-    r.theory_ok = r.set_param_phys_ok && r.triple_ok && r.stability_ok;
+    r.theory_ok = r.positivity_ok && r.unitarity_ok && r.perturbativity_ok;
+    
+    double S_val = 0, T_val = 0, U_val = 0, V_val = 0, W_val = 0, X_val = 0;
+    check.oblique_param(kMh, S_val, T_val, U_val, V_val, W_val, X_val);
+    r.stu_S = S_val;
+    r.stu_T = T_val;
+    r.stu_U = U_val;
+    
+    // STU Electroweak Precision Gate (Provisional Box Cut)
+    // This is a provisional rectangular cut. It is not covariance-aware
+    // and is not a replacement for a global electroweak precision fit.
+    // Future implementations should use configurable central values and covariance/chi2.
+    r.stu_ok = (std::fabs(r.stu_S) < 0.3) && (std::fabs(r.stu_T) < 0.3) && (std::fabs(r.stu_U) < 0.3);
+    r.physics_ok = r.set_param_phys_ok && r.theory_ok && r.stability_ok && r.stu_ok;
 
     DecayTable tab(model);
     r.width_bb_H2 = tab.get_gamma_hdd(2, 3, 3);
@@ -363,7 +389,7 @@ OutputRecord evaluate_point(const InputPoint& p) {
         r.ctau_mm_H2 = kHbarCGeVmm / r.total_width_H2;
         width_ok = true;
     } else {
-        r.theory_ok = false;
+        r.physics_ok = false;
     }
 
     const std::string first_failure = first_constraint_failure(r);
@@ -388,9 +414,9 @@ void write_header(std::ostream& os) {
         << "lambda6_input,lambda7_input,"
         << "M,M2,m12_sq_input,M2_recomputed,relative_M2_reconstruction_error,"
         << "set_param_phys_ok,positivity_ok,unitarity_ok,perturbativity_ok,stability_ok,"
-        << "triple_ok,theory_ok,"
+        << "triple_ok,theory_ok,stu_ok,physics_ok,"
         << "lambda1,lambda2,lambda3,lambda4,lambda5,lambda6_derived,lambda7_derived,"
-        << "m12_sq_derived,tan_beta_derived,"
+        << "m12_sq_derived,tan_beta_derived,stu_S,stu_T,stu_U,"
         << "width_bb_H2,width_tautau_H2,width_WW_H2,width_ZZ_H2,"
         << "width_gammagamma_H2,width_Zgamma_H2,width_gg_H2,width_hh_H2,"
         << "total_width_H2,br_gammagamma_H2,ctau_mm_H2,"
@@ -425,7 +451,9 @@ void write_record(std::ostream& os, const OutputRecord& r) {
        << bool_int(r.perturbativity_ok) << ","
        << bool_int(r.stability_ok) << ","
        << bool_int(r.triple_ok) << ","
-       << bool_int(r.theory_ok) << ",";
+       << bool_int(r.theory_ok) << ","
+       << bool_int(r.stu_ok) << ","
+       << bool_int(r.physics_ok) << ",";
 
     write_double(os, r.lambda1); os << ",";
     write_double(os, r.lambda2); os << ",";
@@ -436,6 +464,9 @@ void write_record(std::ostream& os, const OutputRecord& r) {
     write_double(os, r.lambda7_derived); os << ",";
     write_double(os, r.m12_sq_derived); os << ",";
     write_double(os, r.tan_beta_derived); os << ",";
+    write_double(os, r.stu_S); os << ",";
+    write_double(os, r.stu_T); os << ",";
+    write_double(os, r.stu_U); os << ",";
 
     write_double(os, r.width_bb_H2); os << ",";
     write_double(os, r.width_tautau_H2); os << ",";
