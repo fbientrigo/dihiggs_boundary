@@ -128,15 +128,21 @@ def count_data_rows(path):
         return sum(1 for row in reader if row)
 
 
+def read_summary_md(campaign_dir):
+    return (campaign_dir / "index" / "campaign_summary.md").read_text(encoding="utf-8")
+
+
 def test_rebuild_campaign_index_streaming_outputs(tmp_path):
     campaign_dir = create_campaign(tmp_path)
 
-    run_script(
+    result = run_script(
         "scripts/rebuild_campaign_index.py",
         "--campaign-dir",
         str(campaign_dir),
         "--progress-every",
         "1",
+        "--sort-buffer",
+        "64M",
     )
 
     index_dir = campaign_dir / "index"
@@ -161,6 +167,78 @@ def test_rebuild_campaign_index_streaming_outputs(tmp_path):
     summary_md = (index_dir / "campaign_summary.md").read_text(encoding="utf-8")
     assert "- **Duplicate point_id Count**: `1`" in summary_md
     assert "- **Duplicate point_hash Count**: `1`" in summary_md
+    assert "Starting external duplicate counting (sort buffer: 64M" in result.stdout
+    assert "Finished external duplicate counting: duplicate point_id=1, duplicate point_hash=1" in result.stdout
+    assert not (index_dir / "point_ids.txt.tmp").exists()
+    assert not (index_dir / "point_hashes.txt.tmp").exists()
+
+
+def test_rebuild_campaign_index_duplicate_mode_none(tmp_path):
+    campaign_dir = create_campaign(tmp_path)
+
+    result = run_script(
+        "scripts/rebuild_campaign_index.py",
+        "--campaign-dir",
+        str(campaign_dir),
+        "--duplicate-mode",
+        "none",
+    )
+
+    summary_md = read_summary_md(campaign_dir)
+    assert "- **Duplicate point_id Count**: `-1`" in summary_md
+    assert "- **Duplicate point_hash Count**: `-1`" in summary_md
+    assert "Duplicate counting disabled" in result.stdout
+    assert count_data_rows(campaign_dir / "index" / "all_evaluate_point.csv") == 4
+
+
+def test_rebuild_campaign_index_duplicate_mode_memory_small_data(tmp_path):
+    campaign_dir = create_campaign(tmp_path)
+
+    result = run_script(
+        "scripts/rebuild_campaign_index.py",
+        "--campaign-dir",
+        str(campaign_dir),
+        "--duplicate-mode",
+        "memory",
+    )
+
+    summary_md = read_summary_md(campaign_dir)
+    assert "- **Duplicate point_id Count**: `1`" in summary_md
+    assert "- **Duplicate point_hash Count**: `1`" in summary_md
+    assert "--duplicate-mode memory is exact but not safe for large campaigns" in result.stdout
+
+
+def test_rebuild_campaign_index_can_keep_duplicate_work_files(tmp_path):
+    campaign_dir = create_campaign(tmp_path)
+
+    run_script(
+        "scripts/rebuild_campaign_index.py",
+        "--campaign-dir",
+        str(campaign_dir),
+        "--keep-duplicate-work-files",
+    )
+
+    index_dir = campaign_dir / "index"
+    assert (index_dir / "point_ids.txt.tmp").exists()
+    assert (index_dir / "point_hashes.txt.tmp").exists()
+    assert (index_dir / "point_ids.txt.tmp").read_text(encoding="utf-8").splitlines() == [
+        "p1",
+        "p2",
+        "p2",
+        "p4",
+    ]
+
+
+def test_rebuild_campaign_index_static_streaming_safety():
+    source = (REPO_ROOT / "scripts" / "rebuild_campaign_index.py").read_text(encoding="utf-8")
+    unsafe_patterns = [
+        "all_rows =",
+        "batch_rows = list",
+        "seen_point_ids = set()",
+        "seen_point_hashes = set()",
+    ]
+    for pattern in unsafe_patterns:
+        assert pattern not in source
 
 
 def test_plot_campaign_pixels_streaming_outputs(tmp_path):

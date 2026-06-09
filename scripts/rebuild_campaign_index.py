@@ -7,6 +7,8 @@ import argparse
 import csv
 import hashlib
 import json
+import os
+import subprocess
 from collections import Counter
 from pathlib import Path
 
@@ -25,6 +27,30 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--campaign-dir", required=True, help="Path to the campaign directory.")
     p.add_argument("--progress-every", type=int, default=25, help="Print progress every N batches.")
     p.add_argument("--max-batches", type=int, default=None, help="Only process the first N completed batches.")
+    p.add_argument(
+        "--duplicate-mode",
+        choices=["external-sort", "none", "memory"],
+        default="external-sort",
+        help=(
+            "How to count duplicate point IDs and coordinate hashes. "
+            "external-sort is exact and bounded-memory; memory is only for small tests."
+        ),
+    )
+    p.add_argument(
+        "--sort-buffer",
+        default="512M",
+        help="GNU sort buffer size for --duplicate-mode external-sort.",
+    )
+    p.add_argument(
+        "--sort-temp-dir",
+        default=None,
+        help="Temporary directory for external sort. Defaults to index/.sort_tmp.",
+    )
+    p.add_argument(
+        "--keep-duplicate-work-files",
+        action="store_true",
+        help="Keep point_ids.txt.tmp and point_hashes.txt.tmp after duplicate counting.",
+    )
     return p
 
 def get_canonical_hash(row) -> str:
@@ -42,6 +68,68 @@ def get_canonical_hash(row) -> str:
 
 def tmp_path(path: Path) -> Path:
     return path.with_name(path.name + ".tmp")
+
+def count_duplicate_excess_external_sort(input_path: Path, tmp_dir: Path, sort_buffer: str) -> int:
+    """Count duplicate excess with GNU/coreutils sort on Debian/Linux.
+
+    The result is sum(count - 1 for each sorted key group with count > 1).
+    Python only streams the sorted result, so memory use is bounded with
+    respect to the number of rows.
+    """
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    sorted_path = tmp_dir / f"{input_path.name}.sorted"
+    if sorted_path.exists():
+        sorted_path.unlink()
+
+    cmd = [
+        "sort",
+        "-S",
+        sort_buffer,
+        "-T",
+        str(tmp_dir),
+        "-o",
+        str(sorted_path),
+        str(input_path),
+    ]
+    sort_env = os.environ.copy()
+    sort_env["LC_ALL"] = "C"
+    result = subprocess.run(
+        cmd,
+        env=sort_env,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise SystemExit(
+            "[DHB][FAIL] External duplicate sort failed for "
+            f"{input_path} with exit code {result.returncode}.\n"
+            f"stdout:\n{result.stdout}\n"
+            f"stderr:\n{result.stderr}"
+        )
+
+    duplicate_count = 0
+    previous_key = None
+    group_count = 0
+    with sorted_path.open("r", encoding="utf-8") as f:
+        for line in f:
+            key = line.rstrip("\n")
+            if previous_key is None:
+                previous_key = key
+                group_count = 1
+            elif key == previous_key:
+                group_count += 1
+            else:
+                if group_count > 1:
+                    duplicate_count += group_count - 1
+                previous_key = key
+                group_count = 1
+
+    if group_count > 1:
+        duplicate_count += group_count - 1
+
+    sorted_path.unlink()
+    return duplicate_count
 
 def write_rejection_counts(path: Path, rejection_counts: Counter, total_points: int) -> None:
     with path.open("w", newline="", encoding="utf-8") as f:
@@ -162,10 +250,15 @@ def main():
     total_points = 0
     flag_counts = {col: 0 for col in FLAG_COLUMNS}
     rejection_counts = Counter()
-    seen_point_ids = set()
-    seen_point_hashes = set()
     duplicate_id_count = 0
     duplicate_hash_count = 0
+    memory_point_ids = set() if args.duplicate_mode == "memory" else None
+    memory_point_hashes = set() if args.duplicate_mode == "memory" else None
+
+    if args.duplicate_mode == "memory":
+        print("[DHB][WARNING] --duplicate-mode memory is exact but not safe for large campaigns.")
+    elif args.duplicate_mode == "none":
+        print("[DHB][WARNING] Duplicate counting disabled; duplicate counts will be written as -1.")
 
     # Prepare index directory
     index_dir = campaign_dir / "index"
@@ -176,15 +269,30 @@ def main():
     rejection_csv = index_dir / "rejection_counts.csv"
     theory_summary_csv = index_dir / "theory_acceptance_summary.csv"
     summary_md = index_dir / "campaign_summary.md"
+    point_ids_work = index_dir / "point_ids.txt.tmp"
+    point_hashes_work = index_dir / "point_hashes.txt.tmp"
+    point_hashes_output_tmp = index_dir / "point_hashes.txt.output.tmp"
+    sort_temp_dir = Path(args.sort_temp_dir) if args.sort_temp_dir else index_dir / ".sort_tmp"
 
-    final_paths = [all_eval_csv, point_hashes_txt, rejection_csv, theory_summary_csv, summary_md]
-    tmp_paths = [tmp_path(p) for p in final_paths]
+    final_tmp_pairs = [
+        (all_eval_csv, tmp_path(all_eval_csv)),
+        (point_hashes_txt, point_hashes_output_tmp),
+        (rejection_csv, tmp_path(rejection_csv)),
+        (theory_summary_csv, tmp_path(theory_summary_csv)),
+        (summary_md, tmp_path(summary_md)),
+    ]
+    tmp_paths = [tmp for _, tmp in final_tmp_pairs] + [point_ids_work, point_hashes_work]
     for p in tmp_paths:
         if p.exists():
             p.unlink()
 
     # Process each batch
-    with tmp_path(all_eval_csv).open("w", newline="", encoding="utf-8") as all_f, tmp_path(point_hashes_txt).open("w", encoding="utf-8") as hash_f:
+    with (
+        tmp_path(all_eval_csv).open("w", newline="", encoding="utf-8") as all_f,
+        point_hashes_output_tmp.open("w", encoding="utf-8") as hash_f,
+        point_ids_work.open("w", encoding="utf-8") as id_work_f,
+        point_hashes_work.open("w", encoding="utf-8") as hash_work_f,
+    ):
         writer = None
 
         for batch_index, b in enumerate(completed_batches, start=1):
@@ -226,15 +334,19 @@ def main():
                     p_id = row["point_id"]
                     p_hash = get_canonical_hash(row)
 
-                    if p_id in seen_point_ids:
-                        duplicate_id_count += 1
-                    else:
-                        seen_point_ids.add(p_id)
+                    id_work_f.write(f"{p_id}\n")
+                    hash_work_f.write(f"{p_hash}\n")
 
-                    if p_hash in seen_point_hashes:
-                        duplicate_hash_count += 1
-                    else:
-                        seen_point_hashes.add(p_hash)
+                    if args.duplicate_mode == "memory":
+                        if p_id in memory_point_ids:
+                            duplicate_id_count += 1
+                        else:
+                            memory_point_ids.add(p_id)
+
+                        if p_hash in memory_point_hashes:
+                            duplicate_hash_count += 1
+                        else:
+                            memory_point_hashes.add(p_hash)
 
                     for col in FLAG_COLUMNS:
                         if str(row.get(col, "")).strip() == "1":
@@ -261,6 +373,26 @@ def main():
     if header is None:
         raise SystemExit("[DHB][FAIL] No readable evaluate_point.csv headers found in completed batches.")
 
+    if args.duplicate_mode == "external-sort":
+        print(
+            "[DHB] Starting external duplicate counting "
+            f"(sort buffer: {args.sort_buffer}, temp dir: {sort_temp_dir})."
+        )
+        duplicate_id_count = count_duplicate_excess_external_sort(point_ids_work, sort_temp_dir, args.sort_buffer)
+        duplicate_hash_count = count_duplicate_excess_external_sort(point_hashes_work, sort_temp_dir, args.sort_buffer)
+        print(
+            "[DHB] Finished external duplicate counting: "
+            f"duplicate point_id={duplicate_id_count}, duplicate point_hash={duplicate_hash_count}."
+        )
+    elif args.duplicate_mode == "none":
+        duplicate_id_count = -1
+        duplicate_hash_count = -1
+    else:
+        print(
+            "[DHB] Finished memory duplicate counting: "
+            f"duplicate point_id={duplicate_id_count}, duplicate point_hash={duplicate_hash_count}."
+        )
+
     write_rejection_counts(tmp_path(rejection_csv), rejection_counts, total_points)
     write_theory_summary(tmp_path(theory_summary_csv), flag_counts, total_points)
     write_campaign_summary(
@@ -275,8 +407,13 @@ def main():
         batch_metadata,
     )
 
-    for final_path in final_paths:
-        tmp_path(final_path).replace(final_path)
+    for final_path, final_tmp_path in final_tmp_pairs:
+        final_tmp_path.replace(final_path)
+
+    if not args.keep_duplicate_work_files:
+        for p in (point_ids_work, point_hashes_work):
+            if p.exists():
+                p.unlink()
 
     print(f"[DHB] Campaign index rebuilt successfully.")
     print(f"[DHB]   Merged CSV: {all_eval_csv}")
