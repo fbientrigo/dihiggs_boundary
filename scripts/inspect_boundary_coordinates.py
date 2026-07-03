@@ -23,6 +23,11 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Inspect boundary output by coordinate.")
     p.add_argument("--input", required=True, help="evaluate_point output CSV.")
     p.add_argument("--outdir", required=True, help="Output directory for inspection artifacts.")
+    p.add_argument(
+        "--flag-column",
+        default="theory_ok",
+        help="0/1 acceptance column to aggregate (e.g. exp_ok on an hbhs_enriched CSV).",
+    )
     return p
 
 
@@ -54,9 +59,9 @@ def require_columns(rows: list[dict[str, str]], columns: list[str]) -> None:
         raise SystemExit(f"[DHB][FAIL] Missing columns: {missing}")
 
 
-def write_theory_ok_points(rows: list[dict[str, str]], outdir: Path) -> int:
-    theory_rows = [r for r in rows if is_one(r["theory_ok"])]
-    output = outdir / "theory_ok_points.csv"
+def write_theory_ok_points(rows: list[dict[str, str]], outdir: Path, flag: str) -> int:
+    theory_rows = [r for r in rows if is_one(r[flag])]
+    output = outdir / f"{flag}_points.csv"
 
     with output.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
@@ -66,7 +71,7 @@ def write_theory_ok_points(rows: list[dict[str, str]], outdir: Path) -> int:
     return len(theory_rows)
 
 
-def write_coordinate_acceptance(rows: list[dict[str, str]], outdir: Path) -> None:
+def write_coordinate_acceptance(rows: list[dict[str, str]], outdir: Path, flags: list[str]) -> None:
     output = outdir / "coordinate_acceptance.csv"
 
     with output.open("w", newline="", encoding="utf-8") as f:
@@ -74,8 +79,8 @@ def write_coordinate_acceptance(rows: list[dict[str, str]], outdir: Path) -> Non
             "coordinate",
             "value",
             "total",
-            *[f"{flag}_count" for flag in FLAGS],
-            *[f"{flag}_fraction" for flag in FLAGS],
+            *[f"{flag}_count" for flag in flags],
+            *[f"{flag}_fraction" for flag in flags],
         ]
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -92,10 +97,10 @@ def write_coordinate_acceptance(rows: list[dict[str, str]], outdir: Path) -> Non
                     "total": total,
                 }
 
-                for flag in FLAGS:
+                for flag in flags:
                     count = sum(is_one(r[flag]) for r in subset)
                     record[f"{flag}_count"] = count
-                for flag in FLAGS:
+                for flag in flags:
                     count = int(record[f"{flag}_count"])
                     record[f"{flag}_fraction"] = f"{frac(count, total):.17g}"
 
@@ -137,7 +142,7 @@ def write_rejection_by_coordinate(rows: list[dict[str, str]], outdir: Path) -> N
                     )
 
 
-def write_pair_acceptance(rows: list[dict[str, str]], outdir: Path) -> None:
+def write_pair_acceptance(rows: list[dict[str, str]], outdir: Path, flag: str) -> None:
     output = outdir / "pair_acceptance.csv"
 
     pairs = [
@@ -162,8 +167,8 @@ def write_pair_acceptance(rows: list[dict[str, str]], outdir: Path) -> None:
                 "x_value",
                 "y_value",
                 "total",
-                "theory_ok_count",
-                "theory_ok_fraction",
+                f"{flag}_count",
+                f"{flag}_fraction",
                 "dominant_rejection_stage",
                 "dominant_rejection_count",
             ],
@@ -180,7 +185,7 @@ def write_pair_acceptance(rows: list[dict[str, str]], outdir: Path) -> None:
                 key=lambda item: (as_float_key(item[0][0])[0], as_float_key(item[0][1])[0]),
             ):
                 total = len(subset)
-                theory_ok_count = sum(is_one(r["theory_ok"]) for r in subset)
+                flag_count = sum(is_one(r[flag]) for r in subset)
                 rejection_counts = Counter(r["rejection_stage"] for r in subset)
                 dominant_stage, dominant_count = sorted(
                     rejection_counts.items(),
@@ -194,15 +199,17 @@ def write_pair_acceptance(rows: list[dict[str, str]], outdir: Path) -> None:
                         "x_value": xv,
                         "y_value": yv,
                         "total": total,
-                        "theory_ok_count": theory_ok_count,
-                        "theory_ok_fraction": f"{frac(theory_ok_count, total):.17g}",
+                        f"{flag}_count": flag_count,
+                        f"{flag}_fraction": f"{frac(flag_count, total):.17g}",
                         "dominant_rejection_stage": dominant_stage,
                         "dominant_rejection_count": dominant_count,
                     }
                 )
 
 
-def write_markdown_summary(rows: list[dict[str, str]], outdir: Path, theory_ok_count: int) -> None:
+def write_markdown_summary(
+    rows: list[dict[str, str]], outdir: Path, theory_ok_count: int, flag: str
+) -> None:
     output = outdir / "coordinate_summary.md"
     total = len(rows)
 
@@ -211,8 +218,8 @@ def write_markdown_summary(rows: list[dict[str, str]], outdir: Path, theory_ok_c
     with output.open("w", encoding="utf-8") as f:
         f.write("# Boundary coordinate inspection\n\n")
         f.write(f"- Total points: `{total}`\n")
-        f.write(f"- Theory-ok points: `{theory_ok_count}`\n")
-        f.write(f"- Theory-ok fraction: `{frac(theory_ok_count, total):.6f}`\n\n")
+        f.write(f"- {flag} points: `{theory_ok_count}`\n")
+        f.write(f"- {flag} fraction: `{frac(theory_ok_count, total):.6f}`\n\n")
 
         f.write("## Global rejection stages\n\n")
         f.write("| Rejection stage | Count | Fraction |\n")
@@ -220,16 +227,16 @@ def write_markdown_summary(rows: list[dict[str, str]], outdir: Path, theory_ok_c
         for stage, count in sorted(global_rejections.items(), key=lambda kv: (-kv[1], kv[0])):
             f.write(f"| `{stage}` | {count} | {frac(count, total):.6f} |\n")
 
-        f.write("\n## Theory-ok by coordinate\n\n")
+        f.write(f"\n## {flag} by coordinate\n\n")
         for coord in COORDINATES:
             f.write(f"### `{coord}`\n\n")
-            f.write("| Value | Total | Theory-ok | Fraction |\n")
+            f.write(f"| Value | Total | {flag} | Fraction |\n")
             f.write("|---:|---:|---:|---:|\n")
             values = sorted({r[coord] for r in rows}, key=as_float_key)
             for value in values:
                 subset = [r for r in rows if r[coord] == value]
                 n = len(subset)
-                ok = sum(is_one(r["theory_ok"]) for r in subset)
+                ok = sum(is_one(r[flag]) for r in subset)
                 f.write(f"| `{value}` | {n} | {ok} | {frac(ok, n):.6f} |\n")
             f.write("\n")
 
@@ -240,17 +247,20 @@ def main() -> int:
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
 
-    rows = read_rows(input_csv)
-    require_columns(rows, COORDINATES + FLAGS + ["rejection_stage"])
+    flag = args.flag_column
+    flags = FLAGS if flag in FLAGS else FLAGS + [flag]
 
-    theory_ok_count = write_theory_ok_points(rows, outdir)
-    write_coordinate_acceptance(rows, outdir)
+    rows = read_rows(input_csv)
+    require_columns(rows, COORDINATES + flags + ["rejection_stage"])
+
+    flag_count = write_theory_ok_points(rows, outdir, flag)
+    write_coordinate_acceptance(rows, outdir, flags)
     write_rejection_by_coordinate(rows, outdir)
-    write_pair_acceptance(rows, outdir)
-    write_markdown_summary(rows, outdir, theory_ok_count)
+    write_pair_acceptance(rows, outdir, flag)
+    write_markdown_summary(rows, outdir, flag_count, flag)
 
     print(f"[DHB] Coordinate inspection written to: {outdir}")
-    print(f"[DHB] theory_ok_points={theory_ok_count}")
+    print(f"[DHB] {flag}_points={flag_count}")
     return 0
 
 

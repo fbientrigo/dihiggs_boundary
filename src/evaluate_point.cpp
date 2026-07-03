@@ -5,6 +5,7 @@
 
 #include <cerrno>
 #include <cmath>
+#include <complex>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -64,6 +65,204 @@ bool parse_double_strict(const std::string& text, double& out) {
 
 int bool_int(bool value) {
     return value ? 1 : 0;
+}
+
+double zero_if_nan(double x) {
+    return x == x ? x : 0.0;
+}
+
+// HiggsTools input block: SM-normalized effective couplings and non-SM
+// branching ratios for all Higgs bosons (h1=h, h2=H CP-even, h3=A CP-odd,
+// hc=H+), following the conventions of 2HDMC's HBHS interface
+// (lib/2HDMC-1.8.0/src/HBHS.cpp). Consumed by the python HB/HS enrichment
+// stage; columns are NaN unless theory_ok and the total width is valid.
+struct HbhsBlock {
+    bool ok;
+
+    // per neutral Higgs [h1, h2, h3], _s = CP-even, _p = CP-odd component
+    double eff_ss_s[3];
+    double eff_ss_p[3];
+    double eff_cc_s[3];
+    double eff_cc_p[3];
+    double eff_bb_s[3];
+    double eff_bb_p[3];
+    double eff_tt_s[3];
+    double eff_tt_p[3];
+    double eff_mumu_s[3];
+    double eff_mumu_p[3];
+    double eff_tautau_s[3];
+    double eff_tautau_p[3];
+    double eff_WW[3];
+    double eff_ZZ[3];
+    double eff_Zga[3];
+    double eff_gaga[3];
+    double eff_gg[3];
+    double eff_hiZ[3][3];  // [k][i]: g(hk hi Z) / (g / 2 cos(theta_w))
+
+    double total_width_h1;
+    double total_width_h3;
+    double total_width_hc;
+
+    // per neutral Higgs k: BR(hk -> hj hi) for unordered pairs
+    // [h1h1, h2h2, h3h3, h1h2, h1h3, h2h3], BR(hk -> hi Z), BR(hk -> H+ W-)
+    double br_hh[3][6];
+    double br_hiZ[3][3];
+    double br_hcW[3];
+
+    double br_t_hcb;
+    double br_hc_cs;
+    double br_hc_cb;
+    double br_hc_tb;
+    double br_hc_taunu;
+    double br_hc_hW[3];
+    double hc_kappa_t;
+    double hc_kappa_b;
+
+    HbhsBlock() : ok(false) {
+        double* const scalars[] = {
+            &total_width_h1, &total_width_h3, &total_width_hc,
+            &br_t_hcb, &br_hc_cs, &br_hc_cb, &br_hc_tb, &br_hc_taunu,
+            &hc_kappa_t, &hc_kappa_b
+        };
+        for (size_t i = 0; i < sizeof(scalars) / sizeof(scalars[0]); ++i) {
+            *scalars[i] = nan_value();
+        }
+        for (int k = 0; k < 3; ++k) {
+            eff_ss_s[k] = eff_ss_p[k] = eff_cc_s[k] = eff_cc_p[k] = nan_value();
+            eff_bb_s[k] = eff_bb_p[k] = eff_tt_s[k] = eff_tt_p[k] = nan_value();
+            eff_mumu_s[k] = eff_mumu_p[k] = nan_value();
+            eff_tautau_s[k] = eff_tautau_p[k] = nan_value();
+            eff_WW[k] = eff_ZZ[k] = eff_Zga[k] = eff_gaga[k] = eff_gg[k] = nan_value();
+            br_hcW[k] = br_hc_hW[k] = nan_value();
+            for (int i = 0; i < 3; ++i) {
+                eff_hiZ[k][i] = nan_value();
+                br_hiZ[k][i] = nan_value();
+            }
+            for (int p = 0; p < 6; ++p) {
+                br_hh[k][p] = nan_value();
+            }
+        }
+    }
+};
+
+// Unordered scalar pairs (hj, hi) matching HbhsBlock::br_hh ordering.
+const int kHhPairJ[6] = {1, 2, 3, 1, 1, 2};
+const int kHhPairI[6] = {1, 2, 3, 2, 3, 3};
+
+void compute_hbhs_block(THDM& model, DecayTable& tab, HbhsBlock& b) {
+    const double mass[3] = {model.get_hmass(1), model.get_hmass(2),
+                            model.get_hmass(3)};
+    SM sm = model.get_SM();
+
+    for (int h = 1; h <= 3; ++h) {
+        THDM sm_like;
+        sm_like.set_param_sm(mass[h - 1]);
+        sm_like.set_yukawas_type(1);
+
+        std::complex<double> cs, cp, cs_sm, cp_sm;
+
+        model.get_coupling_hdd(h, 2, 2, cs, cp);
+        sm_like.get_coupling_hdd(1, 2, 2, cs_sm, cp_sm);
+        b.eff_ss_s[h - 1] = cs.imag() / cs_sm.imag();
+        b.eff_ss_p[h - 1] = -cp.real() / cs_sm.imag();
+
+        model.get_coupling_hdd(h, 3, 3, cs, cp);
+        sm_like.get_coupling_hdd(1, 3, 3, cs_sm, cp_sm);
+        b.eff_bb_s[h - 1] = cs.imag() / cs_sm.imag();
+        b.eff_bb_p[h - 1] = -cp.real() / cs_sm.imag();
+
+        model.get_coupling_huu(h, 2, 2, cs, cp);
+        sm_like.get_coupling_huu(1, 2, 2, cs_sm, cp_sm);
+        b.eff_cc_s[h - 1] = cs.imag() / cs_sm.imag();
+        b.eff_cc_p[h - 1] = -cp.real() / cs_sm.imag();
+
+        model.get_coupling_huu(h, 3, 3, cs, cp);
+        sm_like.get_coupling_huu(1, 3, 3, cs_sm, cp_sm);
+        b.eff_tt_s[h - 1] = cs.imag() / cs_sm.imag();
+        b.eff_tt_p[h - 1] = -cp.real() / cs_sm.imag();
+
+        model.get_coupling_hll(h, 2, 2, cs, cp);
+        sm_like.get_coupling_hll(1, 2, 2, cs_sm, cp_sm);
+        b.eff_mumu_s[h - 1] = cs.imag() / cs_sm.imag();
+        b.eff_mumu_p[h - 1] = -cp.real() / cs_sm.imag();
+
+        model.get_coupling_hll(h, 3, 3, cs, cp);
+        sm_like.get_coupling_hll(1, 3, 3, cs_sm, cp_sm);
+        b.eff_tautau_s[h - 1] = cs.imag() / cs_sm.imag();
+        b.eff_tautau_p[h - 1] = -cp.real() / cs_sm.imag();
+
+        model.get_coupling_vvh(2, 2, h, cs);
+        sm_like.get_coupling_vvh(2, 2, 1, cs_sm);
+        b.eff_ZZ[h - 1] = cs.imag() / cs_sm.imag();
+
+        model.get_coupling_vvh(3, 3, h, cs);
+        sm_like.get_coupling_vvh(3, 3, 1, cs_sm);
+        b.eff_WW[h - 1] = cs.imag() / cs_sm.imag();
+
+        DecayTable sm_tab(sm_like);
+        b.eff_gaga[h - 1] =
+            std::sqrt(tab.get_gamma_hgaga(h) / sm_tab.get_gamma_hgaga(1));
+        b.eff_Zga[h - 1] = zero_if_nan(
+            std::sqrt(tab.get_gamma_hZga(h) / sm_tab.get_gamma_hZga(1)));
+        b.eff_gg[h - 1] =
+            std::sqrt(tab.get_gamma_hgg(h) / sm_tab.get_gamma_hgg(1));
+
+        for (int j = 1; j <= 3; ++j) {
+            std::complex<double> c;
+            model.get_coupling_vhh(2, h, j, c);
+            b.eff_hiZ[h - 1][j - 1] =
+                c.real() / (sm.get_g() / 2.0 / sm.get_costw());
+        }
+    }
+
+    b.total_width_h1 = tab.get_gammatot_h(1);
+    b.total_width_h3 = tab.get_gammatot_h(3);
+    b.total_width_hc = tab.get_gammatot_h(4);
+
+    for (int k = 1; k <= 3; ++k) {
+        const double tot = tab.get_gammatot_h(k);
+        for (int p = 0; p < 6; ++p) {
+            b.br_hh[k - 1][p] =
+                zero_if_nan(tab.get_gamma_hhh(k, kHhPairJ[p], kHhPairI[p]) / tot);
+        }
+        for (int i = 1; i <= 3; ++i) {
+            b.br_hiZ[k - 1][i - 1] =
+                zero_if_nan(tab.get_gamma_hvh(k, 2, i) / tot);
+        }
+        b.br_hcW[k - 1] = zero_if_nan(tab.get_gamma_hvh(k, 3, 4) / tot);
+    }
+
+    b.br_t_hcb = zero_if_nan(tab.get_gamma_uhd(3, 4, 3) / tab.get_gammatot_top());
+
+    const double hc_tot = tab.get_gammatot_h(4);
+    b.br_hc_cs = zero_if_nan(tab.get_gamma_hdu(4, 2, 2) / hc_tot);
+    b.br_hc_cb = zero_if_nan(tab.get_gamma_hdu(4, 3, 2) / hc_tot);
+    b.br_hc_tb = zero_if_nan(tab.get_gamma_hdu(4, 3, 3) / hc_tot);
+    b.br_hc_taunu = zero_if_nan(tab.get_gamma_hln(4, 3, 3) / hc_tot);
+    for (int i = 1; i <= 3; ++i) {
+        b.br_hc_hW[i - 1] = zero_if_nan(tab.get_gamma_hvh(4, 3, i) / hc_tot);
+    }
+
+    // effective H+tb quark couplings (kappas), as in HBHS::charged_input
+    std::complex<double> cs, cp;
+    model.get_coupling_hdu(4, 3, 3, cs, cp);
+    const double mHc = model.get_hmass(4);
+    const double mb = sm.get_dmass_MSbar(3);
+    double mbrun = 0.0;
+    if (mb > 0) {
+        mbrun = sm.run_qmass_MSbar(mb, mb, mHc, sm.get_qmass_pole(6),
+                                   sm.get_qmass_pole(5));
+    }
+    b.hc_kappa_b =
+        mb > 0 ? (cs + cp).imag() * sm.get_v() / (std::sqrt(2.0) * mbrun) : 0.0;
+
+    const double mt = sm.get_umass_MSbar(3);
+    const double mtrun = sm.run_qmass_MSbar(mt, mt, mHc, sm.get_qmass_pole(6),
+                                            sm.get_qmass_pole(5));
+    b.hc_kappa_t =
+        -(-cs + cp).imag() * sm.get_v() / (std::sqrt(2.0) * mtrun);
+
+    b.ok = true;
 }
 
 struct InputPoint {
@@ -140,6 +339,8 @@ struct OutputRecord {
     int soft_z2_only;
     std::string rejection_stage;
     std::string rejection_reason;
+
+    HbhsBlock hbhs;
 
     OutputRecord()
         : point_id("unknown"),
@@ -378,7 +579,85 @@ OutputRecord evaluate_point(const InputPoint& p) {
         r.rejection_reason = "ok";
     }
 
+    if (r.theory_ok) {
+        compute_hbhs_block(model, tab, r.hbhs);
+    }
+
     return r;
+}
+
+const char* kNeutralNames[3] = {"h1", "h2", "h3"};
+const char* kHhPairNames[6] = {"h1h1", "h2h2", "h3h3", "h1h2", "h1h3", "h2h3"};
+const char* kEffFermionNames[6] = {"ss", "cc", "bb", "tt", "mumu", "tautau"};
+
+void write_hbhs_header(std::ostream& os) {
+    os << ",hbhs_block_ok";
+    for (int k = 0; k < 3; ++k) {
+        const char* h = kNeutralNames[k];
+        for (int f = 0; f < 6; ++f) {
+            os << ",eff_" << h << "_" << kEffFermionNames[f] << "_s"
+               << ",eff_" << h << "_" << kEffFermionNames[f] << "_p";
+        }
+        os << ",eff_" << h << "_WW"
+           << ",eff_" << h << "_ZZ"
+           << ",eff_" << h << "_Zga"
+           << ",eff_" << h << "_gaga"
+           << ",eff_" << h << "_gg";
+        for (int i = 0; i < 3; ++i) {
+            os << ",eff_" << h << "_" << kNeutralNames[i] << "Z";
+        }
+    }
+    os << ",total_width_h1,total_width_h3,total_width_hc";
+    for (int k = 0; k < 3; ++k) {
+        const char* h = kNeutralNames[k];
+        for (int p = 0; p < 6; ++p) {
+            os << ",br_" << h << "_" << kHhPairNames[p];
+        }
+        for (int i = 0; i < 3; ++i) {
+            os << ",br_" << h << "_" << kNeutralNames[i] << "Z";
+        }
+        os << ",br_" << h << "_hcW";
+    }
+    os << ",br_t_hcb,br_hc_cs,br_hc_cb,br_hc_tb,br_hc_taunu"
+       << ",br_hc_h1W,br_hc_h2W,br_hc_h3W"
+       << ",hc_kappa_t,hc_kappa_b";
+}
+
+void write_hbhs_record(std::ostream& os, const HbhsBlock& b) {
+    os << "," << bool_int(b.ok);
+    for (int k = 0; k < 3; ++k) {
+        const double* fermion_s[6] = {&b.eff_ss_s[k], &b.eff_cc_s[k],
+                                      &b.eff_bb_s[k], &b.eff_tt_s[k],
+                                      &b.eff_mumu_s[k], &b.eff_tautau_s[k]};
+        const double* fermion_p[6] = {&b.eff_ss_p[k], &b.eff_cc_p[k],
+                                      &b.eff_bb_p[k], &b.eff_tt_p[k],
+                                      &b.eff_mumu_p[k], &b.eff_tautau_p[k]};
+        for (int f = 0; f < 6; ++f) {
+            os << "," << *fermion_s[f] << "," << *fermion_p[f];
+        }
+        os << "," << b.eff_WW[k] << "," << b.eff_ZZ[k] << "," << b.eff_Zga[k]
+           << "," << b.eff_gaga[k] << "," << b.eff_gg[k];
+        for (int i = 0; i < 3; ++i) {
+            os << "," << b.eff_hiZ[k][i];
+        }
+    }
+    os << "," << b.total_width_h1 << "," << b.total_width_h3 << ","
+       << b.total_width_hc;
+    for (int k = 0; k < 3; ++k) {
+        for (int p = 0; p < 6; ++p) {
+            os << "," << b.br_hh[k][p];
+        }
+        for (int i = 0; i < 3; ++i) {
+            os << "," << b.br_hiZ[k][i];
+        }
+        os << "," << b.br_hcW[k];
+    }
+    os << "," << b.br_t_hcb << "," << b.br_hc_cs << "," << b.br_hc_cb << ","
+       << b.br_hc_tb << "," << b.br_hc_taunu;
+    for (int i = 0; i < 3; ++i) {
+        os << "," << b.br_hc_hW[i];
+    }
+    os << "," << b.hc_kappa_t << "," << b.hc_kappa_b;
 }
 
 void write_header(std::ostream& os) {
@@ -395,7 +674,9 @@ void write_header(std::ostream& os) {
         << "width_gammagamma_H2,width_Zgamma_H2,width_gg_H2,width_hh_H2,"
         << "total_width_H2,br_gammagamma_H2,ctau_mm_H2,"
         << "yukawa_assignment,scalar_z2_status,soft_z2_only,"
-        << "rejection_stage,rejection_reason\n";
+        << "rejection_stage,rejection_reason";
+    write_hbhs_header(os);
+    os << "\n";
 }
 
 void write_double(std::ostream& os, double value) {
@@ -453,7 +734,9 @@ void write_record(std::ostream& os, const OutputRecord& r) {
        << r.scalar_z2_status << ","
        << r.soft_z2_only << ","
        << r.rejection_stage << ","
-       << r.rejection_reason << "\n";
+       << r.rejection_reason;
+    write_hbhs_record(os, r.hbhs);
+    os << "\n";
 }
 
 int run(const std::string& input_csv, const std::string& output_csv) {

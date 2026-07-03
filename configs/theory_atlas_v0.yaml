@@ -75,8 +75,14 @@ evaluation:
       ctau_mm: true
 
   experiment_higgstools:
-    enabled: false
+    enabled: true
     mode: later_enrichment
+    # HiggsSignals classification: a point is exp_ok when HiggsBounds allows
+    # it and chi2(point) - chi2(SM reference) <= hs_delta_chi2_max.
+    # 6.18 = 95% CL for 2 dof; raw chi2 values are always stored so the
+    # classification can be redone without re-running HB/HS.
+    hs_delta_chi2_max: 6.18
+    reference: sm_h125
 
 output:
   transient_format: csv_shards

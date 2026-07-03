@@ -19,6 +19,8 @@ __pycache__/
 *.pyc
 .venv/
 .env
+*.egg-info/
+.pytest_cache/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -58,6 +60,7 @@ lib/2HDMC-1.8.0/lib/
 # Track reproducible smoke/config inputs.
 !configs/
 !configs/smoke_points.csv
+!configs/smoke_points_hbhs.csv
 
 runs/
 campaigns/

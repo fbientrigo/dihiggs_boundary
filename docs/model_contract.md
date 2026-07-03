@@ -288,6 +288,15 @@ hs_delta_chi2_vs_sm
 
 HiggsTools is not required for the first theory-only atlas.
 
+Status: implemented as the `dhb.enrich` python stage (see
+`docs/hbhs_contract.md`). `evaluate_point` exports the HiggsPredictions
+inputs (schema `evaluate_point_v1`), and `python -m dhb.enrich` runs
+HiggsBounds/HiggsSignals over `theory_ok` points, storing
+`hb_allowed, hb_max_obsratio, hb_limiting_particle, hb_limiting_process,
+hs_chi2, hs_nobs, hs_chi2_sm_ref, hs_delta_chi2, exp_ok` (naming differs
+slightly from the sketch above; collider/citekey provenance is available
+in the HB dataset but not yet stored per point).
+
 ---
 
 ## 10. Production and signal usefulness
