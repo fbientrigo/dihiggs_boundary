@@ -26,6 +26,12 @@ def build_parser() -> argparse.ArgumentParser:
         default="",
         help="Optional comma-separated pairs like mH:mA,tan_beta:lambda6_input.",
     )
+    p.add_argument(
+        "--color-by",
+        default="rejection_stage",
+        help="Column whose values define the scatter groups "
+        "(e.g. exp_ok on an hbhs_enriched CSV).",
+    )
     return p
 
 
@@ -74,8 +80,9 @@ def main() -> int:
         raise SystemExit("[DHB][FAIL] No rows found.")
 
     pairs = parse_pairs(args.pairs)
+    color_by = args.color_by
 
-    required = {"theory_ok", "rejection_stage"}
+    required = {"theory_ok", color_by}
     for x, y in pairs:
         required.add(x)
         required.add(y)
@@ -84,18 +91,21 @@ def main() -> int:
     if missing:
         raise SystemExit(f"[DHB][FAIL] Missing columns: {missing}")
 
-    stages = sorted({row["rejection_stage"] for row in rows})
+    stages = sorted({row[color_by] for row in rows})
 
     for x, y in pairs:
         fig, ax = plt.subplots(figsize=(7, 5))
 
         for stage in stages:
-            subset = [r for r in rows if r["rejection_stage"] == stage]
+            subset = [r for r in rows if r[color_by] == stage]
             if not subset:
                 continue
             xs = [to_float(r[x]) for r in subset]
             ys = [to_float(r[y]) for r in subset]
-            ax.scatter(xs, ys, label=stage, alpha=0.75, s=35)
+            label = stage if stage else "(empty)"
+            if color_by != "rejection_stage":
+                label = f"{color_by}={label}"
+            ax.scatter(xs, ys, label=label, alpha=0.75, s=35)
 
         ax.set_xlabel(x)
         ax.set_ylabel(y)

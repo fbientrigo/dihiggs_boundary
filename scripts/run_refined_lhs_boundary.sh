@@ -7,6 +7,12 @@ SEED=${2:-12345}
 RUN_DIR="runs/refined_lhs_boundary"
 mkdir -p "$RUN_DIR"
 
+# Prefer the project venv (has matplotlib/numpy via scripts/build_higgstools.sh)
+PY="build/venv/bin/python"
+if [ ! -x "$PY" ]; then
+    PY="python3"
+fi
+
 echo "=== Refined LHS Boundary Run ==="
 echo "N_POINTS: $N_POINTS"
 echo "SEED: $SEED"
@@ -19,7 +25,7 @@ echo "Building evaluate_point..."
 ./scripts/build_evaluate_point.sh
 
 echo "Generating input..."
-python3 scripts/generate_refined_lhs_boundary.py \
+"$PY" scripts/generate_refined_lhs_boundary.py \
     --output "$RUN_DIR/points.csv" \
     --n-points "$N_POINTS" \
     --seed "$SEED"
@@ -45,13 +51,13 @@ echo "Checking output CSV..."
 ./scripts/check_evaluate_point_output.sh "$RUN_DIR/evaluate_point.csv"
 
 echo "Summarizing run..."
-python3 scripts/summarize_boundary_run.py --input "$RUN_DIR/evaluate_point.csv" --outdir "$RUN_DIR"
+"$PY" scripts/summarize_boundary_run.py --input "$RUN_DIR/evaluate_point.csv" --outdir "$RUN_DIR"
 
 echo "Inspecting boundary coordinates..."
-python3 scripts/inspect_boundary_coordinates.py --input "$RUN_DIR/evaluate_point.csv" --outdir "$RUN_DIR"
+"$PY" scripts/inspect_boundary_coordinates.py --input "$RUN_DIR/evaluate_point.csv" --outdir "$RUN_DIR"
 
 echo "Plotting boundary pixels..."
-python3 scripts/plot_boundary_pixels.py --input "$RUN_DIR/evaluate_point.csv" --outdir "$RUN_DIR/pixel_plots"
+"$PY" scripts/plot_boundary_pixels.py --input "$RUN_DIR/evaluate_point.csv" --outdir "$RUN_DIR/pixel_plots"
 
 INPUT_ROWS=$(wc -l < "$RUN_DIR/points.csv")
 OUTPUT_ROWS=$(wc -l < "$RUN_DIR/evaluate_point.csv")

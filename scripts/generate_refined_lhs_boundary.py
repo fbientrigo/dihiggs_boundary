@@ -1,7 +1,29 @@
 import argparse
 import csv
+import json
 import math
+import os
 import random
+
+DEFAULT_CONFIG = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "configs", "refined_boundary_v0.json"
+)
+
+REQUIRED_DIMS = ["mH", "mA", "tan_beta", "lambda6", "M"]
+
+
+def load_dims(config_path):
+    with open(config_path) as f:
+        config = json.load(f)
+    dims = config["dims"]
+    missing = [d for d in REQUIRED_DIMS if d not in dims]
+    if missing:
+        raise SystemExit(f"[DHB][FAIL] Ranges config missing dims: {missing}")
+    for name in REQUIRED_DIMS:
+        info = dims[name]
+        if not {"min", "max", "log"} <= set(info):
+            raise SystemExit(f"[DHB][FAIL] Dim {name} needs min/max/log keys")
+    return {name: dims[name] for name in REQUIRED_DIMS}
 
 def generate_lhs(n_points, dims, seed):
     random.seed(seed)
@@ -35,15 +57,14 @@ def main():
     parser.add_argument("--output", required=True, help="Output CSV file path")
     parser.add_argument("--n-points", type=int, default=5000, help="Number of points to generate")
     parser.add_argument("--seed", type=int, default=12345, help="Random seed")
+    parser.add_argument(
+        "--config",
+        default=DEFAULT_CONFIG,
+        help="JSON file with the sampling ranges (default: configs/refined_boundary_v0.json)",
+    )
     args = parser.parse_args()
 
-    dims = {
-        'mH': {'min': 240, 'max': 360, 'log': False},
-        'mA': {'min': 280, 'max': 650, 'log': False},
-        'tan_beta': {'min': 10, 'max': 10000, 'log': True},
-        'lambda6': {'min': 1e-12, 'max': 1e-2, 'log': True},
-        'M': {'min': 200, 'max': 450, 'log': False},
-    }
+    dims = load_dims(args.config)
 
     samples = generate_lhs(args.n_points, dims, args.seed)
 

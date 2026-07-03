@@ -16,7 +16,13 @@ def main():
     parser.add_argument("--input", required=True, help="Input evaluate_point.csv file")
     parser.add_argument("--outdir", required=True, help="Output directory for plots and CSVs")
     parser.add_argument("--bins", type=int, default=64, help="Number of bins per axis")
+    parser.add_argument(
+        "--flag-column",
+        default="theory_ok",
+        help="0/1 acceptance column to plot (e.g. exp_ok on an hbhs_enriched CSV)",
+    )
     args = parser.parse_args()
+    flag = args.flag_column
 
     if not MATPLOTLIB_AVAILABLE:
         print("ERROR: matplotlib or numpy not available. Cannot generate plots.")
@@ -25,7 +31,7 @@ def main():
     os.makedirs(args.outdir, exist_ok=True)
 
     data = {
-        'mH': [], 'mA': [], 'M': [], 'tan_beta': [], 'lambda6_input': [], 'theory_ok': []
+        'mH': [], 'mA': [], 'M': [], 'tan_beta': [], 'lambda6_input': [], flag: []
     }
 
     with open(args.input, "r") as f:
@@ -36,7 +42,7 @@ def main():
             data['M'].append(float(row['M']))
             data['tan_beta'].append(float(row['tan_beta']))
             data['lambda6_input'].append(float(row['lambda6_input']))
-            data['theory_ok'].append(1 if row['theory_ok'] == '1' else 0)
+            data[flag].append(1 if row[flag] == '1' else 0)
 
     for k in data:
         data[k] = np.array(data[k])
@@ -55,7 +61,7 @@ def main():
     for x_var, y_var in pairs:
         x_data = data[x_var]
         y_data = data[y_var]
-        theory_ok = data['theory_ok']
+        theory_ok = data[flag]
 
         x_is_log = x_var in log_vars
         y_is_log = y_var in log_vars
@@ -100,7 +106,7 @@ def main():
 
         plt.figure(figsize=(8, 6))
         plt.pcolormesh(x_edges, y_edges, fraction_masked.T, cmap='viridis', vmin=0, vmax=1)
-        plt.colorbar(label='Theory OK fraction')
+        plt.colorbar(label=f'{flag} fraction')
         plt.xlabel(f"log10({x_var})" if x_is_log else x_var)
         plt.ylabel(f"log10({y_var})" if y_is_log else y_var)
         plt.title(f"Acceptance: {y_var} vs {x_var}")
@@ -111,7 +117,7 @@ def main():
         csv_path = os.path.join(args.outdir, f"pixel_acceptance_{x_var}_vs_{y_var}.csv")
         with open(csv_path, "w", newline="") as f:
             writer = csv.writer(f, lineterminator="\n")
-            writer.writerow([x_var + "_bin_center", y_var + "_bin_center", "total_count", "theory_ok_count", "theory_ok_fraction"])
+            writer.writerow([x_var + "_bin_center", y_var + "_bin_center", "total_count", flag + "_count", flag + "_fraction"])
             for i in range(args.bins):
                 for j in range(args.bins):
                     c = total_counts[i, j]
