@@ -69,6 +69,19 @@ required_columns=(
   soft_z2_only
   rejection_stage
   rejection_reason
+  hbhs_block_ok
+  eff_h1_tt_s
+  eff_h2_gaga
+  eff_h3_h1Z
+  total_width_h1
+  total_width_h3
+  total_width_hc
+  br_h2_h1h1
+  br_h3_h1Z
+  br_t_hcb
+  br_hc_taunu
+  hc_kappa_t
+  hc_kappa_b
 )
 
 for col in "${required_columns[@]}"; do
