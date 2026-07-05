@@ -1,0 +1,16 @@
+schema_version: boundary_atlas_config_v0
+
+experiment:
+  hs_delta_chi2_max: 6.18
+
+signal_tags:
+  br_hh_min: 0.0
+  br_gammagamma_min: 0.0
+  br_bb_min: 0.0
+  ctau_prompt_max_mm: 1.0e-3
+  ctau_displaced_min_mm: 1.0e-3
+  ctau_displaced_max_mm: 1.0e4
+
+quality:
+  max_width_rel_diff: 0.5
+  require_enrich_status_ok_for_exp: true
