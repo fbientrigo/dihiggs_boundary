@@ -1,0 +1,29 @@
+# Canonical physics conventions shared across the dihiggs ecosystem.
+#
+# This file is the single VALUES-ONLY source of truth for the constants and
+# naming conventions that must agree across the three repos:
+#   - dihiggs            (parameter scan + data lake)
+#   - dihiggs_boundary   (theory/experiment boundary; this repo)
+#   - dihiggs_hep_cross  (LLP recast / paper cross-checks)
+#
+# It is intentionally values-only (no code) so C++ and Python, and any repo,
+# can read the same numbers without depending on each other's packages. Keep
+# the three copies byte-identical; `schema_version` bumps on any change and the
+# per-repo tests pin the values so an accidental edit fails CI. (Collapsing the
+# three copies into one shared submodule is tracked as Phase D in the
+# inter-repo assessment.)
+schema_version: physics_conventions_v1
+
+# c*tau[mm] = hbar_c_gev_mm / Gamma[GeV]
+hbar_c_gev_mm: 1.973269804e-13
+# c*tau[mm] = c_mm_per_ns * tau[ns]
+c_mm_per_ns: 299.792458
+
+# Internal neutral-scalar naming used across the CSV contracts and column
+# names (eff_<hk>_*, br_<hk>_*, total_width_<hk>, mass columns).
+neutral_scalars:
+  h1: {symbol: h, role: SM-like CP-even, pdg_id: 25, mass_column: mh}
+  h2: {symbol: H, role: heavy CP-even, pdg_id: 35, mass_column: mH}
+  h3: {symbol: A, role: CP-odd, pdg_id: 36, mass_column: mA}
+charged_scalar:
+  hc: {symbol: H+, pdg_id: 37, mass_column: mHp}

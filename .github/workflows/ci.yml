@@ -1,0 +1,47 @@
+name: CI
+
+# Runs the python unit tests and the data-contract checks. These need neither
+# a 2HDMC/HiggsTools build nor the HB/HS datasets (integration tests, marked
+# `-m integration`, are intentionally excluded here).
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest "PyYAML>=5.0"
+
+      - name: Run unit tests (no HiggsTools / no datasets)
+        env:
+          PYTHONPATH: python
+        run: pytest -q -m "not integration"
+
+      - name: Contracts YAML mirror is in sync with code
+        env:
+          PYTHONPATH: python
+        run: |
+          python -m dhb.contracts --emit /tmp/contracts_check
+          for f in evaluate_point_v1 hbhs_enriched_v1 boundary_atlas_v0; do
+            diff -u "contracts/$f.yaml" "/tmp/contracts_check/$f.yaml"
+          done
+
+      - name: Validate the committed fixture against its contract
+        env:
+          PYTHONPATH: python
+        run: |
+          python -m dhb.validate --contract evaluate_point_v1 \
+            --input tests/fixtures/evaluate_point_sample.csv

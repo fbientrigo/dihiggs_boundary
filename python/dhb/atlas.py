@@ -20,7 +20,7 @@ import json
 import os
 import sys
 
-from . import schema
+from . import contracts, schema
 
 # enrich.py already has boring, tested CSV-value formatting and git-commit
 # helpers; reuse them instead of re-implementing.
@@ -28,6 +28,10 @@ from .enrich import _format_value, _git_commit
 
 ATLAS_SCHEMA_VERSION = "boundary_atlas_v0"
 
+# The columns this stage must find in its input come from the enriched
+# contract (dhb.contracts.ENRICHED), the single source of truth, rather than
+# being redeclared here. The split into theory vs HBHS below is kept for the
+# error message that tells the user which half is missing.
 REQUIRED_THEORY_COLUMNS = [
     "set_param_phys_ok",
     "positivity_ok",
@@ -42,6 +46,12 @@ REQUIRED_THEORY_COLUMNS = [
 # Required per the task; reuse the shared HB/HS enrichment column list
 # rather than redeclaring it.
 REQUIRED_HBHS_COLUMNS = list(schema.ENRICHMENT_COLUMNS)
+
+# Guard: the ad-hoc lists above must stay equal to the enriched contract's
+# required set (order-independent). This keeps atlas and dhb.contracts in sync.
+assert set(REQUIRED_THEORY_COLUMNS + REQUIRED_HBHS_COLUMNS) == set(
+    contracts.ENRICHED["required_columns"]
+)
 
 # "If present" columns: never required, only tracked in the manifest/summary.
 OPTIONAL_COORDINATE_COLUMNS = [

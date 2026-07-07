@@ -1,15 +1,57 @@
 import math
+import os
+import re
 
 from dhb import schema
+
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+EVALUATE_POINT_CPP = os.path.join(REPO_ROOT, "src", "evaluate_point.cpp")
 
 
 def test_block_columns_match_cpp_header(sample_rows, sample_csv_path):
     """The python schema must list the HBHS block columns in exactly the
-    order written by src/evaluate_point.cpp."""
+    order written by src/evaluate_point.cpp (checked via the committed
+    fixture header)."""
     with open(sample_csv_path) as fh:
         header = fh.readline().strip().split(",")
     start = header.index("hbhs_block_ok")
     assert header[start:] == schema.HBHS_BLOCK_COLUMNS
+
+
+def _cpp_char_array(source, name):
+    """Extract a `const char* name[N] = {"a", "b", ...};` literal from C++."""
+    m = re.search(name + r"\s*\[\s*\d*\s*\]\s*=\s*\{([^}]*)\}", source)
+    assert m, "could not find C++ array %s in evaluate_point.cpp" % name
+    return re.findall(r'"([^"]*)"', m.group(1))
+
+
+def test_cpp_source_building_blocks_match_schema():
+    """Non-circular guard against C++/python drift: instead of re-deriving the
+    column order (which both sides encode the same way), assert the *raw name
+    arrays* the C++ header writer loops over equal the python schema
+    constants. If someone renames a scalar/fermion/pair in evaluate_point.cpp
+    without updating schema.py (or vice versa), this fails without needing to
+    compile the evaluator.
+    """
+    if not os.path.exists(EVALUATE_POINT_CPP):
+        # Source not present (e.g. python-only checkout); the fixture test
+        # above still guards the committed schema.
+        import pytest
+
+        pytest.skip("src/evaluate_point.cpp not present")
+    with open(EVALUATE_POINT_CPP) as fh:
+        source = fh.read()
+
+    assert tuple(_cpp_char_array(source, "kNeutralNames")) == schema.NEUTRALS
+    assert tuple(_cpp_char_array(source, "kEffFermionNames")) == schema.EFF_FERMIONS
+    assert tuple(_cpp_char_array(source, "kHhPairNames")) == schema.HH_PAIRS
+
+    # The effective-boson labels are emitted as inline literals in
+    # write_hbhs_header (not an array); assert each appears with the eff_ prefix.
+    for boson in schema.EFF_BOSONS:
+        assert ('eff_" << h << "_%s' % boson) in source, (
+            "boson label %s missing from evaluate_point.cpp header writer" % boson
+        )
 
 
 def test_block_column_count():

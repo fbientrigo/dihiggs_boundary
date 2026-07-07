@@ -1,0 +1,16 @@
+name: boundary_atlas_v0
+produced_by: dhb.atlas
+consumed_by: downstream analysis / plotting
+file: boundary_atlas.csv
+required_columns:
+- region_class
+- is_theory_ok
+- is_exp_ok
+- is_allowed
+full_columns: null
+invariants: []
+aliases:
+  ctau_mm_H2:
+  - ctau_mm
+  total_width_H2:
+  - total_width_GeV
