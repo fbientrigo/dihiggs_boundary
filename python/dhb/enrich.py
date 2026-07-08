@@ -22,7 +22,7 @@ import os
 import subprocess
 import sys
 
-from . import adapter, classify, runner, schema
+from . import adapter, classify, contracts, runner, schema
 
 
 def _nan_result():
@@ -146,8 +146,11 @@ def run(argv=None):
         if reader.fieldnames is None:
             print("[DHB][FAIL] Empty input CSV: %s" % args.input, file=sys.stderr)
             return 2
+        # Required input columns come from the theory contract (single source
+        # of truth), not an inline list, so enrich and dhb.contracts stay in
+        # sync. This is exactly ["point_id", "theory_ok"] + HBHS_BLOCK_COLUMNS.
         missing = schema.missing_columns(
-            reader.fieldnames, ["point_id", "theory_ok"] + schema.HBHS_BLOCK_COLUMNS
+            reader.fieldnames, contracts.THEORY["required_columns"]
         )
         if missing:
             print(
