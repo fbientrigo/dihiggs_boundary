@@ -54,6 +54,11 @@ Thumbs.db
 !tests/fixtures/*.json
 !tests/fixtures/*.jsonl
 
+# Version the frozen golden characterization oracle for evaluate_point
+# (narrow exceptions; other CSVs stay ignored).
+!tests/golden/evaluate_point_v1/input.csv
+!tests/golden/evaluate_point_v1/expected.csv
+
 # Libs
 # 2HDMC local build artifacts
 lib/2HDMC-1.8.0/lib/
