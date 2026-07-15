@@ -1,0 +1,116 @@
+{
+  "golden_suite": "evaluate_point_v1",
+  "golden_suite_version": 1,
+  "generated_utc": "2026-07-15T00:23:52.700598+00:00",
+  "oracle_kind": "generated characterization oracle (output of the current implementation), not manually authored physics assertions",
+  "generation_commands": [
+    "python3 scripts/extract_golden_evaluate_point_inputs.py",
+    "build/bin/evaluate_point tests/golden/evaluate_point_v1/input.csv tests/golden/evaluate_point_v1/expected.csv",
+    "python3 scripts/generate_golden_evaluate_point.py"
+  ],
+  "source": {
+    "repo": "dihiggs_boundary",
+    "git_commit": "ae9bb132dd0b042b9718b744fef8e3db3439beba",
+    "git_status_short": [
+      " M .github/workflows/ci.yml",
+      "?? audit_dihiggs_boundary_repo_notes.json",
+      "?? audit_dihiggs_boundary_repo_notes.md",
+      "?? docs/characterization_evaluate_point.md",
+      "?? llm_wiki/dihiggs_boundary_june2026.txt",
+      "?? scripts/extract_golden_evaluate_point_inputs.py",
+      "?? scripts/generate_golden_evaluate_point.py",
+      "?? scripts/plot_lambda1_relations.py",
+      "?? scripts/run_golden_characterization.sh",
+      "?? tests/golden/",
+      "?? tests/test_golden_evaluate_point.py"
+    ],
+    "tracked_files_modified": true,
+    "evaluator_source": "src/evaluate_point.cpp"
+  },
+  "dependencies": {
+    "2HDMC": {
+      "version": "1.8 (stock)",
+      "vendored_path": "lib/2HDMC-1.8.0",
+      "git_tree_hash": "3f3f0f58a64c040e4330190e77be3b30c05b1fb6",
+      "positivity_stability_alias": "Constraints::check_positivity() and Constraints::check_stability() both return model.check_stability() in this vendored tree"
+    },
+    "gsl": "2.7.1"
+  },
+  "toolchain": {
+    "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "compile_flags": "-std=c++11 -Wall -Wextra -O2 (scripts/build_evaluate_point.sh)",
+    "build_commands": [
+      "scripts/build_2hdmc.sh",
+      "scripts/build_evaluate_point.sh"
+    ],
+    "uname": "Linux 6.18.33.2-microsoft-standard-WSL2 x86_64"
+  },
+  "files": {
+    "input.csv": {
+      "sha256": "2ee7a69e2b5e0cddf205e871f28b5d847876e39974d7e9c80a5b1ab36ab86555",
+      "data_rows": 6
+    },
+    "expected.csv": {
+      "sha256": "513cc9defe61fd2fea09b68b11ba6d246bc6e4303ff0f5bfe6e196f7f93c21cc",
+      "data_rows": 6
+    }
+  },
+  "repeat_run_byte_identical": true,
+  "golden_cases": {
+    "G01": {
+      "point_id": "p1",
+      "source": {
+        "path": "tests/fixtures/evaluate_point_sample.csv",
+        "sha256": "0d174a7d7c6b542eb9f94b57e1b2b6d0f79ba52ff2195e60ca428d86b3c79cee",
+        "tracked": true
+      }
+    },
+    "G02": {
+      "point_id": "p4",
+      "source": {
+        "path": "tests/fixtures/evaluate_point_sample.csv",
+        "sha256": "0d174a7d7c6b542eb9f94b57e1b2b6d0f79ba52ff2195e60ca428d86b3c79cee",
+        "tracked": true
+      }
+    },
+    "G03": {
+      "point_id": "p5",
+      "source": {
+        "path": "tests/fixtures/evaluate_point_sample.csv",
+        "sha256": "0d174a7d7c6b542eb9f94b57e1b2b6d0f79ba52ff2195e60ca428d86b3c79cee",
+        "tracked": true
+      }
+    },
+    "G04": {
+      "point_id": "lhs_000278",
+      "source": {
+        "path": "runs/refined_lhs_boundary/points.csv",
+        "sha256": "8873c39e473f284f1d667b9be6800d541b41930c80404139ce813f762e1fdf5b",
+        "tracked": false,
+        "run_manifest_commit": "073cd142e571b3a29ff4c0b64b4bbe5d482d4c2e",
+        "run_seed": 12345,
+        "run_git_status": "clean"
+      }
+    },
+    "G05": {
+      "point_id": "tiny_mH300_mA300_tb10000_l61em12_M300",
+      "source": {
+        "path": "runs/tiny_boundary/input_points.csv",
+        "sha256": "3df81cd621679ec20a557762759acbbda1e45d5972a272f87be1e8179f843477",
+        "tracked": false,
+        "run_manifest_commit": "87803164fa0d9601ea5391151b68a8ca50308df7",
+        "run_git_status": "dirty",
+        "note": "input coordinates only; expected output is regenerated from a clean build, never copied from this dirty run"
+      }
+    },
+    "G07": {
+      "point_id": "g07_set_param_phys_fail_mH_nextafter_below_mh",
+      "source": {
+        "rule": "mH = nextafter(125.09, -inf); other coordinates copied from G01/p1",
+        "mH_decimal": "125.08999999999999",
+        "mH_hex": "0x1.f45c28f5c28f5p+6",
+        "expected_failure": "stock THDM::set_param_phys returns false when m_h > m_H (lib/2HDMC-1.8.0/src/THDM.cpp)"
+      }
+    }
+  }
+}

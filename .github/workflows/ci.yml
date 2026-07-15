@@ -45,3 +45,30 @@ jobs:
         run: |
           python -m dhb.validate --contract evaluate_point_v1 \
             --input tests/fixtures/evaluate_point_sample.csv
+          python -m dhb.validate --contract evaluate_point_v1 \
+            --input tests/golden/evaluate_point_v1/expected.csv
+
+  # Golden characterization of the C++ evaluator: clean-builds the vendored
+  # stock 2HDMC (~10 s) and build/bin/evaluate_point, then re-runs the frozen
+  # 6-point golden suite and compares against the committed oracle
+  # (tests/golden/evaluate_point_v1/, docs/characterization_evaluate_point.md).
+  # No HiggsTools and no HB/HS datasets are involved. The build is fast enough
+  # that no cross-run caching of build products is worthwhile.
+  evaluate-point-golden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build and test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends g++ make libgsl-dev
+          python -m pip install --upgrade pip
+          pip install pytest "PyYAML>=5.0"
+
+      - name: Build and run the golden characterization suite
+        run: bash scripts/run_golden_characterization.sh
