@@ -44,6 +44,10 @@ Tests: `build/venv/bin/python -m pytest` (unit tests need no HiggsTools;
 `-m integration` exercises the real datasets). End-to-end smoke:
 `scripts/smoke_enrich_hbhs.sh`.
 
+Historical context: [`docs/history/dihiggs_boundary_june2026.md`](docs/history/dihiggs_boundary_june2026.md)
+is a non-authoritative June 2026 source note. Current tracked contracts and
+implementation override it.
+
 ### Next steps
 
 - `scripts/make_boundary_atlas.sh runs/<id>` works standalone against any
