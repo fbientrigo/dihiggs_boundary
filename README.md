@@ -15,7 +15,7 @@ The long-term model authority is `fbientrigo/dihiggs`, whose canonical producers
 
 `dihiggs_boundary` should not become a second 2HDM authority. The historical `src/evaluate_point.cpp` is retained during migration because the current HB/HS adapter still needs its effective-coupling block. Its golden tests characterize compatibility behavior; they do not promote it over `dihiggs.point.v2`.
 
-The August 2026 `dihiggs` work validated the native `h-H2-H2` convention, but the current `DihiggsPointV2Evaluator` does not yet serialize `g_hH2H2_GeV`. Boundary therefore consumes that observable when supplied and fails closed when it is missing; it does not recalculate the coupling.
+As of `fbientrigo/dihiggs` commit `9f8019690c44bb68d46a3b60f5ac2ac349d445f2`, `DihiggsPointV2Evaluator` serializes the validated canonical observable `g_hH2H2_GeV` directly in `dihiggs.point.v2`. Boundary consumes that field without recalculating the coupling convention and still fails closed for older/partial rows where it is absent.
 
 See [`docs/modernization_llp_signal_v1.md`](docs/modernization_llp_signal_v1.md) for the migration audit and REUSE/MODERNIZE/DEPRECATE/ADD map.
 
