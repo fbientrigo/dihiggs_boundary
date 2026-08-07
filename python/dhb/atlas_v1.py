@@ -21,11 +21,10 @@ from .llp_signal import (
     DOMAIN_MISSING,
     DOMAIN_OUTSIDE,
     DOMAIN_SUPPORTED,
-    SIGNAL_COLUMNS,
 )
 
 
-ATLAS_SCHEMA_VERSION = "boundary_atlas_v1"
+ATLAS_SCHEMA_VERSION = schema.BOUNDARY_ATLAS_V1_SCHEMA_VERSION
 
 REQUIRED_COLUMNS = [
     "theory_ok",
@@ -33,7 +32,7 @@ REQUIRED_COLUMNS = [
     "hs_delta_chi2",
     "exp_ok",
     "enrich_status",
-] + list(SIGNAL_COLUMNS)
+] + list(schema.LLP_SIGNAL_NORMALIZED_INPUT_COLUMNS) + list(schema.LLP_SIGNAL_COLUMNS)
 
 APPENDED_COLUMNS = [
     "atlas_schema_version",
@@ -88,7 +87,9 @@ def classify_row(row):
     hb_allowed = schema.parse_flag(row, "hb_allowed")
     is_exp_ok = schema.parse_flag(row, "exp_ok")
     hs_delta_chi2 = _finite(row, "hs_delta_chi2")
-    is_allowed = bool(is_theory_ok and is_exp_ok and enrich_status == schema.ENRICH_STATUS_OK)
+    is_allowed = bool(
+        is_theory_ok and is_exp_ok and enrich_status == schema.ENRICH_STATUS_OK
+    )
 
     domain = row.get("signal_domain_status", "")
     calibration_status = row.get("signal_calibration_status", "")
@@ -96,7 +97,9 @@ def classify_row(row):
     ratio = _finite(row, "N_over_S95")
     domain_supported = domain == DOMAIN_SUPPORTED
     calibration_validated = calibration_status == "VALIDATED"
-    signal_at_or_above = bool(domain_supported and math.isfinite(ratio) and ratio >= 1.0)
+    signal_at_or_above = bool(
+        domain_supported and math.isfinite(ratio) and ratio >= 1.0
+    )
 
     if not is_theory_ok:
         region = "theory_fail"
@@ -174,18 +177,24 @@ def run(argv=None):
             return 2
 
         input_columns = list(reader.fieldnames)
-        output_columns = input_columns + [c for c in APPENDED_COLUMNS if c not in input_columns]
+        output_columns = input_columns + [
+            c for c in APPENDED_COLUMNS if c not in input_columns
+        ]
         counts = collections.OrderedDict((name, 0) for name in REGION_CLASSES)
         n_total = n_allowed = n_supported = n_validated = n_at_or_above = 0
         tmp_csv = csv_path + ".tmp"
         with open(tmp_csv, "w", newline="") as outfile:
-            writer = csv.DictWriter(outfile, fieldnames=output_columns, lineterminator="\n")
+            writer = csv.DictWriter(
+                outfile, fieldnames=output_columns, lineterminator="\n"
+            )
             writer.writeheader()
             for row in reader:
                 verdict = classify_row(row)
                 merged = dict(row)
                 merged.update(verdict)
-                writer.writerow({k: _format_value(merged.get(k, "")) for k in output_columns})
+                writer.writerow(
+                    {k: _format_value(merged.get(k, "")) for k in output_columns}
+                )
                 n_total += 1
                 counts[verdict["region_class"]] += 1
                 n_allowed += int(verdict["is_allowed"])
