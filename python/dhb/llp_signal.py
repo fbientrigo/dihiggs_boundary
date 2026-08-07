@@ -6,7 +6,9 @@ Pipeline role:
 
 This stage does not run MadGraph or Pythia. It consumes a versioned external
 calibration and performs only declared normalization/interpolation arithmetic.
-One input row always produces one output row.
+One input row always produces one output row, including when the calibration is
+invalid; in that case the output is explicitly marked INVALID_CALIBRATION and
+the CLI returns non-zero after writing the auditable failure artifact.
 """
 
 import argparse
@@ -17,41 +19,15 @@ import math
 import os
 import sys
 
-from . import llp_calibration, point_fields
+from . import llp_calibration, point_fields, schema
 from .enrich import _format_value, _git_commit
 
 
-SIGNAL_SCHEMA_VERSION = "llp_signal_enriched_v1"
-
-NORMALIZED_INPUT_COLUMNS = [
-    "m_H2_GeV",
-    "g_hH2H2_GeV",
-    "ctau_mm_H2",
-    "br_bb_H2",
-]
-
-SIGNAL_COLUMNS = [
-    "llp_signal_schema_version",
-    "sigma_production_fb",
-    "sigma_production_unc_fb",
-    "Trackless_Aeff",
-    "Trackless_Aeff_unc",
-    "sigma_4b_fb",
-    "sigma_visible_fb",
-    "luminosity_fb",
-    "N_expected",
-    "N_expected_139fb",
-    "N_expected_unc",
-    "S95",
-    "N_over_S95",
-    "threshold_class",
-    "signal_domain_status",
-    "signal_status",
-    "signal_calibration_version",
-    "signal_calibration_status",
-    "signal_input_sources",
-    "signal_notes",
-]
+# Schema lists live in dhb.schema so contracts, producer and consumer share one
+# serialization authority.
+SIGNAL_SCHEMA_VERSION = schema.LLP_SIGNAL_SCHEMA_VERSION
+NORMALIZED_INPUT_COLUMNS = list(schema.LLP_SIGNAL_NORMALIZED_INPUT_COLUMNS)
+SIGNAL_COLUMNS = list(schema.LLP_SIGNAL_COLUMNS)
 
 DOMAIN_SUPPORTED = "SUPPORTED"
 DOMAIN_OUTSIDE = "OUTSIDE_RECAST_CALIBRATION"
@@ -66,7 +42,9 @@ STATUS_NOT_COMPUTED = "NOT_COMPUTED"
 def _blank_signal(calibration=None):
     out = {column: "" for column in SIGNAL_COLUMNS}
     out["llp_signal_schema_version"] = SIGNAL_SCHEMA_VERSION
-    out["signal_domain_status"] = DOMAIN_INVALID_CALIBRATION if calibration is None else DOMAIN_MISSING
+    out["signal_domain_status"] = (
+        DOMAIN_INVALID_CALIBRATION if calibration is None else DOMAIN_MISSING
+    )
     out["signal_status"] = STATUS_NOT_COMPUTED
     if calibration is not None:
         out["luminosity_fb"] = calibration["luminosity_fb"]
@@ -80,12 +58,23 @@ def _all_finite(values):
     return all(isinstance(v, float) and math.isfinite(v) for v in values)
 
 
-def evaluate_row(row, calibration):
+def evaluate_row(row, calibration, calibration_error=""):
     """Return normalized LLP inputs plus signal columns for one input row."""
     physical, sources, issues = point_fields.resolve_signal_inputs(row)
     out = dict(physical)
     signal = _blank_signal(calibration)
-    signal["signal_input_sources"] = json.dumps(sources, sort_keys=True, separators=(",", ":"))
+    signal["signal_input_sources"] = json.dumps(
+        sources, sort_keys=True, separators=(",", ":")
+    )
+
+    if calibration is None:
+        notes = list(issues)
+        if calibration_error:
+            notes.append("invalid_calibration:%s" % calibration_error)
+        signal["signal_domain_status"] = DOMAIN_INVALID_CALIBRATION
+        signal["signal_notes"] = ";".join(sorted(set(notes)))
+        out.update(signal)
+        return out
 
     required = [
         physical["m_H2_GeV"],
@@ -100,12 +89,14 @@ def evaluate_row(row, calibration):
         return out
 
     mass, g, ctau, br_bb = required
-    if not llp_calibration.mass_supported(calibration, mass) or not llp_calibration.ctau_supported(calibration, ctau):
+    mass_ok = llp_calibration.mass_supported(calibration, mass)
+    ctau_ok = llp_calibration.ctau_supported(calibration, ctau)
+    if not mass_ok or not ctau_ok:
         signal["signal_domain_status"] = DOMAIN_OUTSIDE
         notes = list(issues)
-        if not llp_calibration.mass_supported(calibration, mass):
+        if not mass_ok:
             notes.append("mass_outside_calibration")
-        if not llp_calibration.ctau_supported(calibration, ctau):
+        if not ctau_ok:
             notes.append("ctau_outside_calibration")
         signal["signal_notes"] = ";".join(sorted(set(notes)))
         out.update(signal)
@@ -114,6 +105,8 @@ def evaluate_row(row, calibration):
     sigma_prod, sigma_prod_unc = llp_calibration.production_response(calibration, g)
     aeff, aeff_unc = llp_calibration.acceptance_response(calibration, ctau)
 
+    # H2->bb is forced in the recast event sample. The physical BR is therefore
+    # a normalization factor and is applied exactly once here as BR_bb^2.
     br2 = br_bb * br_bb
     sigma_4b = sigma_prod * br2
     sigma_visible = sigma_4b * aeff
@@ -135,7 +128,11 @@ def evaluate_row(row, calibration):
             "sigma_4b_fb": sigma_4b,
             "sigma_visible_fb": sigma_visible,
             "N_expected": n_expected,
-            "N_expected_139fb": n_expected if math.isclose(luminosity, 139.0, rel_tol=0.0, abs_tol=1e-12) else "",
+            "N_expected_139fb": (
+                n_expected
+                if math.isclose(luminosity, 139.0, rel_tol=0.0, abs_tol=1e-12)
+                else ""
+            ),
             "N_expected_unc": n_unc,
             "N_over_S95": ratio,
             "threshold_class": llp_calibration.threshold_class(calibration, ratio),
@@ -164,16 +161,28 @@ def run(argv=None):
     parser = argparse.ArgumentParser(
         description="Enrich model/HBHS rows with a versioned Trackless LLP signal response."
     )
-    parser.add_argument("--input", required=True, help="input CSV (normally hbhs_enriched.csv)")
-    parser.add_argument("--output", required=True, help="llp_signal_enriched.csv to write")
-    parser.add_argument("--calibration", required=True, help="versioned LLP response calibration YAML")
+    parser.add_argument(
+        "--input", required=True, help="input CSV (normally hbhs_enriched.csv)"
+    )
+    parser.add_argument(
+        "--output", required=True, help="llp_signal_enriched.csv to write"
+    )
+    parser.add_argument(
+        "--calibration", required=True, help="versioned LLP response calibration YAML"
+    )
     args = parser.parse_args(argv)
 
+    calibration = None
+    calibration_error = ""
     try:
         calibration = load_calibration(args.calibration)
     except (OSError, llp_calibration.CalibrationError, ValueError) as exc:
-        print("[DHB][FAIL] invalid LLP calibration: %s" % exc, file=sys.stderr)
-        return 2
+        calibration_error = str(exc).replace("\n", " ").replace(",", ";")
+        print(
+            "[DHB][FAIL] invalid LLP calibration; writing failure-marked rows: %s"
+            % calibration_error,
+            file=sys.stderr,
+        )
 
     started_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
     tmp_output = args.output + ".tmp"
@@ -185,24 +194,36 @@ def run(argv=None):
         DOMAIN_INVALID_CALIBRATION: 0,
     }
 
-    with open(args.input, newline="") as infile:
+    try:
+        infile = open(args.input, newline="")
+    except OSError as exc:
+        print("[DHB][FAIL] cannot open input CSV: %s" % exc, file=sys.stderr)
+        return 2
+
+    with infile:
         reader = csv.DictReader(infile)
         if reader.fieldnames is None:
             print("[DHB][FAIL] Empty input CSV: %s" % args.input, file=sys.stderr)
             return 2
         input_columns = list(reader.fieldnames)
-        appended_normalized = [c for c in NORMALIZED_INPUT_COLUMNS if c not in input_columns]
+        appended_normalized = [
+            c for c in NORMALIZED_INPUT_COLUMNS if c not in input_columns
+        ]
         appended_signal = [c for c in SIGNAL_COLUMNS if c not in input_columns]
         output_columns = input_columns + appended_normalized + appended_signal
 
         with open(tmp_output, "w", newline="") as outfile:
-            writer = csv.DictWriter(outfile, fieldnames=output_columns, lineterminator="\n")
+            writer = csv.DictWriter(
+                outfile, fieldnames=output_columns, lineterminator="\n"
+            )
             writer.writeheader()
             for row in reader:
-                enriched = evaluate_row(row, calibration)
+                enriched = evaluate_row(row, calibration, calibration_error)
                 merged = dict(row)
                 merged.update(enriched)
-                writer.writerow({k: _format_value(merged.get(k, "")) for k in output_columns})
+                writer.writerow(
+                    {k: _format_value(merged.get(k, "")) for k in output_columns}
+                )
                 counts["total"] += 1
                 counts[enriched["signal_domain_status"]] += 1
 
@@ -214,9 +235,17 @@ def run(argv=None):
         "input": os.path.abspath(args.input),
         "output": os.path.abspath(args.output),
         "calibration": os.path.abspath(args.calibration),
-        "calibration_version": calibration["calibration_version"],
-        "calibration_status": calibration["calibration_status"],
-        "calibration_schema_version": calibration["schema_version"],
+        "calibration_valid": calibration is not None,
+        "calibration_error": calibration_error,
+        "calibration_version": (
+            calibration["calibration_version"] if calibration is not None else ""
+        ),
+        "calibration_status": (
+            calibration["calibration_status"] if calibration is not None else ""
+        ),
+        "calibration_schema_version": (
+            calibration["schema_version"] if calibration is not None else ""
+        ),
         "counts": counts,
         "row_counts": {"input": counts["total"], "output": counts["total"]},
         "dhb_version": __import__("dhb").__version__,
@@ -234,17 +263,19 @@ def run(argv=None):
     os.replace(tmp_manifest, manifest_path)
 
     print(
-        "[DHB] llp_signal completed: total=%d supported=%d outside=%d missing=%d"
+        "[DHB] llp_signal completed: total=%d supported=%d outside=%d "
+        "missing=%d invalid_calibration=%d"
         % (
             counts["total"],
             counts[DOMAIN_SUPPORTED],
             counts[DOMAIN_OUTSIDE],
             counts[DOMAIN_MISSING],
+            counts[DOMAIN_INVALID_CALIBRATION],
         )
     )
     print("[DHB] output: %s" % args.output)
     print("[DHB] manifest: %s" % manifest_path)
-    return 0
+    return 0 if calibration is not None else 2
 
 
 if __name__ == "__main__":
