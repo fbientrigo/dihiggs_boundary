@@ -6,19 +6,13 @@ from dhb import llp_calibration, llp_signal
 def calibration(status="VALIDATED"):
     return llp_calibration.validate_calibration(
         {
-            "schema_version": "dhb.llp_signal_calibration.v1",
-            "calibration_version": "synthetic_test_v1",
+            "schema_version": "dhb.llp_signal_calibration.v2",
+            "calibration_version": "synthetic_test_v2",
             "calibration_status": status,
             "domain": {
                 "m_H2_GeV": {"value": 150.0, "abs_tolerance": 1e-9},
                 "ctau_min_mm": 1.0,
                 "ctau_max_mm": 100.0,
-            },
-            "production": {
-                "model": "quadratic_anchor",
-                "anchor_g_GeV": 10.0,
-                "anchor_sigma_fb": 4.0,
-                "anchor_sigma_unc_fb": 0.4,
             },
             "acceptance": {
                 "analysis": "Trackless",
@@ -44,6 +38,8 @@ def base_row(**overrides):
         "ctau_mm_H2": "10.0",
         "width_bb_H2": "0.5",
         "total_width_H2": "1.0",
+        "sigma_production_fb": "4.0",
+        "sigma_production_unc_fb": "0.4",
     }
     row.update(overrides)
     return row
@@ -64,10 +60,28 @@ def test_signal_arithmetic_applies_br_squared_once():
     assert out["signal_status"] == llp_signal.STATUS_COMPUTED_VALIDATED
 
 
-def test_production_response_scales_quadratically_in_g():
-    out = llp_signal.evaluate_row(base_row(g_hH2H2_GeV="20.0"), calibration())
-    assert out["sigma_production_fb"] == 16.0
-    assert out["sigma_production_unc_fb"] == 1.6
+def test_signal_uses_per_row_madgraph_cross_section_not_g_scaling():
+    out = llp_signal.evaluate_row(
+        base_row(
+            g_hH2H2_GeV="20.0",
+            sigma_production_fb="7.0",
+            sigma_production_unc_fb="0.7",
+        ),
+        calibration(),
+    )
+    assert out["g_hH2H2_GeV"] == 20.0
+    assert out["sigma_production_fb"] == 7.0
+    assert out["sigma_production_unc_fb"] == 0.7
+
+
+def test_missing_direct_production_preserves_row_but_no_signal():
+    row = base_row()
+    row.pop("sigma_production_fb")
+    out = llp_signal.evaluate_row(row, calibration())
+    assert out["signal_domain_status"] == llp_signal.DOMAIN_MISSING
+    assert out["signal_status"] == llp_signal.STATUS_NOT_COMPUTED
+    assert out["sigma_visible_fb"] == ""
+    assert "missing:sigma_production_fb" in out["signal_notes"]
 
 
 def test_missing_coupling_preserves_row_but_no_signal():
@@ -80,10 +94,11 @@ def test_missing_coupling_preserves_row_but_no_signal():
     assert "missing:g_hH2H2_GeV" in out["signal_notes"]
 
 
-def test_mass_outside_recast_domain_does_not_extrapolate():
+def test_mass_outside_recast_domain_keeps_madgraph_sigma_but_not_visible_signal():
     out = llp_signal.evaluate_row(base_row(mH="151.0"), calibration())
     assert out["signal_domain_status"] == llp_signal.DOMAIN_OUTSIDE
-    assert out["sigma_production_fb"] == ""
+    assert out["sigma_production_fb"] == 4.0
+    assert out["sigma_visible_fb"] == ""
     assert "mass_outside_calibration" in out["signal_notes"]
 
 
@@ -104,18 +119,13 @@ def test_provisional_calibration_is_visible_in_signal_status():
 
 def test_declared_domain_must_be_covered_by_acceptance_table():
     bad = {
-        "schema_version": "dhb.llp_signal_calibration.v1",
+        "schema_version": "dhb.llp_signal_calibration.v2",
         "calibration_version": "bad",
         "calibration_status": "PROVISIONAL",
         "domain": {
             "m_H2_GeV": {"value": 150.0, "abs_tolerance": 0.0},
             "ctau_min_mm": 0.1,
             "ctau_max_mm": 100.0,
-        },
-        "production": {
-            "model": "quadratic_anchor",
-            "anchor_g_GeV": 10.0,
-            "anchor_sigma_fb": 1.0,
         },
         "acceptance": {
             "analysis": "Trackless",
