@@ -1,14 +1,15 @@
-"""Versioned response calibration interface for the LLP signal layer.
+"""Versioned Trackless response calibration for the LLP signal layer.
 
-The calibration is external data. This module validates and interpolates it;
-it does not contain a default R14/R8/R10 response and therefore cannot silently
-promote a provisional absolute Aeff calibration.
+Production normalization is intentionally *not* part of this calibration.
+Each physical model point must carry its own MadGraph cross section into
+``dhb.llp_signal``.  This module owns only the external recast response,
+normalization constants and interpolation inside the declared support.
 """
 
 import math
 
 
-CALIBRATION_SCHEMA_VERSION = "dhb.llp_signal_calibration.v1"
+CALIBRATION_SCHEMA_VERSION = "dhb.llp_signal_calibration.v2"
 ALLOWED_STATUSES = {"PROVISIONAL", "VALIDATED"}
 
 
@@ -27,7 +28,7 @@ def _finite(value, name):
 
 
 def validate_calibration(data):
-    """Validate and normalize a calibration dict. Raises CalibrationError."""
+    """Validate and normalize a Trackless-response calibration dict."""
     if not isinstance(data, dict):
         raise CalibrationError("calibration must be a mapping")
     if data.get("schema_version") != CALIBRATION_SCHEMA_VERSION:
@@ -43,7 +44,6 @@ def validate_calibration(data):
     try:
         domain = data["domain"]
         mass = domain["m_H2_GeV"]
-        production = data["production"]
         acceptance = data["acceptance"]
         normalization = data["normalization"]
         classification = data["classification"]
@@ -57,16 +57,8 @@ def validate_calibration(data):
     if mass_value <= 0.0 or mass_tol < 0.0 or ctau_min <= 0.0 or ctau_max <= ctau_min:
         raise CalibrationError("invalid calibration domain")
 
-    if production.get("model") != "quadratic_anchor":
-        raise CalibrationError("production.model must be quadratic_anchor")
-    anchor_g = _finite(production.get("anchor_g_GeV"), "production.anchor_g_GeV")
-    anchor_sigma = _finite(production.get("anchor_sigma_fb"), "production.anchor_sigma_fb")
-    anchor_unc = _finite(production.get("anchor_sigma_unc_fb", 0.0), "production.anchor_sigma_unc_fb")
-    if anchor_g <= 0.0 or anchor_sigma < 0.0 or anchor_unc < 0.0:
-        raise CalibrationError("invalid production anchor")
-
     if acceptance.get("analysis") != "Trackless":
-        raise CalibrationError("acceptance.analysis must be Trackless for v1")
+        raise CalibrationError("acceptance.analysis must be Trackless")
     if acceptance.get("model") != "log_linear_ctau":
         raise CalibrationError("acceptance.model must be log_linear_ctau")
     points = acceptance.get("points")
@@ -103,11 +95,6 @@ def validate_calibration(data):
             "ctau_min": ctau_min,
             "ctau_max": ctau_max,
         },
-        "production": {
-            "anchor_g": anchor_g,
-            "anchor_sigma": anchor_sigma,
-            "anchor_unc": anchor_unc,
-        },
         "acceptance_points": normalized_points,
         "luminosity_fb": luminosity,
         "S95": s95,
@@ -124,12 +111,6 @@ def mass_supported(calibration, m_H2_GeV):
 def ctau_supported(calibration, ctau_mm):
     domain = calibration["domain"]
     return domain["ctau_min"] <= ctau_mm <= domain["ctau_max"]
-
-
-def production_response(calibration, g_GeV):
-    anchor = calibration["production"]
-    scale = (g_GeV / anchor["anchor_g"]) ** 2
-    return anchor["anchor_sigma"] * scale, anchor["anchor_unc"] * scale
 
 
 def acceptance_response(calibration, ctau_mm):
