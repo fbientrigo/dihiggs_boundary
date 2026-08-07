@@ -1,0 +1,28 @@
+name: boundary_atlas_v1
+produced_by: dhb.atlas_v1
+consumed_by: downstream analysis / plotting / benchmark selection
+file: boundary_atlas_v1.csv
+required_columns:
+- region_class
+- is_theory_ok
+- is_exp_ok
+- is_allowed
+- is_signal_domain_supported
+- is_signal_calibration_validated
+- is_signal_at_or_above_S95
+full_columns: null
+invariants: []
+aliases:
+  m_H2_GeV:
+  - mH_input_GeV
+  - mH
+  - m_phi
+  g_hH2H2_GeV: []
+  ctau_mm_H2:
+  - ctau_mm
+  br_bb_H2:
+  - br_bb
+  total_width_H2:
+  - total_width_GeV
+  width_bb_H2:
+  - width_bb_GeV

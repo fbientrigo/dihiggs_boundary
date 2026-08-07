@@ -1,0 +1,45 @@
+name: llp_signal_enriched_v1
+produced_by: dhb.llp_signal
+consumed_by: dhb.atlas_v1
+file: llp_signal_enriched.csv
+required_columns:
+- m_H2_GeV
+- g_hH2H2_GeV
+- ctau_mm_H2
+- br_bb_H2
+- llp_signal_schema_version
+- sigma_production_fb
+- sigma_production_unc_fb
+- Trackless_Aeff
+- Trackless_Aeff_unc
+- sigma_4b_fb
+- sigma_visible_fb
+- luminosity_fb
+- N_expected
+- N_expected_139fb
+- N_expected_unc
+- S95
+- N_over_S95
+- threshold_class
+- signal_domain_status
+- signal_status
+- signal_calibration_version
+- signal_calibration_status
+- signal_input_sources
+- signal_notes
+full_columns: null
+invariants: []
+aliases:
+  m_H2_GeV:
+  - mH_input_GeV
+  - mH
+  - m_phi
+  g_hH2H2_GeV: []
+  ctau_mm_H2:
+  - ctau_mm
+  br_bb_H2:
+  - br_bb
+  total_width_H2:
+  - total_width_GeV
+  width_bb_H2:
+  - width_bb_GeV

@@ -1,7 +1,6 @@
-"""Column schemas shared between the C++ evaluate_point stage and the
-python HB/HS enrichment stage.
+"""Column schemas shared across the dihiggs_boundary CSV stages.
 
-The HBHS block column list must stay in sync with write_hbhs_header() in
+The HBHS block list must stay in sync with write_hbhs_header() in
 src/evaluate_point.cpp (schema evaluate_point_v1). Particle naming:
 h1 = h (SM-like, CP-even), h2 = H (CP-even), h3 = A (CP-odd), hc = H+.
 """
@@ -10,6 +9,8 @@ import math
 
 THEORY_SCHEMA_VERSION = "evaluate_point_v1"
 ENRICHED_SCHEMA_VERSION = "hbhs_enriched_v1"
+LLP_SIGNAL_SCHEMA_VERSION = "llp_signal_enriched_v1"
+BOUNDARY_ATLAS_V1_SCHEMA_VERSION = "boundary_atlas_v1"
 
 NEUTRALS = ("h1", "h2", "h3")
 EFF_FERMIONS = ("ss", "cc", "bb", "tt", "mumu", "tautau")
@@ -75,6 +76,39 @@ ENRICHMENT_COLUMNS = [
     "exp_ok",
     "width_rel_diff_max",
     "enrich_status",
+]
+
+# Normalized model observables consumed by the LLP response. These are not
+# independently recalculated by boundary; dhb.point_fields only resolves
+# serialized aliases and may derive br_bb from same-row widths.
+LLP_SIGNAL_NORMALIZED_INPUT_COLUMNS = [
+    "m_H2_GeV",
+    "g_hH2H2_GeV",
+    "ctau_mm_H2",
+    "br_bb_H2",
+]
+
+LLP_SIGNAL_COLUMNS = [
+    "llp_signal_schema_version",
+    "sigma_production_fb",
+    "sigma_production_unc_fb",
+    "Trackless_Aeff",
+    "Trackless_Aeff_unc",
+    "sigma_4b_fb",
+    "sigma_visible_fb",
+    "luminosity_fb",
+    "N_expected",
+    "N_expected_139fb",
+    "N_expected_unc",
+    "S95",
+    "N_over_S95",
+    "threshold_class",
+    "signal_domain_status",
+    "signal_status",
+    "signal_calibration_version",
+    "signal_calibration_status",
+    "signal_input_sources",
+    "signal_notes",
 ]
 
 ENRICH_STATUS_OK = "ok"
