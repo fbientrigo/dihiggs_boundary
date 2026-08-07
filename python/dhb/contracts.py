@@ -16,13 +16,10 @@ import argparse
 import os
 import sys
 
-from . import llp_signal, schema
+from . import schema
 
-# hbar*c used by the theory stage (src/evaluate_point.cpp) to derive
-# ctau_mm_H2. Mirrors conventions/physics_conventions.yaml.
 HBAR_C_GEV_MM = 1.973269804e-13
 
-# --- Theory stage: evaluate_point_v1 --------------------------------------
 EVALUATE_POINT_THEORY_COLUMNS = [
     "point_id",
     "mh",
@@ -143,12 +140,12 @@ ATLAS = {
 }
 
 LLP_SIGNAL = {
-    "name": llp_signal.SIGNAL_SCHEMA_VERSION,
+    "name": schema.LLP_SIGNAL_SCHEMA_VERSION,
     "produced_by": "dhb.llp_signal",
     "consumed_by": "dhb.atlas_v1",
     "file": "llp_signal_enriched.csv",
-    "required_columns": list(llp_signal.NORMALIZED_INPUT_COLUMNS)
-    + list(llp_signal.SIGNAL_COLUMNS),
+    "required_columns": list(schema.LLP_SIGNAL_NORMALIZED_INPUT_COLUMNS)
+    + list(schema.LLP_SIGNAL_COLUMNS),
     "full_columns": None,
     "invariants": [],
     "aliases": {
@@ -162,7 +159,7 @@ LLP_SIGNAL = {
 }
 
 ATLAS_V1 = {
-    "name": "boundary_atlas_v1",
+    "name": schema.BOUNDARY_ATLAS_V1_SCHEMA_VERSION,
     "produced_by": "dhb.atlas_v1",
     "consumed_by": "downstream analysis / plotting / benchmark selection",
     "file": "boundary_atlas_v1.csv",
