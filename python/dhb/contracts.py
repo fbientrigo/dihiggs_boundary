@@ -106,7 +106,7 @@ THEORY = {
 ENRICHED = {
     "name": schema.ENRICHED_SCHEMA_VERSION,
     "produced_by": "dhb.enrich",
-    "consumed_by": "dhb.atlas (v0) or dhb.llp_signal (v1)",
+    "consumed_by": "dhb.atlas",
     "file": "hbhs_enriched.csv",
     "required_columns": (
         [
