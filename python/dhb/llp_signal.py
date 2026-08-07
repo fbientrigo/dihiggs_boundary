@@ -2,13 +2,15 @@
 
 Pipeline role:
 
-    hbhs_enriched.csv -> dhb.llp_signal -> llp_signal_enriched.csv
+    model/HBHS rows + per-point MadGraph sigma
+        -> dhb.llp_signal -> llp_signal_enriched.csv
 
-This stage does not run MadGraph or Pythia. It consumes a versioned external
-calibration and performs only declared normalization/interpolation arithmetic.
-One input row always produces one output row, including when the calibration is
-invalid; in that case the output is explicitly marked INVALID_CALIBRATION and
-the CLI returns non-zero after writing the auditable failure artifact.
+This stage does not run MadGraph or Pythia. Production normalization must already
+be present on each row as a direct MadGraph result. The external calibration
+contains only the Trackless response and normalization constants. One input row
+always produces one output row, including when the calibration is invalid; in
+that case the output is explicitly marked INVALID_CALIBRATION and the CLI
+returns non-zero after writing the auditable failure artifact.
 """
 
 import argparse
@@ -58,11 +60,52 @@ def _all_finite(values):
     return all(isinstance(v, float) and math.isfinite(v) for v in values)
 
 
+def _nonnegative_row_float(row, key):
+    text = row.get(key, "")
+    if str(text).strip() == "":
+        return float("nan"), "missing:%s" % key
+    try:
+        value = float(text)
+    except (TypeError, ValueError):
+        return float("nan"), "invalid:%s" % key
+    if not math.isfinite(value) or value < 0.0:
+        return float("nan"), "invalid:%s" % key
+    return value, ""
+
+
+def _resolve_production_inputs(row):
+    """Read the direct MadGraph production result from one joined model row.
+
+    Boundary intentionally accepts no coupling-based production fallback. The
+    upstream production stage must join these exact fields onto the same point.
+    """
+    sigma, sigma_issue = _nonnegative_row_float(row, "sigma_production_fb")
+    unc, unc_issue = _nonnegative_row_float(row, "sigma_production_unc_fb")
+    sources = {
+        "sigma_production_fb": "sigma_production_fb" if math.isfinite(sigma) else "",
+        "sigma_production_unc_fb": (
+            "sigma_production_unc_fb" if math.isfinite(unc) else ""
+        ),
+    }
+    issues = [issue for issue in (sigma_issue, unc_issue) if issue]
+    return sigma, unc, sources, issues
+
+
 def evaluate_row(row, calibration, calibration_error=""):
     """Return normalized LLP inputs plus signal columns for one input row."""
     physical, sources, issues = point_fields.resolve_signal_inputs(row)
+    sigma_prod, sigma_prod_unc, production_sources, production_issues = (
+        _resolve_production_inputs(row)
+    )
+    sources.update(production_sources)
+    issues = sorted(set(issues + production_issues))
+
     out = dict(physical)
     signal = _blank_signal(calibration)
+    if math.isfinite(sigma_prod):
+        signal["sigma_production_fb"] = sigma_prod
+    if math.isfinite(sigma_prod_unc):
+        signal["sigma_production_unc_fb"] = sigma_prod_unc
     signal["signal_input_sources"] = json.dumps(
         sources, sort_keys=True, separators=(",", ":")
     )
@@ -81,6 +124,8 @@ def evaluate_row(row, calibration, calibration_error=""):
         physical["g_hH2H2_GeV"],
         physical["ctau_mm_H2"],
         physical["br_bb_H2"],
+        sigma_prod,
+        sigma_prod_unc,
     ]
     if not _all_finite(required):
         signal["signal_domain_status"] = DOMAIN_MISSING
@@ -88,7 +133,9 @@ def evaluate_row(row, calibration, calibration_error=""):
         out.update(signal)
         return out
 
-    mass, g, ctau, br_bb = required
+    mass = physical["m_H2_GeV"]
+    ctau = physical["ctau_mm_H2"]
+    br_bb = physical["br_bb_H2"]
     mass_ok = llp_calibration.mass_supported(calibration, mass)
     ctau_ok = llp_calibration.ctau_supported(calibration, ctau)
     if not mass_ok or not ctau_ok:
@@ -102,7 +149,6 @@ def evaluate_row(row, calibration, calibration_error=""):
         out.update(signal)
         return out
 
-    sigma_prod, sigma_prod_unc = llp_calibration.production_response(calibration, g)
     aeff, aeff_unc = llp_calibration.acceptance_response(calibration, ctau)
 
     # H2->bb is forced in the recast event sample. The physical BR is therefore
@@ -159,16 +205,19 @@ def load_calibration(path):
 
 def run(argv=None):
     parser = argparse.ArgumentParser(
-        description="Enrich model/HBHS rows with a versioned Trackless LLP signal response."
+        description=(
+            "Combine per-point MadGraph production with a versioned Trackless "
+            "LLP response."
+        )
     )
     parser.add_argument(
-        "--input", required=True, help="input CSV (normally hbhs_enriched.csv)"
+        "--input", required=True, help="input CSV with model/HBHS + MadGraph sigma"
     )
     parser.add_argument(
         "--output", required=True, help="llp_signal_enriched.csv to write"
     )
     parser.add_argument(
-        "--calibration", required=True, help="versioned LLP response calibration YAML"
+        "--calibration", required=True, help="versioned Trackless response YAML"
     )
     args = parser.parse_args(argv)
 
@@ -232,6 +281,7 @@ def run(argv=None):
     manifest = {
         "stage": "llp_signal_enrichment",
         "schema_version": SIGNAL_SCHEMA_VERSION,
+        "production_policy": "MADGRAPH_PER_PHYSICAL_POINT_REQUIRED",
         "input": os.path.abspath(args.input),
         "output": os.path.abspath(args.output),
         "calibration": os.path.abspath(args.calibration),
