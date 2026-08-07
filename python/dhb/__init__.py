@@ -1,7 +1,9 @@
-"""HiggsBounds/HiggsSignals enrichment stage for the dihiggs_boundary atlas.
+"""DiHiggs boundary enrichment and classification package.
 
-Consumes the evaluate_point CSV (theory stage, schema evaluate_point_v1) and
-appends HiggsBounds/HiggsSignals results computed with HiggsTools.
+The maintained Python stages cover HiggsBounds/HiggsSignals enrichment,
+versioned LLP response enrichment and derived boundary-atlas classification.
+The historical C++ evaluate_point producer remains a compatibility input during
+the canonical dihiggs.point.v2 migration.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
