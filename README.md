@@ -1,6 +1,6 @@
 # dihiggs_boundary
 
-`dihiggs_boundary` composes theory/model-point data, HiggsBounds/HiggsSignals results and versioned LLP-response information into analysis-ready boundary datasets.
+`dihiggs_boundary` composes theory/model-point data, HiggsBounds/HiggsSignals results, direct production results and versioned LLP-response information into analysis-ready boundary datasets.
 
 External versions used by the existing HB/HS path:
 
@@ -16,6 +16,8 @@ The long-term model authority is `fbientrigo/dihiggs`, whose canonical producers
 `dihiggs_boundary` should not become a second 2HDM authority. The historical `src/evaluate_point.cpp` is retained during migration because the current HB/HS adapter still needs its effective-coupling block. Its golden tests characterize compatibility behavior; they do not promote it over `dihiggs.point.v2`.
 
 As of `fbientrigo/dihiggs` commit `9f8019690c44bb68d46a3b60f5ac2ac349d445f2`, `DihiggsPointV2Evaluator` serializes the validated canonical observable `g_hH2H2_GeV` directly in `dihiggs.point.v2`. Boundary consumes that field without recalculating the coupling convention and still fails closed for older/partial rows where it is absent.
+
+Production cross sections are owned upstream by the MadGraph production layer. For new physical-point scans, Boundary requires the direct per-point fields `sigma_production_fb` and `sigma_production_unc_fb`; it does **not** infer a general cross section from `g_hH2H2_GeV`.
 
 See [`docs/modernization_llp_signal_v1.md`](docs/modernization_llp_signal_v1.md) for the migration audit and REUSE/MODERNIZE/DEPRECATE/ADD map.
 
@@ -39,19 +41,27 @@ evaluate_point.csv
 canonical/compatibility model row
   -> HB/HS enrichment
   -> hbhs_enriched.csv
-  -> dhb.llp_signal + external versioned response
+  -> join direct MadGraph production by point_id
+  -> dhb.llp_signal + external Trackless response
   -> llp_signal_enriched.csv
   -> dhb.atlas_v1
   -> boundary_atlas_v1.csv
 ```
 
-`dhb.llp_signal` does **not** execute MadGraph or Pythia. It applies a declared production/recast response to the physically linked tuple:
+`dhb.llp_signal` does **not** execute MadGraph or Pythia. It combines the physically linked tuple
 
 ```text
 (m_H2_GeV, g_hH2H2_GeV, ctau_mm_H2, br_bb_H2)
 ```
 
-with
+with the direct production result for that same point:
+
+```text
+sigma_production_fb
+sigma_production_unc_fb
+```
+
+and then computes
 
 ```text
 sigma_4b      = sigma_production * br_bb_H2^2
@@ -59,9 +69,11 @@ sigma_visible = sigma_4b * Trackless_Aeff
 N_expected    = luminosity * sigma_visible
 ```
 
-`BR_bb^2` is applied exactly once. The external calibration defines `sigma(g)`, Trackless `Aeff(ctau)`, its support, uncertainties, luminosity, `S95`, status and provenance.
+`BR_bb^2` is applied exactly once. The external calibration defines only the Trackless `Aeff(ctau)` response, its support, uncertainty, luminosity, `S95`, status and provenance.
 
-There is deliberately **no built-in R14 absolute Aeff table**. A provisional or later validated response is supplied as a separate YAML artifact, so the unresolved absolute-Aeff calibration can change without rewriting boundary.
+For new physical-point scans there is no automatic `sigma ~ g^2` fallback. Such scaling can still be tested as a controlled diagnostic when only the relevant coupling changes and all other production ingredients are proven fixed.
+
+The canonical 150 GeV absolute Trackless response is the frozen original/published R8/R10 response. The later `modified` analysis is a distinct selection and must not replace it silently. At the benchmark `ctau = 4.326221529733112 mm`, `Trackless_Aeff = 0.01573386`.
 
 See:
 
@@ -81,9 +93,9 @@ MISSING_REQUIRED_OBSERVABLE
 INVALID_CALIBRATION
 ```
 
-The initial intended calibration domain is the Trackless response at `m_H2 = 150 GeV`. A future mass-dependent response should be introduced explicitly rather than reusing a 150 GeV curve at arbitrary mass.
+The current calibration domain is the Trackless response at `m_H2 = 150 GeV`. A future mass-dependent response should be introduced explicitly rather than reusing a 150 GeV curve at arbitrary mass.
 
-Theory validity, HB/HS validity, signal-domain validity and signal usefulness remain separate fields.
+Theory validity, HB/HS validity, production provenance, signal-domain validity and signal usefulness remain separate concepts.
 
 ## Setup
 
@@ -103,9 +115,18 @@ scripts/run_hbhs_enrichment.sh runs/<id>
 
 This produces `runs/<id>/hbhs_enriched.csv` using the compatibility theory/HBHS path.
 
+Before the LLP signal stage, join the direct MadGraph result for each stable `point_id` so the input contains:
+
+```text
+sigma_production_fb
+sigma_production_unc_fb
+```
+
+The MadGraph cards, logs, process definition, UFO provenance, PDF/scale settings and run metadata stay owned by the production repository rather than being duplicated here.
+
 ## LLP signal + Atlas v1
 
-Supply an explicit calibration artifact that satisfies `dhb.llp_signal_calibration.v1`:
+Supply an explicit Trackless response artifact that satisfies `dhb.llp_signal_calibration.v2`:
 
 ```bash
 bash scripts/run_llp_signal.sh \
@@ -132,9 +153,9 @@ A structurally invalid calibration still produces failure-marked signal rows and
 
 ```bash
 python -m dhb.llp_signal \
-  --input runs/<id>/hbhs_enriched.csv \
+  --input runs/<id>/hbhs_plus_madgraph.csv \
   --output runs/<id>/llp_signal_enriched.csv \
-  --calibration /path/to/calibration.yaml
+  --calibration /path/to/trackless_calibration.yaml
 
 python -m dhb.atlas_v1 \
   --input runs/<id>/llp_signal_enriched.csv \
@@ -169,10 +190,10 @@ Unit tests do not require HiggsTools. Tests marked `integration` exercise the re
 
 ```text
 3D: g_hH2H2_GeV vs ctau_mm_H2 vs br_bb_H2
-color: N_expected / N_over_S95 / theory-HBHS-signal status / model parameter
+color: sigma_production_fb / N_expected / N_over_S95 / model parameter
 ```
 
-This supports comparison between the effective `(g, ctau, BR_bb)` cube and the physically realizable cloud generated by 2HDM model points, without reducing that question to pairwise correlations.
+This supports comparison between physical 2HDM points and their DV+jets signal without pretending that production is determined by the trilinear magnitude alone.
 
 ## Historical context
 
