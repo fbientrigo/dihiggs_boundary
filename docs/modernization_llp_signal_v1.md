@@ -12,9 +12,9 @@ evaluate_point_v1 -> dhb.enrich -> dhb.atlas (boundary_atlas_v0)
 
 `boundary_atlas_v0` is a derived classifier. Its `tag_*` fields are finder aids and are not ATLAS DV+jets recast results.
 
-The maintained `dihiggs` repository advanced after the July snapshot. In particular, the h-H2-H2 convention was validated in August 2026 using `THDM::get_coupling_hhh(1,2,2,c)` and the benchmark artifact records `g_hH2H2_GeV = abs(Im(c))`. However, current `DihiggsPointV2Evaluator` still does not serialize this coupling in `dihiggs.point.v2`.
+The maintained `dihiggs` repository advanced after the July snapshot. The h-H2-H2 convention was validated in August 2026 using `THDM::get_coupling_hhh(1,2,2,c)` and the benchmark artifact records `g_hH2H2_GeV = abs(Im(c))`. As of `dihiggs` commit `9f8019690c44bb68d46a3b60f5ac2ac349d445f2`, `DihiggsPointV2Evaluator` now serializes this canonical coupling directly in `dihiggs.point.v2`.
 
-A second migration gap remains: `dhb.enrich` needs the large HB/HS effective-coupling input block currently produced by `src/evaluate_point.cpp`. `dihiggs.point.v2` does not serialize that block. Therefore a direct replacement of `evaluate_point_v1` by `dihiggs.point.v2` would currently break the HB/HS stage.
+One migration gap remains: `dhb.enrich` needs the large HB/HS effective-coupling input block currently produced by `src/evaluate_point.cpp`. `dihiggs.point.v2` does not serialize that block. Therefore a direct replacement of `evaluate_point_v1` by `dihiggs.point.v2` would currently break the HB/HS stage.
 
 ## REUSE
 
@@ -67,13 +67,14 @@ New responsibilities:
 
 ### Already owned by `dihiggs.point.v2`
 
-The canonical producer currently owns model-point identity/provenance, model parameters, theory flags, H2 widths, selected BRs and `ctau_mm`.
+The canonical producer owns model-point identity/provenance, model parameters, theory flags, H2 widths, selected BRs, `ctau_mm`, and the validated `h-H2-H2` production coupling.
 
 The migration bridge recognizes the following serialized aliases:
 
 | Boundary-normalized field | Canonical `dihiggs.point.v2` field |
 |---|---|
 | `m_H2_GeV` | `mH_input_GeV` |
+| `g_hH2H2_GeV` | `g_hH2H2_GeV` |
 | `ctau_mm_H2` | `ctau_mm` |
 | `br_bb_H2` | `br_bb` |
 | `width_bb_H2` | `width_bb_GeV` |
@@ -81,19 +82,26 @@ The migration bridge recognizes the following serialized aliases:
 
 If both canonical and legacy aliases are present, they must agree or the signal row fails closed.
 
-### Still missing from the canonical handoff
+The coupling convention is core-owned and frozen upstream:
 
-1. `g_hH2H2_GeV` is scientifically validated in `dihiggs` benchmark tooling but is not yet a column of `dihiggs.point.v2`.
-2. The full HB/HS effective-coupling block required by `dhb.enrich` is not present in `dihiggs.point.v2`.
+```text
+2HDMC: c = -i*g
+g_hH2H2_GeV = abs(Im(c))
+UFO: GHphiphi = Im(c) = -g_hH2H2_GeV
+```
 
-Boundary v1 does not fill either gap by reconstructing the 2HDM. A row without the coupling is preserved with:
+Boundary consumes the serialized non-negative magnitude and never rederives this convention. Older or partial rows without the field remain valid historical inputs but receive:
 
 ```text
 signal_domain_status = MISSING_REQUIRED_OBSERVABLE
 signal_status = NOT_COMPUTED
 ```
 
-The clean long-term fix is a core-owned export/handoff for these model observables, followed by retirement of the duplicated construction path after equivalence/regression gates pass.
+### Still missing from the canonical handoff
+
+The full HB/HS effective-coupling block required by `dhb.enrich` is not present in `dihiggs.point.v2`.
+
+Boundary v1 does not fill that gap by reconstructing the 2HDM. The clean long-term fix is a core-owned HB/HS handoff/export, followed by retirement of the duplicated construction path after equivalence/regression gates pass.
 
 ## Scientific invariants of LLP signal v1
 
