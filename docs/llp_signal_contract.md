@@ -2,18 +2,19 @@
 
 Schema: `llp_signal_enriched_v1`  
 Producer: `python -m dhb.llp_signal`  
-Input: normally `hbhs_enriched.csv`  
+Input: model/HBHS rows already joined with one MadGraph production result per physical point  
 Output: `llp_signal_enriched.csv` + `llp_signal_manifest.json`
 
 ## Responsibility
 
-`dhb.llp_signal` maps already-computed model observables onto an already-calibrated DV+jets response. It does **not** reconstruct a 2HDM point and does **not** execute MadGraph, Pythia or the ATLAS recast.
+`dhb.llp_signal` combines already-computed model observables, a **direct per-point MadGraph production cross section**, and an already-calibrated DV+jets response. It does **not** reconstruct a 2HDM point and does **not** execute MadGraph, Pythia or the ATLAS recast.
 
 ```text
 model/HBHS row
-  + versioned production/recast calibration
+  + direct MadGraph sigma for the same point
+  + versioned Trackless response
   -> normalized (mH, g, ctau, BR_bb)
-  -> sigma_production
+  -> BR_bb^2
   -> Trackless_Aeff
   -> sigma_visible
   -> N_expected / S95
@@ -21,7 +22,7 @@ model/HBHS row
 
 The stage preserves every input row.
 
-## Required physical observables
+## Required physical inputs
 
 The normalized LLP tuple is:
 
@@ -32,7 +33,16 @@ ctau_mm_H2
 br_bb_H2
 ```
 
-`dhb.point_fields` accepts documented serialized aliases. It does not compute `g_hH2H2_GeV` from 2HDMC. If both canonical and legacy aliases are present, finite values must agree or the observable is treated as missing/invalid.
+The same row must also carry the production result:
+
+```text
+sigma_production_fb
+sigma_production_unc_fb
+```
+
+These production fields are upstream physics inputs. They are not reconstructed from `g_hH2H2_GeV` inside Boundary.
+
+`dhb.point_fields` accepts documented serialized aliases for the model observables. It does not compute `g_hH2H2_GeV` from 2HDMC. If both canonical and legacy aliases are present, finite values must agree or the observable is treated as missing/invalid.
 
 For `BR(H2->bb)`, an explicit serialized `br_bb`/`br_bb_H2` is preferred. If it is absent, the bridge may derive exactly once:
 
@@ -42,20 +52,45 @@ br_bb_H2 = width_bb_H2 / total_width_H2
 
 using widths from the same row. If both forms are present, they must agree.
 
-## Calibration schema
+## Production policy
 
-The calibration is an **external file** with schema:
+For new physical-point scans, the default and required production handoff is:
 
 ```text
-dhb.llp_signal_calibration.v1
+canonical 2HDM point
+  -> parameter/UFO mapping
+  -> MadGraph
+  -> sigma_production_fb + integration uncertainty
+  -> join by stable point_id
+  -> dhb.llp_signal
 ```
 
-There is deliberately no built-in R8/R10/R14 calibration. The unresolved absolute-Aeff comparison can therefore be settled by changing the calibration artifact without changing the architecture.
+Boundary has **no coupling-rescaling fallback**.
+
+A relation such as
+
+```text
+sigma(g) = sigma0 * (g/g0)^2
+```
+
+may remain useful as a controlled validation diagnostic when only that coupling is varied and the relevant diagrams, widths, coupling orders and all other model inputs are proven fixed. It is **not** the general production prescription for varying physical 2HDM points, where additional couplings, widths, interference or kinematics may also change.
+
+The production repository must preserve the MadGraph process, cards, UFO provenance, PDF/scale configuration, seed, integration result and uncertainty according to the project MadGraph contract. Boundary consumes the resulting cross section; it does not duplicate that provenance machinery.
+
+## Trackless calibration schema
+
+The Trackless response is an **external file** with schema:
+
+```text
+dhb.llp_signal_calibration.v2
+```
+
+Calibration v2 intentionally contains no production model. This prevents an acceptance artifact from becoming an implicit cross-section model.
 
 Required structure:
 
 ```yaml
-schema_version: dhb.llp_signal_calibration.v1
+schema_version: dhb.llp_signal_calibration.v2
 calibration_version: <immutable human-readable id>
 calibration_status: PROVISIONAL  # or VALIDATED
 
@@ -65,12 +100,6 @@ domain:
     abs_tolerance: <declared numerical/model tolerance>
   ctau_min_mm: <positive lower support>
   ctau_max_mm: <positive upper support>
-
-production:
-  model: quadratic_anchor
-  anchor_g_GeV: <validated anchor magnitude>
-  anchor_sigma_fb: <production cross section>
-  anchor_sigma_unc_fb: <absolute uncertainty>
 
 acceptance:
   analysis: Trackless
@@ -88,21 +117,32 @@ classification:
   near_fraction: <fractional band around N/S95 = 1>
 
 provenance:
-  # free-form artifact identifiers, commits, hashes, campaign ids, etc.
+  # recast campaign, commit, hashes and scientific status
 ```
 
 Only `PROVISIONAL` and `VALIDATED` are accepted calibration states. A structurally invalid calibration produces failure-marked rows, a failure manifest and a non-zero exit status.
 
-## Response arithmetic
+For the current 150 GeV canonical Trackless use, the authoritative absolute response is the frozen **original/published Trackless** R8/R10 line. The later `modified` analysis response is a different selection and must not silently replace the published Trackless calibration.
+
+At the validated benchmark:
+
+```text
+m_H2 = 150 GeV
+ctau = 4.326221529733112 mm
+Trackless_Aeff = 0.01573386
+raw Trackless acceptance = 40 / 2000 = 0.020000
+weighted Acc x Eff = 31.46772 / 2000
+```
+
+The historical carried weighted-Aeff uncertainty convention remains provisional; do not reinterpret it as a detector systematic.
+
+## Signal arithmetic
 
 For a supported point:
 
 ```text
-sigma_production(g)
-  = sigma_anchor * (g / g_anchor)^2
-
 sigma_4b
-  = sigma_production * BR_bb^2
+  = sigma_production_fb * BR_bb^2
 
 sigma_visible
   = sigma_4b * Trackless_Aeff
@@ -114,9 +154,9 @@ N_over_S95
   = N_expected / S95
 ```
 
-`BR_bb^2` is applied exactly once in this stage. The recast calibration is defined for samples where `H2 -> bb` is forced, so `Trackless_Aeff` must not contain an additional physical BR factor.
+`BR_bb^2` is applied exactly once in this stage. The recast response is defined for samples where `H2 -> bb` is forced, so `Trackless_Aeff` must not contain an additional physical BR factor.
 
-The v1 uncertainty propagation treats the declared production and Aeff uncertainties as independent absolute uncertainties:
+The v1 uncertainty propagation treats the supplied MadGraph integration uncertainty and declared Aeff uncertainty as independent absolute uncertainties:
 
 ```text
 (delta sigma_visible)^2
@@ -124,18 +164,20 @@ The v1 uncertainty propagation treats the declared production and Aeff uncertain
   + (BR_bb^2 * sigma_production * delta Aeff)^2
 ```
 
-No BR uncertainty is introduced by v1 because the current model row supplies BR deterministically. A future uncertainty model must be an explicit contract change.
+No BR uncertainty is introduced by v1 because the current model row supplies BR deterministically. Scale/PDF/model uncertainties are separate from the MadGraph integration uncertainty and should only be added by an explicit later uncertainty contract.
 
 ## Interpolation and domain
 
 Acceptance interpolation is linear in `log(ctau)` between neighboring calibration points. There is no extrapolation.
 
-A row is `SUPPORTED` only if both:
+A row is `SUPPORTED` only if:
 
+- the required model observables exist and are valid;
+- `sigma_production_fb` and `sigma_production_unc_fb` are finite and non-negative;
 - `m_H2_GeV` is within the declared fixed-mass tolerance;
 - `ctau_mm_H2` lies within the declared lifetime domain and acceptance-table support.
 
-The initial intended scientific domain is the 150 GeV Trackless response. A broader `Aeff(mH,ctau)` calibration requires a later schema/version.
+The current intended scientific domain is the 150 GeV Trackless response. A broader `Aeff(mH,ctau)` calibration requires a later explicit calibration update rather than reusing the 150 GeV curve at arbitrary mass.
 
 ## Status vocabulary
 
@@ -143,20 +185,20 @@ The initial intended scientific domain is the 150 GeV Trackless response. A broa
 
 | Value | Meaning |
 |---|---|
-| `SUPPORTED` | all required observables exist and the point is inside calibration support |
-| `OUTSIDE_RECAST_CALIBRATION` | observables exist but mass/lifetime is outside support |
-| `MISSING_REQUIRED_OBSERVABLE` | one or more of mH, g, ctau, BR_bb is missing/invalid/conflicting |
-| `INVALID_CALIBRATION` | the supplied response artifact failed its structural/scientific contract |
+| `SUPPORTED` | all required inputs exist and the point is inside recast support |
+| `OUTSIDE_RECAST_CALIBRATION` | production/model inputs exist but mass/lifetime is outside response support |
+| `MISSING_REQUIRED_OBSERVABLE` | one or more model observables or direct production fields is missing/invalid/conflicting |
+| `INVALID_CALIBRATION` | the supplied Trackless response artifact failed its contract |
 
 ### `signal_status`
 
 | Value | Meaning |
 |---|---|
-| `COMPUTED_VALIDATED` | numbers computed with a calibration marked `VALIDATED` |
-| `COMPUTED_PROVISIONAL` | numbers computed with a calibration marked `PROVISIONAL` |
+| `COMPUTED_VALIDATED` | numbers computed with a Trackless calibration marked `VALIDATED` |
+| `COMPUTED_PROVISIONAL` | numbers computed with a Trackless calibration marked `PROVISIONAL` |
 | `NOT_COMPUTED` | no supported response was applied |
 
-A provisional response can be inspected and plotted but must not be silently described as the final absolute recast calibration.
+The calibration status describes the Trackless response. MadGraph production provenance remains owned by the upstream production artifact.
 
 ## Threshold class
 
@@ -174,9 +216,11 @@ This is a boundary-analysis convenience. It is not a replacement for a full like
 
 Every output records:
 
-- calibration version and status;
-- source alias used for each normalized observable;
+- Trackless calibration version and status;
+- source alias used for each normalized model observable;
+- explicit source fields for the direct production cross section and uncertainty;
 - row-level notes/domain status;
 - run-level calibration path and validity;
+- the production policy `MADGRAPH_PER_PHYSICAL_POINT_REQUIRED` in the manifest;
 - dhb version and Git commit;
 - row counts and UTC timestamps.
