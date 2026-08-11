@@ -199,7 +199,12 @@ def load_calibration(path):
     import yaml
 
     with open(path) as fh:
-        raw = yaml.safe_load(fh)
+        try:
+            raw = yaml.safe_load(fh)
+        except yaml.YAMLError as exc:
+            raise llp_calibration.CalibrationError(
+                "invalid YAML calibration: %s" % exc
+            )
     return llp_calibration.validate_calibration(raw)
 
 

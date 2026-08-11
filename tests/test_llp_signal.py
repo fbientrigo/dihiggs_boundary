@@ -1,4 +1,8 @@
+import csv
+import json
 import math
+import sys
+import types
 
 from dhb import llp_calibration, llp_signal
 
@@ -94,6 +98,22 @@ def test_missing_coupling_preserves_row_but_no_signal():
     assert "missing:g_hH2H2_GeV" in out["signal_notes"]
 
 
+def test_malformed_populated_alias_does_not_fall_back_to_width_derived_br():
+    out = llp_signal.evaluate_row(base_row(br_bb_H2="not-a-number"), calibration())
+    assert out["signal_domain_status"] == llp_signal.DOMAIN_MISSING
+    assert out["signal_status"] == llp_signal.STATUS_NOT_COMPUTED
+    assert "invalid:br_bb_H2" in out["signal_notes"]
+    assert out["sigma_visible_fb"] == ""
+
+
+def test_malformed_canonical_mass_does_not_fall_back_to_legacy_alias():
+    out = llp_signal.evaluate_row(
+        base_row(m_H2_GeV="not-a-number", mH="150.0"), calibration()
+    )
+    assert out["signal_domain_status"] == llp_signal.DOMAIN_MISSING
+    assert "invalid:m_H2_GeV" in out["signal_notes"]
+
+
 def test_mass_outside_recast_domain_keeps_madgraph_sigma_but_not_visible_signal():
     out = llp_signal.evaluate_row(base_row(mH="151.0"), calibration())
     assert out["signal_domain_status"] == llp_signal.DOMAIN_OUTSIDE
@@ -144,3 +164,44 @@ def test_declared_domain_must_be_covered_by_acceptance_table():
         pass
     else:
         raise AssertionError("invalid domain coverage must fail")
+
+
+def test_yaml_syntax_error_writes_failure_marked_rows_and_manifest(tmp_path, monkeypatch):
+    class FakeYAMLError(Exception):
+        pass
+
+    def bad_safe_load(_):
+        raise FakeYAMLError("unclosed collection")
+
+    monkeypatch.setitem(
+        sys.modules,
+        "yaml",
+        types.SimpleNamespace(YAMLError=FakeYAMLError, safe_load=bad_safe_load),
+    )
+    input_path = tmp_path / "input.csv"
+    output_path = tmp_path / "llp_signal_enriched.csv"
+    calibration_path = tmp_path / "broken.yaml"
+    calibration_path.write_text("schema_version: [unclosed\n")
+    with input_path.open("w", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=sorted(base_row()))
+        writer.writeheader()
+        writer.writerow(base_row())
+
+    assert llp_signal.run(
+        [
+            "--input",
+            str(input_path),
+            "--output",
+            str(output_path),
+            "--calibration",
+            str(calibration_path),
+        ]
+    ) == 2
+
+    with output_path.open(newline="") as fh:
+        row = next(csv.DictReader(fh))
+    assert row["signal_domain_status"] == llp_signal.DOMAIN_INVALID_CALIBRATION
+    assert row["signal_status"] == llp_signal.STATUS_NOT_COMPUTED
+    manifest = json.loads((tmp_path / "llp_signal_manifest.json").read_text())
+    assert manifest["calibration_valid"] is False
+    assert "invalid YAML calibration" in manifest["calibration_error"]

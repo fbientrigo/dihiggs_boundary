@@ -64,6 +64,14 @@ Classification precedence is deliberate:
 
 A `PROVISIONAL` calibration does not change the numerical threshold class, but `is_signal_calibration_validated` is false and `atlas_notes` records that the calibration is not validated.
 
+For a row declaring `signal_domain_status = SUPPORTED`, Atlas v1 also verifies
+that the LLP schema version is current, the calibration and signal statuses
+agree, and the finite `N_expected`, `S95`, `N_over_S95`, `Trackless_Aeff`, and
+`sigma_visible_fb` fields are mutually usable.  An inconsistent serialized
+signal state is fail-closed as `allowed_no_signal_calibration`, with
+`inconsistent_supported_signal_state` in `atlas_notes`; it is never assigned a
+threshold signal class.
+
 ## Non-claims
 
 - `allowed_signal_above` means the calibrated yield metric is above the declared `S95` threshold; it is not by itself a full statistical exclusion.
