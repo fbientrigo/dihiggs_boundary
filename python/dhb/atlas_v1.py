@@ -15,7 +15,7 @@ import sys
 
 from . import schema
 from .atlas import write_parquet
-from .enrich import _format_value, _git_commit
+from .enrich import _format_value, _git_commit, _git_dirty, _sha256_file
 from .llp_signal import (
     DOMAIN_INVALID_CALIBRATION,
     DOMAIN_MISSING,
@@ -278,6 +278,7 @@ def run(argv=None):
         "stage": "boundary_atlas_v1",
         "atlas_schema_version": ATLAS_SCHEMA_VERSION,
         "input": os.path.abspath(args.input),
+        "input_sha256": _sha256_file(args.input),
         "output_csv": os.path.abspath(csv_path),
         "output_parquet": os.path.abspath(parquet_path) if parquet_written else "",
         "output_summary": os.path.abspath(summary_path),
@@ -286,6 +287,7 @@ def run(argv=None):
         "parquet_skipped_reason": parquet_reason,
         "dhb_version": __import__("dhb").__version__,
         "git_commit": _git_commit(os.path.dirname(os.path.abspath(__file__))),
+        "git_dirty": _git_dirty(os.path.dirname(os.path.abspath(__file__))),
         "started_at_utc": started_at,
         "finished_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }

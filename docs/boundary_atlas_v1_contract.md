@@ -30,6 +30,10 @@ The input must contain:
 
 Every input row produces one output row.
 
+The run manifest records the SHA-256 identity of the consumed LLP input and
+whether the producing checkout was dirty, so a regenerated Atlas artifact does
+not falsely appear to come from a pristine commit.
+
 ## Appended fields
 
 ```text

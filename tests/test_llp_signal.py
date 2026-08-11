@@ -205,3 +205,6 @@ def test_yaml_syntax_error_writes_failure_marked_rows_and_manifest(tmp_path, mon
     manifest = json.loads((tmp_path / "llp_signal_manifest.json").read_text())
     assert manifest["calibration_valid"] is False
     assert "invalid YAML calibration" in manifest["calibration_error"]
+    assert len(manifest["input_sha256"]) == 64
+    assert len(manifest["calibration_sha256"]) == 64
+    assert isinstance(manifest["git_dirty"], bool)

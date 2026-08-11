@@ -1,3 +1,6 @@
+import csv
+import json
+
 from dhb import atlas_v1, llp_signal, schema
 
 
@@ -126,3 +129,19 @@ def test_supported_threshold_label_must_not_contradict_its_yield_ratio():
     )
     assert verdict["region_class"] == "allowed_no_signal_calibration"
     assert verdict["is_signal_at_or_above_S95"] is False
+
+
+def test_atlas_manifest_identifies_input_and_dirty_checkout(tmp_path):
+    row = base_row()
+    for column in schema.LLP_SIGNAL_NORMALIZED_INPUT_COLUMNS:
+        row[column] = "1.0"
+    input_path = tmp_path / "llp_signal_enriched.csv"
+    with input_path.open("w", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=list(row))
+        writer.writeheader()
+        writer.writerow(row)
+
+    assert atlas_v1.run(["--input", str(input_path), "--output-dir", str(tmp_path)]) == 0
+    manifest = json.loads((tmp_path / "boundary_atlas_v1_manifest.json").read_text())
+    assert len(manifest["input_sha256"]) == 64
+    assert isinstance(manifest["git_dirty"], bool)

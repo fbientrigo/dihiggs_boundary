@@ -221,6 +221,7 @@ Every output records:
 - explicit source fields for the direct production cross section and uncertainty;
 - row-level notes/domain status;
 - run-level calibration path and validity;
+- SHA-256 identities for the consumed input and calibration artifacts;
 - the production policy `MADGRAPH_PER_PHYSICAL_POINT_REQUIRED` in the manifest;
-- dhb version and Git commit;
+- dhb version, Git commit and whether the producing checkout was dirty;
 - row counts and UTC timestamps.
