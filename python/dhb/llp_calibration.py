@@ -27,6 +27,12 @@ def _finite(value, name):
     return out
 
 
+def _mapping(value, name):
+    if not isinstance(value, dict):
+        raise CalibrationError("%s must be a mapping" % name)
+    return value
+
+
 def validate_calibration(data):
     """Validate and normalize a Trackless-response calibration dict."""
     if not isinstance(data, dict):
@@ -43,12 +49,23 @@ def validate_calibration(data):
 
     try:
         domain = data["domain"]
-        mass = domain["m_H2_GeV"]
         acceptance = data["acceptance"]
         normalization = data["normalization"]
         classification = data["classification"]
     except KeyError as exc:
         raise CalibrationError("missing calibration section/key: %s" % exc)
+
+    domain = _mapping(domain, "domain")
+    acceptance = _mapping(acceptance, "acceptance")
+    normalization = _mapping(normalization, "normalization")
+    classification = _mapping(classification, "classification")
+    provenance = _mapping(data.get("provenance", {}), "provenance")
+
+    try:
+        mass = domain["m_H2_GeV"]
+    except KeyError as exc:
+        raise CalibrationError("missing calibration section/key: %s" % exc)
+    mass = _mapping(mass, "domain.m_H2_GeV")
 
     mass_value = _finite(mass.get("value"), "domain.m_H2_GeV.value")
     mass_tol = _finite(mass.get("abs_tolerance"), "domain.m_H2_GeV.abs_tolerance")
@@ -67,6 +84,7 @@ def validate_calibration(data):
     normalized_points = []
     previous_ctau = None
     for index, point in enumerate(points):
+        point = _mapping(point, "acceptance.points[%d]" % index)
         ctau = _finite(point.get("ctau_mm"), "acceptance.points[%d].ctau_mm" % index)
         aeff = _finite(point.get("aeff"), "acceptance.points[%d].aeff" % index)
         unc = _finite(point.get("aeff_unc", 0.0), "acceptance.points[%d].aeff_unc" % index)
@@ -99,7 +117,7 @@ def validate_calibration(data):
         "luminosity_fb": luminosity,
         "S95": s95,
         "near_fraction": near_fraction,
-        "provenance": data.get("provenance", {}),
+        "provenance": provenance,
     }
 
 
