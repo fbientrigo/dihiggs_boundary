@@ -69,6 +69,22 @@ def test_outside_recast_domain_is_separate_from_theory_and_hbhs():
     assert verdict["is_allowed"] is True
     assert verdict["region_class"] == "allowed_outside_recast_domain"
     assert verdict["is_signal_domain_supported"] is False
+    assert verdict["is_signal_calibration_validated"] is True
+
+
+def test_provisional_calibration_outside_domain_remains_unvalidated():
+    verdict = atlas_v1.classify_row(
+        base_row(
+            signal_domain_status=llp_signal.DOMAIN_OUTSIDE,
+            signal_calibration_status="PROVISIONAL",
+            signal_status=llp_signal.STATUS_NOT_COMPUTED,
+            threshold_class="",
+            N_over_S95="",
+        )
+    )
+    assert verdict["region_class"] == "allowed_outside_recast_domain"
+    assert verdict["is_signal_domain_supported"] is False
+    assert verdict["is_signal_calibration_validated"] is False
 
 
 def test_missing_coupling_becomes_no_signal_calibration_not_theory_failure():
@@ -119,6 +135,7 @@ def test_inconsistent_supported_signal_state_fails_closed():
     )
     assert verdict["region_class"] == "allowed_no_signal_calibration"
     assert verdict["is_signal_domain_supported"] is False
+    assert verdict["is_signal_calibration_validated"] is True
     assert verdict["is_signal_at_or_above_S95"] is False
     assert "inconsistent_supported_signal_state" in verdict["atlas_notes"]
 
