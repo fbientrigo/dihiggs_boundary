@@ -1,3 +1,4 @@
+import copy
 import csv
 import json
 import math
@@ -7,31 +8,33 @@ import types
 from dhb import llp_calibration, llp_signal
 
 
+def calibration_payload(status="VALIDATED"):
+    return {
+        "schema_version": "dhb.llp_signal_calibration.v2",
+        "calibration_version": "synthetic_test_v2",
+        "calibration_status": status,
+        "domain": {
+            "m_H2_GeV": {"value": 150.0, "abs_tolerance": 1e-9},
+            "ctau_min_mm": 1.0,
+            "ctau_max_mm": 100.0,
+        },
+        "acceptance": {
+            "analysis": "Trackless",
+            "model": "log_linear_ctau",
+            "points": [
+                {"ctau_mm": 1.0, "aeff": 0.1, "aeff_unc": 0.01},
+                {"ctau_mm": 10.0, "aeff": 0.2, "aeff_unc": 0.02},
+                {"ctau_mm": 100.0, "aeff": 0.1, "aeff_unc": 0.01},
+            ],
+        },
+        "normalization": {"luminosity_fb": 139.0, "S95": 3.0},
+        "classification": {"near_fraction": 0.2},
+        "provenance": {"purpose": "unit_test_only"},
+    }
+
+
 def calibration(status="VALIDATED"):
-    return llp_calibration.validate_calibration(
-        {
-            "schema_version": "dhb.llp_signal_calibration.v2",
-            "calibration_version": "synthetic_test_v2",
-            "calibration_status": status,
-            "domain": {
-                "m_H2_GeV": {"value": 150.0, "abs_tolerance": 1e-9},
-                "ctau_min_mm": 1.0,
-                "ctau_max_mm": 100.0,
-            },
-            "acceptance": {
-                "analysis": "Trackless",
-                "model": "log_linear_ctau",
-                "points": [
-                    {"ctau_mm": 1.0, "aeff": 0.1, "aeff_unc": 0.01},
-                    {"ctau_mm": 10.0, "aeff": 0.2, "aeff_unc": 0.02},
-                    {"ctau_mm": 100.0, "aeff": 0.1, "aeff_unc": 0.01},
-                ],
-            },
-            "normalization": {"luminosity_fb": 139.0, "S95": 3.0},
-            "classification": {"near_fraction": 0.2},
-            "provenance": {"purpose": "unit_test_only"},
-        }
-    )
+    return llp_calibration.validate_calibration(calibration_payload(status))
 
 
 def base_row(**overrides):
@@ -166,6 +169,48 @@ def test_declared_domain_must_be_covered_by_acceptance_table():
         raise AssertionError("invalid domain coverage must fail")
 
 
+def test_structurally_invalid_calibration_mappings_raise_calibration_error():
+    cases = []
+
+    bad = copy.deepcopy(calibration_payload())
+    bad["domain"] = []
+    cases.append((bad, "domain must be a mapping"))
+
+    bad = copy.deepcopy(calibration_payload())
+    bad["domain"]["m_H2_GeV"] = []
+    cases.append((bad, "domain.m_H2_GeV must be a mapping"))
+
+    bad = copy.deepcopy(calibration_payload())
+    bad["acceptance"] = []
+    cases.append((bad, "acceptance must be a mapping"))
+
+    bad = copy.deepcopy(calibration_payload())
+    bad["acceptance"]["points"][0] = 42
+    cases.append((bad, "acceptance.points[0] must be a mapping"))
+
+    bad = copy.deepcopy(calibration_payload())
+    bad["normalization"] = []
+    cases.append((bad, "normalization must be a mapping"))
+
+    bad = copy.deepcopy(calibration_payload())
+    bad["classification"] = []
+    cases.append((bad, "classification must be a mapping"))
+
+    bad = copy.deepcopy(calibration_payload())
+    bad["provenance"] = []
+    cases.append((bad, "provenance must be a mapping"))
+
+    for malformed, expected_message in cases:
+        try:
+            llp_calibration.validate_calibration(malformed)
+        except llp_calibration.CalibrationError as exc:
+            assert expected_message in str(exc)
+        except (AttributeError, TypeError) as exc:
+            raise AssertionError("structural error leaked past CalibrationError") from exc
+        else:
+            raise AssertionError("structurally invalid calibration must fail")
+
+
 def test_yaml_syntax_error_writes_failure_marked_rows_and_manifest(tmp_path, monkeypatch):
     class FakeYAMLError(Exception):
         pass
@@ -208,3 +253,47 @@ def test_yaml_syntax_error_writes_failure_marked_rows_and_manifest(tmp_path, mon
     assert len(manifest["input_sha256"]) == 64
     assert len(manifest["calibration_sha256"]) == 64
     assert isinstance(manifest["git_dirty"], bool)
+
+
+def test_structural_calibration_error_writes_failure_marked_rows_and_manifest(
+    tmp_path, monkeypatch
+):
+    class FakeYAMLError(Exception):
+        pass
+
+    malformed = calibration_payload()
+    malformed["domain"] = []
+    monkeypatch.setitem(
+        sys.modules,
+        "yaml",
+        types.SimpleNamespace(YAMLError=FakeYAMLError, safe_load=lambda _: malformed),
+    )
+
+    input_path = tmp_path / "input.csv"
+    output_path = tmp_path / "llp_signal_enriched.csv"
+    calibration_path = tmp_path / "structurally_broken.yaml"
+    calibration_path.write_text("domain: []\n")
+    with input_path.open("w", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=sorted(base_row()))
+        writer.writeheader()
+        writer.writerow(base_row())
+
+    assert llp_signal.run(
+        [
+            "--input",
+            str(input_path),
+            "--output",
+            str(output_path),
+            "--calibration",
+            str(calibration_path),
+        ]
+    ) == 2
+
+    with output_path.open(newline="") as fh:
+        row = next(csv.DictReader(fh))
+    assert row["signal_domain_status"] == llp_signal.DOMAIN_INVALID_CALIBRATION
+    assert row["signal_status"] == llp_signal.STATUS_NOT_COMPUTED
+    manifest = json.loads((tmp_path / "llp_signal_manifest.json").read_text())
+    assert manifest["calibration_valid"] is False
+    assert "domain must be a mapping" in manifest["calibration_error"]
+    assert manifest["row_counts"] == {"input": 1, "output": 1}

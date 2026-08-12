@@ -48,6 +48,12 @@ is_signal_at_or_above_S95
 atlas_notes
 ```
 
+`is_signal_domain_supported` describes whether the individual point is inside
+the declared recast response domain. `is_signal_calibration_validated` describes
+the scientific status of the supplied calibration artifact itself. These are
+independent: a point may lie outside a calibration's support while the
+calibration remains `VALIDATED`.
+
 ## Region classes
 
 Classification precedence is deliberate:
