@@ -30,6 +30,10 @@ The input must contain:
 
 Every input row produces one output row.
 
+The run manifest records the SHA-256 identity of the consumed LLP input and
+whether the producing checkout was dirty, so a regenerated Atlas artifact does
+not falsely appear to come from a pristine commit.
+
 ## Appended fields
 
 ```text
@@ -63,6 +67,14 @@ Classification precedence is deliberate:
 | `allowed_signal_above` | allowed, supported point with threshold class `ABOVE` |
 
 A `PROVISIONAL` calibration does not change the numerical threshold class, but `is_signal_calibration_validated` is false and `atlas_notes` records that the calibration is not validated.
+
+For a row declaring `signal_domain_status = SUPPORTED`, Atlas v1 also verifies
+that the LLP schema version is current, the calibration and signal statuses
+agree, and the finite `N_expected`, `S95`, `N_over_S95`, `Trackless_Aeff`, and
+`sigma_visible_fb` fields are mutually usable.  An inconsistent serialized
+signal state is fail-closed as `allowed_no_signal_calibration`, with
+`inconsistent_supported_signal_state` in `atlas_notes`; it is never assigned a
+threshold signal class.
 
 ## Non-claims
 

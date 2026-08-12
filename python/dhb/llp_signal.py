@@ -22,7 +22,7 @@ import os
 import sys
 
 from . import llp_calibration, point_fields, schema
-from .enrich import _format_value, _git_commit
+from .enrich import _format_value, _git_commit, _git_dirty, _sha256_file
 
 
 # Schema lists live in dhb.schema so contracts, producer and consumer share one
@@ -199,7 +199,12 @@ def load_calibration(path):
     import yaml
 
     with open(path) as fh:
-        raw = yaml.safe_load(fh)
+        try:
+            raw = yaml.safe_load(fh)
+        except yaml.YAMLError as exc:
+            raise llp_calibration.CalibrationError(
+                "invalid YAML calibration: %s" % exc
+            )
     return llp_calibration.validate_calibration(raw)
 
 
@@ -223,6 +228,8 @@ def run(argv=None):
 
     calibration = None
     calibration_error = ""
+    input_sha256 = _sha256_file(args.input)
+    calibration_sha256 = _sha256_file(args.calibration)
     try:
         calibration = load_calibration(args.calibration)
     except (OSError, llp_calibration.CalibrationError, ValueError) as exc:
@@ -283,8 +290,10 @@ def run(argv=None):
         "schema_version": SIGNAL_SCHEMA_VERSION,
         "production_policy": "MADGRAPH_PER_PHYSICAL_POINT_REQUIRED",
         "input": os.path.abspath(args.input),
+        "input_sha256": input_sha256,
         "output": os.path.abspath(args.output),
         "calibration": os.path.abspath(args.calibration),
+        "calibration_sha256": calibration_sha256,
         "calibration_valid": calibration is not None,
         "calibration_error": calibration_error,
         "calibration_version": (
@@ -300,6 +309,7 @@ def run(argv=None):
         "row_counts": {"input": counts["total"], "output": counts["total"]},
         "dhb_version": __import__("dhb").__version__,
         "git_commit": _git_commit(os.path.dirname(os.path.abspath(__file__))),
+        "git_dirty": _git_dirty(os.path.dirname(os.path.abspath(__file__))),
         "started_at_utc": started_at,
         "finished_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }

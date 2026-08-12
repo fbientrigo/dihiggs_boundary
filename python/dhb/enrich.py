@@ -17,6 +17,7 @@ The output is written atomically (.tmp -> rename) and accompanied by
 import argparse
 import csv
 import datetime
+import hashlib
 import json
 import os
 import subprocess
@@ -56,6 +57,33 @@ def _git_commit(repo_dir):
         return out.stdout.strip() if out.returncode == 0 else "unknown"
     except OSError:
         return "unknown"
+
+
+def _git_dirty(repo_dir):
+    """Return whether the producing checkout had uncommitted changes."""
+    try:
+        out = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=repo_dir,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        return bool(out.stdout.strip()) if out.returncode == 0 else None
+    except OSError:
+        return None
+
+
+def _sha256_file(path):
+    """Return a content identity for an artifact consumed by a pipeline stage."""
+    try:
+        digest = hashlib.sha256()
+        with open(path, "rb") as fh:
+            for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+    except OSError:
+        return ""
 
 
 def _higgstools_version():

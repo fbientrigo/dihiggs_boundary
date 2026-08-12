@@ -15,12 +15,15 @@ import sys
 
 from . import schema
 from .atlas import write_parquet
-from .enrich import _format_value, _git_commit
+from .enrich import _format_value, _git_commit, _git_dirty, _sha256_file
 from .llp_signal import (
     DOMAIN_INVALID_CALIBRATION,
     DOMAIN_MISSING,
     DOMAIN_OUTSIDE,
     DOMAIN_SUPPORTED,
+    SIGNAL_SCHEMA_VERSION,
+    STATUS_COMPUTED_PROVISIONAL,
+    STATUS_COMPUTED_VALIDATED,
 )
 
 
@@ -66,6 +69,50 @@ def _finite(row, key):
     return value if schema.is_finite(value) else float("nan")
 
 
+def _supported_signal_state_is_consistent(row, calibration_status, ratio, threshold):
+    """Check the redundant LLP handoff fields before assigning a signal class.
+
+    Atlas is intentionally a classifier, but it is also the final boundary for
+    a serialized LLP artifact.  A stale or tampered row must not become a
+    scientific signal category merely because it contains plausible text.
+    """
+    expected_status = {
+        "VALIDATED": STATUS_COMPUTED_VALIDATED,
+        "PROVISIONAL": STATUS_COMPUTED_PROVISIONAL,
+    }.get(calibration_status)
+    if (
+        row.get("llp_signal_schema_version", "") != SIGNAL_SCHEMA_VERSION
+        or row.get("signal_status", "") != expected_status
+    ):
+        return False
+
+    expected = _finite(row, "N_expected")
+    s95 = _finite(row, "S95")
+    aeff = _finite(row, "Trackless_Aeff")
+    visible = _finite(row, "sigma_visible_fb")
+    if not (
+        math.isfinite(ratio)
+        and math.isfinite(expected)
+        and expected >= 0.0
+        and math.isfinite(s95)
+        and s95 > 0.0
+        and math.isfinite(aeff)
+        and 0.0 <= aeff <= 1.0
+        and math.isfinite(visible)
+        and visible >= 0.0
+    ):
+        return False
+    if not math.isclose(ratio, expected / s95, rel_tol=1e-9, abs_tol=1e-12):
+        return False
+    # The precise near band belongs to the calibration, but its ordering gives
+    # these two invariant checks without importing a second threshold model.
+    if threshold == "BELOW":
+        return ratio < 1.0
+    if threshold == "ABOVE":
+        return ratio > 1.0
+    return threshold == "NEAR"
+
+
 def classify_row(row):
     notes = []
     theory_raw = row.get("theory_ok", "").strip()
@@ -88,7 +135,10 @@ def classify_row(row):
     is_exp_ok = schema.parse_flag(row, "exp_ok")
     hs_delta_chi2 = _finite(row, "hs_delta_chi2")
     is_allowed = bool(
-        is_theory_ok and is_exp_ok and enrich_status == schema.ENRICH_STATUS_OK
+        is_theory_ok
+        and hb_allowed
+        and is_exp_ok
+        and enrich_status == schema.ENRICH_STATUS_OK
     )
 
     domain = row.get("signal_domain_status", "")
@@ -96,7 +146,12 @@ def classify_row(row):
     threshold = row.get("threshold_class", "")
     ratio = _finite(row, "N_over_S95")
     domain_supported = domain == DOMAIN_SUPPORTED
-    calibration_validated = calibration_status == "VALIDATED"
+    if domain_supported and not _supported_signal_state_is_consistent(
+        row, calibration_status, ratio, threshold
+    ):
+        domain_supported = False
+        notes.append("inconsistent_supported_signal_state")
+    calibration_validated = domain_supported and calibration_status == "VALIDATED"
     signal_at_or_above = bool(
         domain_supported and math.isfinite(ratio) and ratio >= 1.0
     )
@@ -223,6 +278,7 @@ def run(argv=None):
         "stage": "boundary_atlas_v1",
         "atlas_schema_version": ATLAS_SCHEMA_VERSION,
         "input": os.path.abspath(args.input),
+        "input_sha256": _sha256_file(args.input),
         "output_csv": os.path.abspath(csv_path),
         "output_parquet": os.path.abspath(parquet_path) if parquet_written else "",
         "output_summary": os.path.abspath(summary_path),
@@ -231,6 +287,7 @@ def run(argv=None):
         "parquet_skipped_reason": parquet_reason,
         "dhb_version": __import__("dhb").__version__,
         "git_commit": _git_commit(os.path.dirname(os.path.abspath(__file__))),
+        "git_dirty": _git_dirty(os.path.dirname(os.path.abspath(__file__))),
         "started_at_utc": started_at,
         "finished_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }

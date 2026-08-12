@@ -42,8 +42,12 @@ def resolve_alias(row, canonical_name):
         if name not in row or str(row.get(name, "")).strip() == "":
             continue
         value = _float(row.get(name))
-        if math.isfinite(value):
-            found.append((name, value))
+        if not math.isfinite(value):
+            # A populated alias is evidence about this observable.  Treating a
+            # malformed canonical value as if it were absent would let a legacy
+            # alias (or the BR width bridge) silently replace corrupted input.
+            return float("nan"), "", "invalid:%s" % canonical_name
+        found.append((name, value))
     if not found:
         return float("nan"), "", "missing:%s" % canonical_name
     reference = found[0][1]
@@ -83,7 +87,13 @@ def resolve_signal_inputs(row):
     if math.isfinite(total_width) and total_width > 0.0 and math.isfinite(width_bb):
         derived_br = width_bb / total_width
 
-    if math.isfinite(direct_br):
+    if br_issue.startswith("invalid:"):
+        # An explicit BR is authoritative when supplied.  Do not turn a
+        # malformed explicit value into a numerical signal via width fallback.
+        result["br_bb_H2"] = float("nan")
+        sources["br_bb_H2"] = ""
+        issues.append(br_issue)
+    elif math.isfinite(direct_br):
         result["br_bb_H2"] = direct_br
         sources["br_bb_H2"] = br_source
         if math.isfinite(derived_br) and not _close(direct_br, derived_br, rel_tol=1e-6):
