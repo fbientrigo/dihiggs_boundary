@@ -151,7 +151,7 @@ def classify_row(row):
     ):
         domain_supported = False
         notes.append("inconsistent_supported_signal_state")
-    calibration_validated = domain_supported and calibration_status == "VALIDATED"
+    calibration_validated = calibration_status == "VALIDATED"
     signal_at_or_above = bool(
         domain_supported and math.isfinite(ratio) and ratio >= 1.0
     )
