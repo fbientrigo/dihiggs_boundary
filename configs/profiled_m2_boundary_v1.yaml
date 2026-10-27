@@ -1,0 +1,30 @@
+# Bounded existence/profile scan; edit this file (not code) for resolution/range changes.
+schema_version: dhb.profiled_m2_boundary.v1
+campaign_id: profiled_m2_boundary_v1
+dihiggs_root: ../../dihiggs
+evaluator: dihiggs/app/DihiggsPointV2Evaluator
+physics:
+  mh_GeV: 125.13
+  mass_convention_id: mh_125p13_pdg_2026
+  yukawa_type: 1
+  sin_beta_minus_alpha: 1.0
+  lambda7: 0.0
+outer_grid:
+  m_phi_GeV: {min: 130.0, max: 350.0, n: 20}
+  M_plot_GeV: {min: 130.0, max: 350.0, n: 20}
+profile:
+  n_proposals: 16
+  seed: 20260914
+  sampler: lhs
+  # No validated common X envelope exists. This common positive/log diagnostic
+  # range stays inside lambda6=[1e-12,1e-2] for every requested tan(beta).
+  X_lambda6_times_tan_beta: {min: 1.0e-5, max: 1.0, scale: log}
+  lambda6_hard_envelope: {min: 1.0e-12, max: 1.0e-2}
+  # From dihiggs/docs/contracts/high_mass_campaign_template.yaml stage_1
+  # candidate nodes; its status is not_launched, so this is diagnostic only.
+  Delta_heavy_GeV: {min: 150.0, max: 500.0, scale: linear}
+tan_beta_slices: [100.0, 10000.0, 100000.0, 10000000.0]
+runtime:
+  timeout_s: 120
+  max_workers: 4
+  chunk_size: 100

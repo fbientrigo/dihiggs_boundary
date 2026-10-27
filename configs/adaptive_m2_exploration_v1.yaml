@@ -1,0 +1,31 @@
+schema_version: dhb.adaptive_m2_exploration.v1
+campaign_id: adaptive_m2_boundary_exploration_v1
+dihiggs_root: ../../dihiggs
+evaluator: dihiggs/app/DihiggsPointV2Evaluator
+seed:
+  adaptive_manifest: ../data/runs/adaptive_m2_boundary_v1/manifest.json
+  adaptive_state: ../data/runs/adaptive_m2_boundary_v1/mesh_state.json
+physics:
+  mh_GeV: 125.13
+  mass_convention_id: mh_125p13_pdg_2026
+  yukawa_type: 1
+  sin_beta_minus_alpha: 1.0
+  lambda7: 0.0
+tan_beta_slices: [100.0, 10000.0, 100000.0, 10000000.0]
+profile:
+  n_proposals: 16
+  seed: 20260915
+  sampler: lhs
+  X_lambda6_times_tan_beta: {min: 1.0e-6, max: 2.0, scale: log}
+  lambda6_hard_envelope: {min: 1.0e-12, max: 1.0e-2}
+  Delta_heavy_GeV: {min: 100.0, max: 600.0, scale: linear}
+mesh:
+  min_GeV: 130.0
+  max_GeV: 350.0
+  root_cells: 10
+  exploration_depth: 6
+  new_evaluation_cap: 600000
+runtime:
+  timeout_s: 120
+  max_workers: 4
+  leaf_chunk: 200
