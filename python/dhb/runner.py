@@ -9,7 +9,7 @@ import math
 
 from . import schema
 
-SM_REFERENCE_MH = 125.09
+SM_REFERENCE_MH_REPLAY = 125.09
 
 
 def import_higgs_modules():
@@ -36,12 +36,12 @@ class HbhsRunner:
         self._sm_chi2 = None
 
     def sm_reference_chi2(self):
-        """HiggsSignals chi2 of a single SM-like Higgs at 125.09 GeV,
-        computed once and cached; reference for delta chi2."""
+        """Historical evaluate_point_v0 replay reference at 125.09 GeV. This must not
+        be used to label a new v3 point; reference for legacy delta-chi2 only."""
         if self._sm_chi2 is None:
             pred = self.HP.Predictions()
             h = pred.addParticle(self.HP.BsmParticle("h", "neutral", "even"))
-            h.setMass(SM_REFERENCE_MH)
+            h.setMass(SM_REFERENCE_MH_REPLAY)
             self.HP.effectiveCouplingInput(h, self.HP.smLikeEffCouplings)
             self._sm_chi2 = float(self.signals(pred))
         return self._sm_chi2

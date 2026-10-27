@@ -1,5 +1,8 @@
 # Atlas Schema — `dihiggsbounds`
 
+> **Version scope:** Atlas v0 and its `mh_GeV=125.09` field describe frozen legacy replay data. New points use the v3 convention authority and provenance-bearing v1 handoff; do not interpret v0 columns as current convention metadata.
+
+
 ## 1. Purpose
 
 This document defines the canonical data schema for the first `dihiggsbounds` theory and experimental atlases.

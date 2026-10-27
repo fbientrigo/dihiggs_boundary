@@ -5,15 +5,16 @@
 # versions each repo builds against, so version drift is detectable instead of
 # hidden in directory names and build scripts. The declared versions must AGREE
 # across the three manifests -- that agreement is the cross-repo "version pin".
-# tests/test_external_tools.py enforces the versions and the conventions md5.
+# tests/test_external_tools.py enforces the versions and the convention-cache SHA-256 and provenance sidecar.
 schema_version: external_tools_v1
 
-# Shared physics conventions file, byte-identical across all three repos.
-# The md5 is the cross-repo drift pin for conventions/physics_conventions.yaml.
+# Controlled cache of the canonical physics convention file.
+# The SHA-256 pins the canonical v3 convention cache; provenance is in its sidecar.
 conventions:
   file: conventions/physics_conventions.yaml
-  schema_version: physics_conventions_v1
-  md5: a2fea4c862d3b678334fd07a396f26ba
+  provenance_file: conventions/physics_conventions.lock.yaml
+  schema_version: physics_conventions_v3
+  sha256: 4f3a938ed54dbc779d25f691ce1dd06fe17af69751105dc3b69ccb6b7d92fff6
 
 tools:
   2HDMC:

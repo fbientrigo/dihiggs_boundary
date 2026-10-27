@@ -1,5 +1,8 @@
 # HB/HS enrichment stage contract (`dhb.enrich`)
 
+> **Historical reference:** the 125.09 GeV SM reference below is retained for the legacy v0 replay contract. It is distinct from the active v3 model-point mass (`125.20` project convention) and must be recorded separately in any new statistical handoff.
+
+
 ## Purpose
 
 The enrichment stage applies the experimental constraints from HiggsBounds

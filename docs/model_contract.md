@@ -1,5 +1,8 @@
 # Model Contract — `type1_lambda6_alignment_v0`
 
+> **Historical replay contract:** `type1_lambda6_alignment_v0` records the old `m_h=125.09 GeV` setup and fixed campaign choices. It remains a legacy atlas contract; do not send new points through it. New production follows the v3 authority in `dihiggs/conventions/physics_conventions.yaml` and requires explicit campaign choices and provenance.
+
+
 ## 1. Purpose
 
 This document defines the physics contract for the first reproducible atlas of valid and invalid regions in the `dihiggsbounds` project.
@@ -10,7 +13,7 @@ The immediate goal is not MCMC and not a full experimental recast. The immediate
 2. experimental validity,
 3. combined signal usefulness.
 
-This contract is the root of the project. Code, samplers, runners, schemas, and plots must conform to it unless this file is explicitly updated.
+This document records the historical Atlas v0 setup. New code and handoffs follow the active v3 authority; this file remains the replay contract for the original atlas.
 
 ---
 

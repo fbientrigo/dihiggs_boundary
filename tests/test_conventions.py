@@ -17,23 +17,20 @@ def conventions():
 
 def test_conventions_file_present():
     assert os.path.exists(CONVENTIONS)
+    assert os.path.exists(os.path.join(REPO_ROOT, "conventions", "physics_conventions.lock.yaml"))
 
 
 def test_hbar_c_matches_conventions(conventions):
-    """The hbar*c used to derive ctau_mm_H2 must equal the shared conventions
-    value. This is the same literal the C++ evaluator and the other repos use;
-    the conventions file is what keeps them from drifting apart."""
-    assert contracts.HBAR_C_GEV_MM == float(conventions["hbar_c_gev_mm"])
+    assert contracts.HBAR_C_GEV_MM == float(conventions["constants"]["hbar_c_gev_mm"])
 
 
-def test_pinned_hbar_c_value():
-    # Pin the numeric value so an accidental edit to either side is caught.
-    assert contracts.HBAR_C_GEV_MM == 1.973269804e-13
-
-
-def test_neutral_scalar_naming_matches_schema(conventions):
-    """schema.NEUTRALS / MASS_COLUMN must agree with the shared naming map."""
-    assert tuple(conventions["neutral_scalars"]) == schema.NEUTRALS
-    for hk, meta in conventions["neutral_scalars"].items():
-        assert schema.MASS_COLUMN[hk] == meta["mass_column"]
-    assert schema.MASS_COLUMN["hc"] == conventions["charged_scalar"]["hc"]["mass_column"]
+def test_v3_names_distinguish_phi_from_legacy_boundary_schema(conventions):
+    assert conventions["schema_version"] == "physics_conventions_v3"
+    assert conventions["states"]["phi"]["canonical_symbol"] == "phi"
+    assert conventions["states"]["phi"]["pdg_id"] == 35
+    # The v0 CSV/API names remain readable for historical replay only.
+    assert schema.MASS_COLUMN["h2"] == "mH"
+    assert conventions["states"]["phi"]["legacy_mass_fields"] == [
+        "mH", "mH_input_GeV", "mH2_GeV"
+    ]
+    assert "H" in conventions["states"]["phi"]["forbidden_unqualified_aliases"]

@@ -1,4 +1,12 @@
-# Project Bootstrap — dihiggs_boundary
+# Historical project bootstrap — dihiggs_boundary
+
+> **Legacy:** this page describes the original bootstrap plan and is not the
+> current project guide. Use the global workspace onboarding and the current
+> contracts under `docs/`. The source tree, package names, mass convention,
+> and evaluation workflow have changed since this plan was written.
+
+Current entry point: `../../README.md` (workspace root when viewed from the
+canonical multi-repository checkout).
 
 ## Current goal
 

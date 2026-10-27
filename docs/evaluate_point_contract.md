@@ -1,5 +1,8 @@
 # `evaluate_point` contract
 
+> **Historical replay contract:** this `evaluate_point_v1` API fixes `m_h=125.09 GeV`, exact alignment, `lambda7=0`, and `mHp=mA`. Preserve it for its original replay only. It is not the new-production interface. New points and cross-repository handoffs use the v3 authority in `dihiggs/conventions/physics_conventions.yaml` and must carry its commit/checksum provenance and explicit campaign choices.
+
+
 ## Purpose
 
 `evaluate_point` evaluates individual CP-conserving 2HDM points using 2HDMC.
@@ -14,7 +17,7 @@ only in that later stage.
 
 ## Physics model
 
-Current model contract:
+Historical `evaluate_point_v1` model contract:
 
 - CP-conserving 2HDM.
 - SM-like light Higgs with `mh = 125.09 GeV`.
