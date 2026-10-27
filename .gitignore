@@ -69,4 +69,7 @@ lib/2HDMC-1.8.0/lib/
 
 runs/
 campaigns/
-
+!campaigns/
+campaigns/*
+!campaigns/survivor_adaptive_12520_tanbeta_v2/
+!campaigns/survivor_adaptive_12520_tanbeta_v2/campaign.yaml
