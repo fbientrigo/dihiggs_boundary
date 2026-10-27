@@ -189,15 +189,52 @@ def _rows(out, leaf_id):
 
 
 def _update_leaf(leaf, rows, max_zero):
+    """Leaf verdict from this run's rows plus any prior lake coverage (prior_attempts/prior_successes, see load_explored)."""
     successes = [row for row in rows if _theory_ok(row)]
-    leaf["attempts"], leaf["successes"] = len(rows), len(successes)
-    leaf["has_survivor"] = bool(successes)
-    leaf["theory_pass_fraction"] = len(successes) / len(rows) if rows else math.nan
-    leaf["wilson95_low"], leaf["wilson95_high"] = wilson95(len(successes), len(rows))
-    leaf["zero_event_upper_95"] = zero_event_upper_95(len(rows)) if not successes else math.nan
-    leaf["best_point_id"] = max(successes, key=lambda row: abs(float(row.get("g_physical_hphiphi_GeV", "nan"))), default={}).get("point_id", "")
-    leaf["decision_state"] = "survivor" if successes else ("tested_empty_95" if len(rows) >= max_zero else "inconclusive")
+    n, k = len(rows) + leaf.get("prior_attempts", 0), len(successes) + leaf.get("prior_successes", 0)
+    leaf["attempts"], leaf["successes"] = n, k
+    leaf["has_survivor"] = bool(k)
+    leaf["theory_pass_fraction"] = k / n if n else math.nan
+    leaf["wilson95_low"], leaf["wilson95_high"] = wilson95(k, n)
+    leaf["zero_event_upper_95"] = zero_event_upper_95(n) if not k else math.nan
+    leaf["best_point_id"] = max(successes, key=lambda row: abs(float(row.get("g_physical_hphiphi_GeV", "nan"))), default={}).get("point_id", leaf.get("prior_best_point_id", ""))
+    leaf["decision_state"] = "survivor" if k else ("tested_empty_95" if n >= max_zero else "inconclusive")
     leaf["coverage_state"] = leaf["decision_state"]
+
+
+def _geometry(leaf):
+    return (leaf["leaf_id"], float(leaf["tan_beta"]), float(leaf["mphi_min_GeV"]), float(leaf["mphi_max_GeV"]),
+            float(leaf["Mbar_min_GeV"]), float(leaf["Mbar_max_GeV"]))
+
+
+def load_explored(path, cfg, convention_id):
+    """Prior coverage from `lake explored --export`: {leaf geometry: (n_points, n_valid, best_point_id)}.
+
+    Only rows of this exact regime count: lambda7 and mh equal, and convention_id equal when the lake knows it
+    (commits before 2026-10-27 have none; there mh is the measured proxy). The leaf id and its rectangle must both
+    match, so a mesh with other root cells or bounds is never mistaken for this one."""
+    lam7, mh, prior = float(cfg["physics"]["lambda7"]), float(cfg["physics"]["mh_GeV"]), {}
+    with open(path, newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            if not row["lambda7"] or not row["mh_GeV"] or float(row["lambda7"]) != lam7 or not math.isclose(float(row["mh_GeV"]), mh, rel_tol=1e-9):
+                continue
+            if row.get("convention_id") and row["convention_id"] != convention_id:
+                continue
+            key, n = _geometry(row), int(row["n_points"])
+            # ponytail: max over commits/campaigns, not a sum: a growing campaign re-commits its earlier rows, and an
+            # undercount only re-runs a batch while an overcount would skip unexplored work. Sum distinct point_ids if that matters.
+            if n > prior.get(key, (0,))[0]:
+                prior[key] = (n, int(row["n_valid"]), row.get("best_point_id", ""))
+    return prior
+
+
+def _seed(leaf, prior, max_zero):
+    """A new leaf already explored in the lake starts from its recorded counts instead of from zero."""
+    n, k, best = prior.get(_geometry(leaf), (0, 0, ""))
+    if n:
+        leaf.update(prior_attempts=n, prior_successes=k, prior_best_point_id=best)
+        _update_leaf(leaf, [], max_zero)
+    return leaf
 
 
 def _contexts(leaf, cfg, replicate):
@@ -229,7 +266,7 @@ def _run_batch(out, leaves, cfg, executable, dihiggs_root, api, cap, started):
     eligible = [leaf for leaf in leaves if leaf["attempts"] + batch <= cap]
     jobs = []
     for leaf in eligible:
-        replicate = leaf["attempts"] // batch
+        replicate = -(-leaf["attempts"] // batch)  # ceil: a partial prior replicate is never re-proposed
         directory = out / ("tanbeta_" + _tag(leaf["tan_beta"])) / "raw_shards" / leaf["leaf_id"].replace("/", "__")
         directory.mkdir(parents=True, exist_ok=True)
         for index, context in _contexts(leaf, cfg, replicate):
@@ -297,7 +334,7 @@ def _v2_rank(leaf, halo):
     return (*priority(leaf, halo, bool(leaf["historical_hint_score"])), -leaf["historical_hint_score"], leaf["attempts"], leaf["leaf_id"])
 
 
-def _run_v2(config_path, cfg, dihiggs_root, executable, output_dir, smoke, mass_convention, history_checks, only_tan_beta=None):
+def _run_v2(config_path, cfg, dihiggs_root, executable, output_dir, smoke, mass_convention, history_checks, only_tan_beta=None, explored=None):
     """Run each slice to its independent exact batch quota."""
     if smoke:
         cfg = json.loads(json.dumps(cfg))
@@ -309,15 +346,16 @@ def _run_v2(config_path, cfg, dihiggs_root, executable, output_dir, smoke, mass_
     out = Path(output_dir).resolve() / cfg["campaign_id"]
     out.mkdir(parents=True, exist_ok=True)
     state_path, history = out / "campaign_state.json", _historical_rectangles(cfg)
+    max_zero = int(cfg["profile"]["zero_success_max_attempts"])
+    prior = load_explored(explored, cfg, mass_convention["convention_id"]) if explored else {}
     leaves = json.loads(state_path.read_text())["leaves"] if state_path.exists() else _new_root_leaves(cfg)
-    if not state_path.exists():
+    if not state_path.exists():  # a resumed run keeps its state; prior coverage then seeds only leaves it creates
         for leaf in leaves:
-            _new_v2_leaf(leaf, history)
+            _seed(_new_v2_leaf(leaf, history), prior, max_zero)
     quotas, batch = slice_batch_quotas(cfg), int(cfg["profile"]["batch_size"])
     api, started = _canonical_api(dihiggs_root), time.monotonic()
     low, high, root_n = float(cfg["mesh"]["min_GeV"]), float(cfg["mesh"]["max_GeV"]), int(cfg["mesh"]["root_cells"])
     depth_limit = min(int(cfg["mesh"]["max_depth"]), int(math.log2(int(cfg["mesh"]["max_cells_per_axis"]) / root_n)))
-    max_zero = int(cfg["profile"]["zero_success_max_attempts"])
     if only_tan_beta is not None and float(only_tan_beta) not in quotas:
         raise ValueError("requested tan(beta) is not in config")
     selected = {float(only_tan_beta)} if only_tan_beta is not None else set(quotas)
@@ -337,9 +375,9 @@ def _run_v2(config_path, cfg, dihiggs_root, executable, output_dir, smoke, mass_
             refinable = [leaf for leaf in active if leaf["depth"] < depth_limit and (leaf["has_survivor"] or leaf["historical_hint_score"] > 0)]
             if remaining >= 4 and refinable:
                 parent = min(refinable, key=lambda leaf: _v2_rank(leaf, halo))
-                new = [_new_v2_leaf(child, history) for child in children(parent, low, high, root_n)]
+                new = [_seed(_new_v2_leaf(child, history), prior, max_zero) for child in children(parent, low, high, root_n)]
                 leaves.extend(new)
-                _run_batch(out, new, cfg, executable, dihiggs_root, api, limit, started)
+                _run_batch(out, [leaf for leaf in new if not leaf["attempts"]], cfg, executable, dihiggs_root, api, limit, started)
                 _save_state(state_path, leaves)
                 continue
             eligible = [leaf for leaf in active if leaf["has_survivor"] or leaf["attempts"] < max_zero]
@@ -357,7 +395,8 @@ def _run_v2(config_path, cfg, dihiggs_root, executable, output_dir, smoke, mass_
     raw_csv = out / "raw_fresh_12520_tanbeta_v2_points.csv"
     total = _consolidate(out, raw_csv, fields)
     completed = [tb for tb, quota in quotas.items() if sum(leaf["attempts"] for leaf in leaves if leaf["tan_beta"] == tb) == quota * batch]
-    complete = len(completed) == len(quotas) and total == int(cfg["mesh"]["new_evaluation_cap"])
+    seeded = sum(leaf.get("prior_attempts", 0) for leaf in leaves)
+    complete = len(completed) == len(quotas) and total + seeded == int(cfg["mesh"]["new_evaluation_cap"])
     _write_rows(out / "rectangular_leaves.csv", leaves, LEAF_FIELDS)
     parquet, reason = write_parquet(str(raw_csv), str(raw_csv.with_suffix(".parquet"))) if complete else (False, "deferred until all tan(beta) slices finish")
     manifest = {"schema": "dhb.survivor_adaptive_12520_tanbeta.manifest.v2", "campaign_id": cfg["campaign_id"], "config_sha256": _sha256(config_path),
@@ -366,8 +405,10 @@ def _run_v2(config_path, cfg, dihiggs_root, executable, output_dir, smoke, mass_
         "historical_inputs": history_checks["checked"], "historical_archive_checksum_verification": history_checks,
         "historical_hint_scoring": {"method": "binary rectangle occupancy linearly interpolated in log(tan_beta)", "historical_tan_beta_slices": sorted({entry[0] for entry in history}), "scheduling_only": True},
         "historical_evidence_policy": "125.13 geometry is a deterministic priority hint only; no historical rows, outcomes, intervals, fractions, or classifications were pooled into this 125.20 campaign.",
+        "explored_seed": {"path": str(Path(explored).resolve()), "sha256": _sha256(explored), "regime_matched_leaves": len(prior),
+                          "seeded_leaves": sum(1 for leaf in leaves if leaf.get("prior_attempts")), "seeded_attempts": seeded} if explored else None,
         "status": "COMPLETE" if complete else "RUNNING", "completed_tan_beta_slices": completed, "last_selected_tan_beta_slices": sorted(selected),
-        "budget": {"cap": int(cfg["mesh"]["new_evaluation_cap"]), "batch_size": batch, "slice_batch_quotas": [{"tan_beta": tb, "batches": quota, "rows": quota * batch} for tb, quota in quotas.items()], "fresh_rows": total, "remaining": int(cfg["mesh"]["new_evaluation_cap"]) - total},
+        "budget": {"cap": int(cfg["mesh"]["new_evaluation_cap"]), "batch_size": batch, "slice_batch_quotas": [{"tan_beta": tb, "batches": quota, "rows": quota * batch} for tb, quota in quotas.items()], "fresh_rows": total, "remaining": int(cfg["mesh"]["new_evaluation_cap"]) - total - seeded},
         "effective_max_depth": depth_limit, "raw_csv": str(raw_csv), "state": str(state_path), "parquet_written": parquet, "parquet_skipped_reason": reason, "finished_at_utc": _now()}
     _write_json(out / "manifest.json", manifest)
     if complete:
@@ -376,7 +417,7 @@ def _run_v2(config_path, cfg, dihiggs_root, executable, output_dir, smoke, mass_
     print(); return manifest
 
 
-def run(config_path, output_dir, smoke=False, only_tan_beta=None):
+def run(config_path, output_dir, smoke=False, only_tan_beta=None, explored=None):
     config_path, cfg, dihiggs_root, executable = _load(config_path)
     if smoke and not cfg["schema_version"].endswith("v2"):
         cfg = json.loads(json.dumps(cfg)); cfg["mesh"]["root_cells"] = 4; cfg["mesh"]["max_depth"] = 1; cfg["mesh"]["new_evaluation_cap"] = 2048; cfg["campaign_id"] += "_smoke"
@@ -384,7 +425,9 @@ def run(config_path, output_dir, smoke=False, only_tan_beta=None):
     # with this campaign's claimed active mass convention.
     mass_convention = _mass_convention(dihiggs_root, float(cfg["physics"]["mh_GeV"]))
     if cfg["schema_version"].endswith("v2"):
-        return _run_v2(config_path, cfg, dihiggs_root, executable, output_dir, smoke, mass_convention, _verify_historical_inputs(cfg), only_tan_beta)
+        return _run_v2(config_path, cfg, dihiggs_root, executable, output_dir, smoke, mass_convention, _verify_historical_inputs(cfg), only_tan_beta, explored)
+    if explored is not None:
+        raise ValueError("--explored is supported only for the v2 campaign")
     if only_tan_beta is not None:
         raise ValueError("--tan-beta is supported only for the v2 campaign")
     out = Path(output_dir).resolve() / cfg["campaign_id"]; out.mkdir(parents=True, exist_ok=True)
@@ -442,7 +485,8 @@ def run(config_path, output_dir, smoke=False, only_tan_beta=None):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__); parser.add_argument("--config", required=True); parser.add_argument("--output-dir", required=True); parser.add_argument("--smoke", action="store_true"); parser.add_argument("--tan-beta", type=float, help="run or resume one configured v2 slice")
-    args = parser.parse_args(argv); manifest = run(args.config, args.output_dir, args.smoke, args.tan_beta); print("[DHB] survivor adaptive: status=%s rows=%d" % (manifest.get("status", "COMPLETE"), manifest["budget"]["fresh_rows"])); return 0
+    parser.add_argument("--explored", metavar="CSV", help="skip/reuse leaves already explored for this regime: output of `lake explored --export`")
+    args = parser.parse_args(argv); manifest = run(args.config, args.output_dir, args.smoke, args.tan_beta, args.explored); print("[DHB] survivor adaptive: status=%s rows=%d" % (manifest.get("status", "COMPLETE"), manifest["budget"]["fresh_rows"])); return 0
 
 
 if __name__ == "__main__": raise SystemExit(main())
