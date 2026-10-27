@@ -868,6 +868,21 @@ class THDM {
   double      sinba;
   bool        params_set;
   double      v2;
+
+  // Physical-basis cache: set_param_phys() receives m_h, m_H, m_A, m_Hp
+  // and m12_2 as EXACT inputs, but THDM's only persistent state is the
+  // generic basis above. At extreme tan(beta), folding m12_2 into m22_2
+  // loses it below the double-precision noise floor of the O(v^2) leading
+  // term -- get_m12_2()'s read-back is then information-theoretically
+  // lossy, not merely imprecise. Caching the exact input here, and
+  // invalidating it on any call that changes the generic-basis state,
+  // avoids ever discarding that information for the entry point where it
+  // is known exactly. Ported from the equivalent fix in the canonical
+  // ~/atlas_dihiggs/dihiggs/2hdmc checkout -- see that repo's
+  // campaigns/physical_vs_effective_coupling_v1/validation/MASS_RECONSTRUCTION_FIX.md.
+  bool        phys_cache_valid;
+  double      phys_mh, phys_mH, phys_mA, phys_mHp, phys_m12_2;
+
   gsl_matrix *kappa_D;
   gsl_matrix *kappa_U;
   gsl_matrix *kappa_L;

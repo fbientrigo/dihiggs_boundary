@@ -203,6 +203,9 @@ void THDM::init() {
   beta	=	0;
   m22_2	=	0;
 
+  phys_cache_valid = false;
+  phys_mh = phys_mH = phys_mA = phys_mHp = phys_m12_2 = 0.;
+
   kappa_D = gsl_matrix_alloc(3,3);
   kappa_U = gsl_matrix_alloc(3,3);
   kappa_L = gsl_matrix_alloc(3,3);
@@ -224,6 +227,8 @@ void THDM::init() {
 bool THDM::set_param_gen(double lambda1, double lambda2, double lambda3,
 			 double lambda4, double lambda5, double lambda6,
 			 double lambda7, double m12_2, double tan_beta) {
+
+  phys_cache_valid = false;
 
   // tan(beta) must be greater than 0 for valid basis
   if (tan_beta<=0) {
@@ -307,6 +312,8 @@ bool THDM::set_param_phys(double m_h,double m_H, double m_A, double m_Hp,
 			  double sba, double lambda6, double lambda7,
 			  double m12_2,double tan_beta) {
 
+  phys_cache_valid = false;
+
   if (m_h>m_H) {
     cerr << "WARNING: Cannot set physical masses such that m_H < m_h\n";
     params_set = false;
@@ -338,6 +345,9 @@ bool THDM::set_param_phys(double m_h,double m_H, double m_A, double m_Hp,
 
   double cba = sqrt(1.-sba*sba);
 
+  // NOTE: dividing by cb2=cos(beta)^2 makes this formula ill-conditioned
+  // at extreme tan(beta) (cb2 underflows toward 0). See the canonical fix
+  // this was ported from for measurements and rationale.
   lambda[1]=(m_H*m_H*ca2+m_h*m_h*sa2-m12_2*tb)/v2/cb2-1.5*lambda6*tb+0.5*lambda7*tb*tb*tb;
   lambda[2]=(m_H*m_H*sa2+m_h*m_h*ca2-m12_2*ctb)/v2/sb2+0.5*lambda6*ctb*ctb*ctb-1.5*lambda7*ctb;
   lambda[3]=((m_H*m_H-m_h*m_h)*ca*sa+2.*m_Hp*m_Hp*sb*cb-m12_2)/v2/sb/cb-0.5*lambda6*ctb-0.5*lambda7*tb;
@@ -348,6 +358,16 @@ bool THDM::set_param_phys(double m_h,double m_H, double m_A, double m_Hp,
 
   params_set=true;
 
+  // m_h, m_H, m_A, m_Hp and m12_2 were given exactly -- cache them so
+  // get_param_phys()/get_hmass() never have to recover them from the
+  // lossy m22_2/lambda[] round-trip (see get_m12_2()'s header comment).
+  phys_mh = m_h;
+  phys_mH = m_H;
+  phys_mA = m_A;
+  phys_mHp = m_Hp;
+  phys_m12_2 = m12_2;
+  phys_cache_valid = true;
+
   return params_set;
 }
 
@@ -355,6 +375,8 @@ bool THDM::set_param_phys(double m_h,double m_H, double m_A, double m_Hp,
 bool THDM::set_param_higgs(double Lambda1, double Lambda2, double Lambda3,
 			   double Lambda4, double Lambda5, double Lambda6,
 			   double Lambda7, double m_Hp) {
+
+  phys_cache_valid = false;
 
   if (m_Hp<0) {
     params_set = false;
@@ -480,6 +502,8 @@ bool THDM::set_param_hybrid_sba(double mh, double mH, double sba, double Z4,
 
 
 bool THDM::set_inert(double m_h,double m_H, double m_A, double m_Hp, double lambda2, double lambda3) {
+
+  phys_cache_valid = false;
 
   if ((m_h<=0)||(m_H<=0)||(m_A<=0)||(m_Hp<=0)) {
     params_set = false;
@@ -986,6 +1010,21 @@ void THDM::get_param_phys(double &m_h,double &m_H, double &m_A, double &m_Hp,
   lambda6=lambda[6];
   lambda7=lambda[7];
   tan_beta=tan(beta);
+  sba = sinba;
+
+  // set_param_phys() received these masses and m12_2 as exact inputs.
+  // Returning the cache instead of re-deriving them through get_m12_2()'s
+  // lossy round-trip avoids the catastrophic-cancellation error documented
+  // on get_m12_2(). See the canonical fix this was ported from.
+  if (phys_cache_valid) {
+    m_h = phys_mh;
+    m_H = phys_mH;
+    m_A = phys_mA;
+    m_Hp = phys_mHp;
+    m12_2 = phys_m12_2;
+    return;
+  }
+
   double sb  = sin(beta);
   double sb2 = sb*sb;
   double cb	 = cos(beta);
@@ -1003,10 +1042,13 @@ void THDM::get_param_phys(double &m_h,double &m_H, double &m_A, double &m_Hp,
   double M112   =  m_A2*sb2+v2*(lambda[1]*cb2+2.*lambda[6]*sb*cb+lambda[5]*sb2);
   double M122   = -m_A2*sb*cb+v2*((lambda[3]+lambda[4])*sb*cb+lambda[6]*cb2+lambda[7]*sb2);
   double M222   =  m_A2*cb2+v2*(lambda[2]*sb2+2.*lambda[7]*sb*cb+lambda[5]*cb2);
-  double m_h2   =  0.5*(M112+M222-sqrt((M112-M222)*(M112-M222)+4.*M122*M122));
-  double m_H2   =  0.5*(M112+M222+sqrt((M112-M222)*(M112-M222)+4.*M122*M122));
-
-  sba = sinba;
+  double disc   =  sqrt((M112-M222)*(M112-M222)+4.*M122*M122);
+  // Stable quadratic-root pair (avoids the direct difference's catastrophic
+  // cancellation whenever m_h << m_H): see the canonical fix this was
+  // ported from.
+  double m_H2   =  0.5*(M112+M222+disc);
+  double m_h2   =  (m_H2 != 0.0) ? (M112*M222-M122*M122)/m_H2
+                                 : 0.5*(M112+M222-disc);
 
   // Sanity checks. Masses set negative in case of troubles
   if (m_h2>0)   m_h=sqrt(m_h2);   else m_h=-sqrt(-m_h2);
@@ -1078,6 +1120,8 @@ void THDM::get_param_hybrid(double &m_h, double &m_H, double &cba,
 
 
 void THDM::recalc_tan_beta(double tan_beta) {
+
+  phys_cache_valid = false;
 
 	// Only positive tan(beta) allowed
   if (tan_beta < 0) return;
@@ -2673,6 +2717,11 @@ void THDM::print_param_higgs() {
 
 double THDM::get_m12_2() {
   //hep-ph/0207010
+  // NOTE: information-theoretically lossy at extreme tan(beta), not just
+  // imprecise -- no reformulation can fix it. Callers with an exact m12_2
+  // (set_param_phys()) should go through get_param_phys()'s
+  // phys_cache_valid short-circuit instead. See the canonical fix this was
+  // ported from.
   double sb=sin(beta);
   double sb2=sb*sb;
   double cb=cos(beta);

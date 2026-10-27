@@ -11,7 +11,7 @@ DEBUG=
 
 VPATH=src
 
-CFLAGS= -std=c++11 -Wall $(DEBUG) $(OPT)
+CFLAGS= -std=c++11 -Wall $(DEBUG) $(OPT) -MMD -MP
 
 OBJDIR=lib
 LIBDIR=$(OBJDIR)
@@ -48,8 +48,16 @@ endif
 
 all: lib $(PROG)
 
-$(OBJDIR)/%.o : %.cpp %.h
+# -MMD -MP (CFLAGS above) + -include below give this rule the FULL
+# transitive #include dependency graph, so a plain `make` after any header
+# change rebuilds everything that actually needs it -- not just the one
+# .cpp whose own matching .h changed. Prevents the ODR-violation class of
+# bug documented in dihiggs_hep_cross's
+# campaigns/physical_vs_effective_coupling_v1/validation/MASS_RECONSTRUCTION_FIX.md.
+$(OBJDIR)/%.o : %.cpp
 	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+-include $(addprefix $(OBJDIR)/, $(OBJECTS:.o=.d))
 
 lib: $(addprefix $(LIBDIR)/, $(LIB))
 
@@ -64,6 +72,7 @@ $(addprefix $(LIBDIR)/, $(LIB)): $(addprefix $(OBJDIR)/, $(OBJECTS))
 clean:
 	@ echo "Cleaning library"
 	@ rm -f $(addprefix $(OBJDIR)/, *.o)
+	@ rm -f $(addprefix $(OBJDIR)/, *.d)
 	@ rm -f $(addprefix $(LIBDIR)/, $(LIB))
 
 distclean:
