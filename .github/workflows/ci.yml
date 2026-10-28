@@ -53,8 +53,7 @@ jobs:
           python -m dhb.validate --contract evaluate_point_v1 \
             --input tests/golden/evaluate_point_v1/expected.csv
 
-  # Golden characterization of the C++ evaluator: clean-builds the vendored
-  # stock 2HDMC (~10 s) and build/bin/evaluate_point, then re-runs the frozen
+  # Golden characterization of the C++ evaluator: clean-builds dihiggs/2hdmc (~10 s) and build/bin/evaluate_point, then re-runs the frozen
   # 6-point golden suite and compares against the committed oracle
   # (tests/golden/evaluate_point_v1/, docs/characterization_evaluate_point.md).
   # No HiggsTools and no HB/HS datasets are involved. The build is fast enough
@@ -75,5 +74,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest "PyYAML>=5.0"
 
+      # 2HDMC is owned by dihiggs (DATA_FLOW N2): build the pinned copy.
+      - uses: actions/checkout@v4
+        with:
+          repository: fbientrigo/dihiggs
+          ref: 4834b055aa1b33e86eddf9bbe10f1bb151617797  # dihiggs feat/autoharness
+          path: _dihiggs
+
       - name: Build and run the golden characterization suite
+        env:
+          DHB_2HDMC_ROOT: ${{ github.workspace }}/_dihiggs/2hdmc
         run: bash scripts/run_golden_characterization.sh

@@ -131,9 +131,9 @@ def main():
         "dependencies": {
             "2HDMC": {
                 "version": "1.8 (stock)",
-                "vendored_path": "lib/2HDMC-1.8.0",
+                "source_path": os.environ.get("DHB_2HDMC_ROOT", "../dihiggs/2hdmc"),
                 "git_tree_hash": cmd_output(
-                    ["git", "rev-parse", "HEAD:lib/2HDMC-1.8.0"]
+                    ["git", "-C", os.environ.get("DHB_2HDMC_ROOT", "../dihiggs/2hdmc"), "rev-parse", "HEAD:./"]
                 ),
                 "positivity_stability_alias": (
                     "Constraints::check_positivity() and "

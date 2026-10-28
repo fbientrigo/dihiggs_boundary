@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # CI / local entry point for the evaluate_point golden characterization suite:
-# clean-build the vendored stock 2HDMC, build the evaluate_point binary, then
+# clean-build dihiggs/2hdmc ($DHB_2HDMC_ROOT), build the evaluate_point binary, then
 # run the golden tests with the binary REQUIRED (absence fails, not skips).
 #
 # See docs/characterization_evaluate_point.md. Total runtime is dominated by

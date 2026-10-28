@@ -46,9 +46,11 @@ INPUT_CSV = os.path.join(GOLDEN_DIR, "input.csv")
 EXPECTED_CSV = os.path.join(GOLDEN_DIR, "expected.csv")
 MANIFEST_JSON = os.path.join(GOLDEN_DIR, "manifest.json")
 BINARY = os.path.join(REPO_ROOT, "build", "bin", "evaluate_point")
-CONSTRAINTS_CPP = os.path.join(
-    REPO_ROOT, "lib", "2HDMC-1.8.0", "src", "Constraints.cpp"
+# 2HDMC is owned by dihiggs (DATA_FLOW N2); same default as scripts/setup_env.sh.
+TWOHDMC_ROOT = os.environ.get(
+    "DHB_2HDMC_ROOT", os.path.join(REPO_ROOT, "..", "dihiggs", "2hdmc")
 )
+CONSTRAINTS_CPP = os.path.join(TWOHDMC_ROOT, "src", "Constraints.cpp")
 
 REQUIRE_BINARY = os.environ.get("DHB_REQUIRE_EVALUATE_POINT") == "1"
 
@@ -470,6 +472,10 @@ def test_positivity_stability_alias_in_data(expected_by_id):
         )
 
 
+@pytest.mark.skipif(
+    not os.path.exists(CONSTRAINTS_CPP) and not REQUIRE_BINARY,
+    reason="2HDMC source absent (set DHB_2HDMC_ROOT or check out dihiggs beside this repo)",
+)
 def test_positivity_stability_alias_in_vendored_source():
     """Contract check on the exact vendored source being built:
     Constraints::check_positivity() and Constraints::check_stability() both

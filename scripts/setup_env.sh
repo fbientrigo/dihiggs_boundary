@@ -5,7 +5,8 @@
 _DHB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export DHB_ROOT="$(cd "${_DHB_SCRIPT_DIR}/.." && pwd)"
 
-export DHB_2HDMC_ROOT="${DHB_ROOT}/lib/2HDMC-1.8.0"
+# One patched 2HDMC for the workspace: the dihiggs submodule (DATA_FLOW N2).
+export DHB_2HDMC_ROOT="${DHB_2HDMC_ROOT:-$(cd "${DHB_ROOT}/../dihiggs/2hdmc" 2>/dev/null && pwd)}"
 export DHB_HIGGSTOOLS_ROOT="${DHB_ROOT}/lib/higgstools-v1.2"
 
 export DHB_HB_DATASET_ROOT="${DHB_ROOT}/dataset/hbdataset-v1.7"

@@ -19,9 +19,9 @@ tools:
   2HDMC:
     version: "1.8"
     upstream_url: https://2hdmc.hepforge.org/
-    distribution: tarball          # not a git repo -> cannot be a git submodule
-    vendored_path: lib/2HDMC-1.8.0
-    local_patches: []              # closer to stock v1.8; project code lives in src/, not the vendored tree
+    distribution: tarball          # not a git repo; the one patched copy is dihiggs/2hdmc
+    owner: dihiggs                 # built from $DHB_2HDMC_ROOT (default ../dihiggs/2hdmc), DATA_FLOW N2
+    local_patches: [phys/gen exact-input caches, set_param_phys_lam1, calc_unitarity_spectrum, hgaga diagnostics]
 
   HiggsTools:
     version: v1.2

@@ -45,7 +45,7 @@ points.csv
 
 Computed only when `theory_ok = 1` (NaN otherwise); `hbhs_block_ok` records
 whether the block is valid. Conventions ported from
-`lib/2HDMC-1.8.0/src/HBHS.cpp`:
+`dihiggs/2hdmc/src/HBHS.cpp`:
 
 - `eff_<hk>_<ff>_s` / `eff_<hk>_<ff>_p` for `ff` in
   `ss, cc, bb, tt, mumu, tautau`: SM-normalized CP-even (`cs.imag/cs_sm.imag`)

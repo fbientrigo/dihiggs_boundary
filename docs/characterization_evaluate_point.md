@@ -102,8 +102,9 @@ generation time:
 - `g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0`, flags
   `-std=c++11 -Wall -Wextra -O2` (`scripts/build_evaluate_point.sh`),
 - GSL 2.7.1,
-- vendored **stock** 2HDMC 1.8 at `lib/2HDMC-1.8.0` (git tree hash in the
-  manifest; `external_tools.lock.yaml` records no local patches).
+- 2HDMC 1.8 at `lib/2HDMC-1.8.0` when frozen; since DATA_FLOW N2 the build uses
+  `dihiggs/2hdmc` (output byte-identical on the golden input and 4000 random points; git tree hash in the
+  manifest; `external_tools.lock.yaml` lists the dihiggs patches).
 
 ## Numerical comparison policy
 
@@ -166,7 +167,7 @@ Executable invariants checked on every applicable row:
 
 In the exact vendored source being built, `Constraints::check_positivity()`
 and `Constraints::check_stability()` **both** `return model.check_stability();`
-(`lib/2HDMC-1.8.0/src/Constraints.cpp`, lines 568–575; the header even
+(`dihiggs/2hdmc/src/Constraints.cpp`, lines 568–575; the header even
 documents `check_positivity` as doing "the exact same" as `check_stability`).
 Consequently `positivity_ok == stability_ok` on every constructed row, and the
 `stability_ok` term in `theory_ok` is currently redundant even though it is

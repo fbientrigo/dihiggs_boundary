@@ -214,7 +214,7 @@ labels: `h1 = h`, `h2 = H`, `h3 = A`, `hc = H+`.
 - `br_t_hcb`, `br_hc_cs`, `br_hc_cb`, `br_hc_tb`, `br_hc_taunu`,
   `br_hc_h1W`, `br_hc_h2W`, `br_hc_h3W`, `hc_kappa_t`, `hc_kappa_b`
 
-Conventions are ported from `lib/2HDMC-1.8.0/src/HBHS.cpp`; the definitive
+Conventions are ported from `dihiggs/2hdmc/src/HBHS.cpp`; the definitive
 description lives in `docs/hbhs_contract.md`. The python mirror of this
 column list is `python/dhb/schema.py` (`HBHS_BLOCK_COLUMNS`) and is enforced
 against a committed fixture by `tests/test_schema.py`.

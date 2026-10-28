@@ -23,7 +23,7 @@ Golden case -> source:
        coordinates are reused -- the expected output is regenerated cleanly)
   G07  generated: G01 coordinates with mH = nextafter(125.09, -inf), which
        makes stock THDM::set_param_phys return false (m_h > m_H branch,
-       lib/2HDMC-1.8.0/src/THDM.cpp).
+       dihiggs/2hdmc/src/THDM.cpp).
 
 The ignored runs/ sources exist only on machines that produced those runs, so
 this script is a *regeneration* tool, not a CI step; CI consumes the committed
@@ -169,7 +169,7 @@ def main():
             "mH_hex": g07_mh.hex(),
             "expected_failure": (
                 "stock THDM::set_param_phys returns false when m_h > m_H "
-                "(lib/2HDMC-1.8.0/src/THDM.cpp)"
+                "(dihiggs/2hdmc/src/THDM.cpp)"
             ),
         },
     }
