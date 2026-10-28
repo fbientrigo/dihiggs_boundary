@@ -82,6 +82,10 @@ See:
 - `contracts/llp_signal_enriched_v1.yaml`
 - `contracts/boundary_atlas_v1.yaml`
 
+## Campaign layout
+
+One rule: `campaigns/<id>/campaign.yaml` is tracked; everything else under `campaigns/<id>/` (raw points, leaves, `*_state.json`, manifests, aggregates) is ignored and lives in the lake. The old `data/runs/<id>/` layout is gone: pass `--output-dir campaigns/<id>` (resumable `*_state.json` are found there; `lake sync` never prunes `*_state.json` or `*.yaml`). Restore a campaign with `python ../lake/lake.py restore <cid> campaigns/<id>` (find `<cid>` with `python ../lake/lake.py ls | grep <id>`), e.g. survivor v2: `20261013T000618Z-8292bb`.
+
 ## Domain semantics
 
 The v1 signal stage never extrapolates silently. Each row receives one of:

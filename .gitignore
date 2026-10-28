@@ -9,8 +9,6 @@ cmake-build-*/
 *.exe
 
 # Runtime data
-data/runs/*
-!data/runs/.gitkeep
 scratch/*
 !scratch/.gitkeep
 
@@ -68,8 +66,8 @@ lib/2HDMC-1.8.0/lib/
 !configs/smoke_points_hbhs.csv
 
 runs/
-campaigns/
-!campaigns/
+# One campaign layout: campaigns/<id>/campaign.yaml tracked, everything else ignored (it lives in the lake).
 campaigns/*
-!campaigns/survivor_adaptive_12520_tanbeta_v2/
-!campaigns/survivor_adaptive_12520_tanbeta_v2/campaign.yaml
+!campaigns/*/
+campaigns/*/*
+!campaigns/*/campaign.yaml

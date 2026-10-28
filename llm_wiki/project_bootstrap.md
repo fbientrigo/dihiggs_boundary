@@ -56,7 +56,7 @@ Important directories:
 
     llm_wiki/
 
-    data/runs/
+    campaigns/
 
 ## Third-party policy
 

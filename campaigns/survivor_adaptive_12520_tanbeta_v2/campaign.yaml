@@ -1,0 +1,36 @@
+schema_version: dhb.survivor_adaptive_12520_tanbeta.v2
+campaign_id: survivor_adaptive_12520_tanbeta_v2
+dihiggs_root: ../../../dihiggs
+evaluator: dihiggs/app/DihiggsPointV2Evaluator
+physics:
+  mh_GeV: 125.20
+  mass_convention_id: mh_125p20_active_2026
+  yukawa_type: 1
+  sin_beta_minus_alpha: 1.0
+  lambda7: 0.0
+# 10**(2 + 5*i/7), i=0..7; these are fresh 125.20 slices.
+tan_beta_slices: [100.0, 517.9474679231213, 2682.6957952797275, 13894.95494373136, 71968.56730011529, 372759.3720314938, 1930697.7288832497, 10000000.0]
+# 16 rows per batch: 2*782 + 6*781 = 6,250 batches = 100,000 rows.
+slice_batch_quotas: [782, 782, 781, 781, 781, 781, 781, 781]
+profile:
+  batch_size: 16
+  zero_success_max_attempts: 64
+  seed: 20260916
+  sampler: lhs
+  X_lambda6_times_tan_beta: {min: 1.0e-5, max: 1.0, scale: log}
+  lambda6_hard_envelope: {min: 1.0e-12, max: 1.0e-2}
+  Delta_heavy_GeV: {min: 150.0, max: 500.0, scale: linear}
+mesh:
+  min_GeV: 130.0
+  max_GeV: 350.0
+  root_cells: 20
+  max_depth: 6
+  max_cells_per_axis: 640
+  new_evaluation_cap: 100000
+historical_hint:
+  manifest: /home/fabian/atlas_dihiggs_archive/20260831_pre_madgraph_reset/runs/adaptive_m2_boundary_v1_mh12513_historical_copy/manifest.json
+  state: /home/fabian/atlas_dihiggs_archive/20260831_pre_madgraph_reset/runs/adaptive_m2_boundary_v1_mh12513_historical_copy/mesh_state.json
+  archive_manifest: /home/fabian/atlas_dihiggs_archive/20260831_pre_madgraph_reset/runs/adaptive_m2_boundary_v1_mh12513_historical_copy/ARCHIVE_MANIFEST.json
+runtime:
+  timeout_s: 120
+  max_workers: 2

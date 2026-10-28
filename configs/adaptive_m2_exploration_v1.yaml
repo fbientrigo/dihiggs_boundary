@@ -3,8 +3,8 @@ campaign_id: adaptive_m2_boundary_exploration_v1
 dihiggs_root: ../../dihiggs
 evaluator: dihiggs/app/DihiggsPointV2Evaluator
 seed:
-  adaptive_manifest: ../data/runs/adaptive_m2_boundary_v1/manifest.json
-  adaptive_state: ../data/runs/adaptive_m2_boundary_v1/mesh_state.json
+  adaptive_manifest: ../campaigns/adaptive_m2_boundary_v1/manifest.json
+  adaptive_state: ../campaigns/adaptive_m2_boundary_v1/mesh_state.json
 physics:
   mh_GeV: 125.13
   mass_convention_id: mh_125p13_pdg_2026
