@@ -5,14 +5,13 @@
 # versions each repo builds against, so version drift is detectable instead of
 # hidden in directory names and build scripts. The declared versions must AGREE
 # across the three manifests -- that agreement is the cross-repo "version pin".
-# tests/test_external_tools.py enforces the versions and the convention-cache SHA-256 and provenance sidecar.
+# tests/test_external_tools.py enforces the versions and the convention SHA-256 pin.
 schema_version: external_tools_v1
 
-# Controlled cache of the canonical physics convention file.
-# The SHA-256 pins the canonical v3 convention cache; provenance is in its sidecar.
+# The convention file lives only in dihiggs (conventions/physics_conventions.yaml).
+# The SHA-256 pins its canonical v3 bytes; scripts/check_workspace.py verifies them.
 conventions:
-  file: conventions/physics_conventions.yaml
-  provenance_file: conventions/physics_conventions.lock.yaml
+  owner: dihiggs
   schema_version: physics_conventions_v3
   sha256: 4f3a938ed54dbc779d25f691ce1dd06fe17af69751105dc3b69ccb6b7d92fff6
 

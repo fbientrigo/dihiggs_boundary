@@ -157,7 +157,7 @@ Executable invariants checked on every applicable row:
 - `ctau_mm_H2 == 1.973269804e-13 GeV·mm / total_width_H2[GeV]` (lifetime in
   **millimetres**; the constant is `kHbarCGeVmm` in `src/evaluate_point.cpp`,
   mirrored by `dhb.contracts.HBAR_C_GEV_MM` and
-  `conventions/physics_conventions.yaml`);
+  `dihiggs/conventions/physics_conventions.yaml`);
 - all partial widths finite and nonnegative on `theory_ok` rows;
 - serial vs two-shard (`split_point_csv.py` → binary → `merge_shard_outputs.py`)
   scientific rows identical.

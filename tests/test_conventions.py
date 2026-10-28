@@ -5,7 +5,13 @@ import pytest
 from dhb import contracts, schema
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CONVENTIONS = os.path.join(REPO_ROOT, "conventions", "physics_conventions.yaml")
+# Convention YAML has one owner: dihiggs. Sibling checkout, or $DIHIGGS_ROOT.
+CONVENTIONS = os.path.join(
+    os.environ.get("DIHIGGS_ROOT", os.path.join(os.path.dirname(REPO_ROOT), "dihiggs")),
+    "conventions", "physics_conventions.yaml",
+)
+if not os.path.exists(CONVENTIONS):
+    pytest.skip("dihiggs convention YAML not found at %s; set DIHIGGS_ROOT" % CONVENTIONS, allow_module_level=True)
 
 
 @pytest.fixture
@@ -13,11 +19,6 @@ def conventions():
     yaml = pytest.importorskip("yaml")
     with open(CONVENTIONS) as fh:
         return yaml.safe_load(fh)
-
-
-def test_conventions_file_present():
-    assert os.path.exists(CONVENTIONS)
-    assert os.path.exists(os.path.join(REPO_ROOT, "conventions", "physics_conventions.lock.yaml"))
 
 
 def test_hbar_c_matches_conventions(conventions):

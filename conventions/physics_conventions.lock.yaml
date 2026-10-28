@@ -1,7 +1,0 @@
-schema: physics_conventions_cache.v1
-source_repository: fbientrigo/dihiggs
-source_commit: 087ba246e9a9fa34b16249b52629a62703893b5c
-source_path: conventions/physics_conventions.yaml
-source_sha256: 4f3a938ed54dbc779d25f691ce1dd06fe17af69751105dc3b69ccb6b7d92fff6
-schema_version: physics_conventions_v3
-copied_utc: "2026-10-21"
