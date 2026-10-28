@@ -7,7 +7,9 @@ External versions used by the existing HB/HS path:
 - HiggsTools v1.2
   - HiggsBounds Dataset v1.7
   - HiggsSignals Dataset v1.1
-- 2HDMC v1.8 for the historical compatibility evaluator
+- 2HDMC v1.8 for the historical compatibility evaluator: the patched copy in `dihiggs/2hdmc`
+  (`$DHB_2HDMC_ROOT`, default `../dihiggs/2hdmc`; the vendored `lib/2HDMC-1.8.0` is in lake
+  `20261028T200807Z-d116d2`)
 
 ## Scientific ownership
 
@@ -119,12 +121,20 @@ scripts/run_hbhs_enrichment.sh runs/<id>
 
 This produces `runs/<id>/hbhs_enriched.csv` using the compatibility theory/HBHS path.
 
-Before the LLP signal stage, join the direct MadGraph result for each stable `point_id` so the input contains:
+The LLP signal stage needs `sigma_production_fb` and `sigma_production_unc_fb` on each `point_id`.
+`dhb.join_signal` joins them and applies the calibration in one step. It takes sigma only from the table
+that `dihiggs_hep_cross/state/CURRENT_CAMPAIGN.yaml` registers (`madgraph.authoritative_results`); with none
+registered (today: `null`), no row gets a sigma:
 
-```text
-sigma_production_fb
-sigma_production_unc_fb
+```bash
+python -m dhb.join_signal --points runs/<id>/hbhs_enriched.csv \
+  --registry ../dihiggs_hep_cross/state/CURRENT_CAMPAIGN.yaml \
+  --calibration ../dihiggs_llp_recast/calibration/trackless_mH150_r7.yaml \
+  --output runs/<id>/llp_signal_enriched.csv
 ```
+
+The tracked calibration still has null fields (S95, A_eff uncertainties, mass tolerance, near_fraction:
+fbientrigo/atlas_dihiggs#11), so until they are filled it produces failure-marked rows.
 
 The MadGraph cards, logs, process definition, UFO provenance, PDF/scale settings and run metadata stay owned by the production repository rather than being duplicated here.
 
