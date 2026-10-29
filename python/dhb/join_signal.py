@@ -1,16 +1,15 @@
-"""Join hep_cross production sigma onto boundary points, then apply the LLP response.
+"""Join hep_cross production sigma onto boundary points.
 
-One step, keyed on point_id:
+Keyed on point_id:
   boundary points CSV
   + the sigma table registered in hep_cross state/CURRENT_CAMPAIGN.yaml
     (madgraph.authoritative_results, a CSV path relative to the hep_cross repo)
-  + a versioned Trackless calibration YAML (passed through to dhb.llp_signal).
 
 Sigma comes from the registry only: there is no --sigma argument, so an
 unregistered MadGraph run cannot be joined.  With no registered result
-(authoritative_results: null) every row keeps blank sigma columns and
-dhb.llp_signal marks it missing.  Only rows with madgraph_status == VALID are
-joined; a duplicated point_id in the sigma table is an error.
+(authoritative_results: null) every row keeps blank sigma columns.  Only rows
+with madgraph_status == VALID are joined; a duplicated point_id in the sigma
+table is an error.
 """
 
 import argparse
@@ -19,8 +18,6 @@ import os
 import sys
 
 import yaml
-
-from dhb import llp_signal
 
 SIGMA_COLUMNS = ("sigma_production_fb", "sigma_production_unc_fb")
 
@@ -80,18 +77,16 @@ def run(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--points", required=True, help="boundary points CSV (point_id + model/HBHS columns)")
     parser.add_argument("--registry", required=True, help="dihiggs_hep_cross/state/CURRENT_CAMPAIGN.yaml")
-    parser.add_argument("--calibration", required=True, help="versioned Trackless response YAML")
-    parser.add_argument("--output", required=True, help="llp_signal_enriched.csv to write")
+    parser.add_argument("--output", required=True, help="points + sigma CSV to write")
     args = parser.parse_args(argv)
 
-    joined = args.output + ".joined.csv"
     try:
-        n_rows, n_joined = join(args.points, args.registry, joined)
+        n_rows, n_joined = join(args.points, args.registry, args.output)
     except (OSError, JoinError, KeyError) as exc:
         print("[DHB][FAIL] join: %s" % exc, file=sys.stderr)
         return 2
-    print("[DHB] joined registered sigma onto %d/%d points -> %s" % (n_joined, n_rows, joined))
-    return llp_signal.run(["--input", joined, "--output", args.output, "--calibration", args.calibration])
+    print("[DHB] joined registered sigma onto %d/%d points -> %s" % (n_joined, n_rows, args.output))
+    return 0
 
 
 if __name__ == "__main__":

@@ -38,9 +38,7 @@ jobs:
           for f in \
             evaluate_point_v1 \
             hbhs_enriched_v1 \
-            boundary_atlas_v0 \
-            llp_signal_enriched_v1 \
-            boundary_atlas_v1; do
+            boundary_atlas_v0; do
             diff -u "contracts/$f.yaml" "/tmp/contracts_check/$f.yaml"
           done
 

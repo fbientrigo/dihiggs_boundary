@@ -4,10 +4,6 @@ The historical v0 path remains supported:
 
     evaluate_point.csv -> hbhs_enriched.csv -> boundary_atlas.csv
 
-The LLP-aware v1 path is additive:
-
-    hbhs_enriched.csv -> llp_signal_enriched.csv -> boundary_atlas_v1.csv
-
 Each contract is a plain mapping mirrored under ``contracts/*.yaml``.
 ``python -m dhb.contracts --emit contracts`` regenerates that mirror.
 """
@@ -139,50 +135,10 @@ ATLAS = {
     "aliases": THEORY["aliases"],
 }
 
-LLP_SIGNAL = {
-    "name": schema.LLP_SIGNAL_SCHEMA_VERSION,
-    "produced_by": "dhb.llp_signal",
-    "consumed_by": "dhb.atlas_v1",
-    "file": "llp_signal_enriched.csv",
-    "required_columns": list(schema.LLP_SIGNAL_NORMALIZED_INPUT_COLUMNS)
-    + list(schema.LLP_SIGNAL_COLUMNS),
-    "full_columns": None,
-    "invariants": [],
-    "aliases": {
-        "m_H2_GeV": ["mH_input_GeV", "mH", "m_phi"],
-        "g_hH2H2_GeV": [],
-        "ctau_mm_H2": ["ctau_mm"],
-        "br_bb_H2": ["br_bb"],
-        "total_width_H2": ["total_width_GeV"],
-        "width_bb_H2": ["width_bb_GeV"],
-    },
-}
-
-ATLAS_V1 = {
-    "name": schema.BOUNDARY_ATLAS_V1_SCHEMA_VERSION,
-    "produced_by": "dhb.atlas_v1",
-    "consumed_by": "downstream analysis / plotting / benchmark selection",
-    "file": "boundary_atlas_v1.csv",
-    "required_columns": [
-        "region_class",
-        "is_theory_ok",
-        "is_exp_ok",
-        "is_allowed",
-        "is_signal_domain_supported",
-        "is_signal_calibration_validated",
-        "is_signal_at_or_above_S95",
-    ],
-    "full_columns": None,
-    "invariants": [],
-    "aliases": LLP_SIGNAL["aliases"],
-}
-
 CONTRACTS = {
     "evaluate_point_v1": THEORY,
     "hbhs_enriched_v1": ENRICHED,
     "boundary_atlas_v0": ATLAS,
-    "llp_signal_enriched_v1": LLP_SIGNAL,
-    "boundary_atlas_v1": ATLAS_V1,
 }
 
 
