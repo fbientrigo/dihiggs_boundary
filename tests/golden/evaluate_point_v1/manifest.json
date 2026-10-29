@@ -1,7 +1,7 @@
 {
   "golden_suite": "evaluate_point_v1",
   "golden_suite_version": 1,
-  "generated_utc": "2026-07-15T00:23:52.700598+00:00",
+  "generated_utc": "2026-10-29T02:12:31.804961+00:00",
   "oracle_kind": "generated characterization oracle (output of the current implementation), not manually authored physics assertions",
   "generation_commands": [
     "python3 scripts/extract_golden_evaluate_point_inputs.py",
@@ -10,19 +10,9 @@
   ],
   "source": {
     "repo": "dihiggs_boundary",
-    "git_commit": "ae9bb132dd0b042b9718b744fef8e3db3439beba",
+    "git_commit": "1fab1c129476b2698c45c7b21f892d9b29f7b529",
     "git_status_short": [
-      " M .github/workflows/ci.yml",
-      "?? audit_dihiggs_boundary_repo_notes.json",
-      "?? audit_dihiggs_boundary_repo_notes.md",
-      "?? docs/characterization_evaluate_point.md",
-      "?? llm_wiki/dihiggs_boundary_june2026.txt",
-      "?? scripts/extract_golden_evaluate_point_inputs.py",
-      "?? scripts/generate_golden_evaluate_point.py",
-      "?? scripts/plot_lambda1_relations.py",
-      "?? scripts/run_golden_characterization.sh",
-      "?? tests/golden/",
-      "?? tests/test_golden_evaluate_point.py"
+      " M tests/golden/evaluate_point_v1/expected.csv"
     ],
     "tracked_files_modified": true,
     "evaluator_source": "src/evaluate_point.cpp"
@@ -30,20 +20,20 @@
   "dependencies": {
     "2HDMC": {
       "version": "1.8 (stock)",
-      "vendored_path": "lib/2HDMC-1.8.0",
-      "git_tree_hash": "3f3f0f58a64c040e4330190e77be3b30c05b1fb6",
+      "source_path": "../dihiggs/2hdmc",
+      "git_tree_hash": "3d937c3b9d4d646e534bd8670b939d450f01cca1",
       "positivity_stability_alias": "Constraints::check_positivity() and Constraints::check_stability() both return model.check_stability() in this vendored tree"
     },
-    "gsl": "2.7.1"
+    "gsl": "2.8"
   },
   "toolchain": {
-    "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "compiler": "g++ (Debian 14.2.0-19) 14.2.0",
     "compile_flags": "-std=c++11 -Wall -Wextra -O2 (scripts/build_evaluate_point.sh)",
     "build_commands": [
       "scripts/build_2hdmc.sh",
       "scripts/build_evaluate_point.sh"
     ],
-    "uname": "Linux 6.18.33.2-microsoft-standard-WSL2 x86_64"
+    "uname": "Linux 6.12.63+deb13-amd64 x86_64"
   },
   "files": {
     "input.csv": {
@@ -51,7 +41,7 @@
       "data_rows": 6
     },
     "expected.csv": {
-      "sha256": "513cc9defe61fd2fea09b68b11ba6d246bc6e4303ff0f5bfe6e196f7f93c21cc",
+      "sha256": "fb78b50e7c0d8979f21cccc49be8f04c1e1c1f0614772d836925eaa2cf1115ae",
       "data_rows": 6
     }
   },
