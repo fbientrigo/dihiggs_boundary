@@ -23,7 +23,7 @@ jobs:
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest "PyYAML>=5.0"
+          pip install pytest "PyYAML>=5.0" matplotlib
 
       - name: Run unit tests (no HiggsTools / no datasets)
         env:
@@ -78,7 +78,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: fbientrigo/dihiggs
-          ref: 4834b055aa1b33e86eddf9bbe10f1bb151617797  # dihiggs feat/autoharness
+          ref: a3b49079292deecb39614e9b4f470a2fb9518ee6  # dihiggs feat/autoharness, = root pin (golden generated against it)
           path: _dihiggs
 
       - name: Build and run the golden characterization suite
