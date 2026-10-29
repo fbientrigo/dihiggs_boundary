@@ -10,6 +10,12 @@ from dhb.survivor_adaptive_campaign import (
 from dhb.survivor_adaptive_aggregate import aggregate_run
 from dhb.survivor_adaptive_campaign import _load
 
+import pytest
+
+# _load needs the built sibling evaluator (dihiggs_root in the config) and the local archive manifests.
+EVALUATOR = Path(__file__).parents[2] / "dihiggs" / "dihiggs" / "app" / "DihiggsPointV2Evaluator"
+needs_evaluator = pytest.mark.skipif(not EVALUATOR.is_file(), reason="canonical evaluator not built: %s" % EVALUATOR)
+
 
 def _cfg():
     return {
@@ -40,6 +46,7 @@ def test_historical_hint_is_a_tie_breaker_not_a_survivor():
     assert leaf["decision_state"] == "inconclusive"
 
 
+@needs_evaluator
 def test_production_config_uses_the_historical_archive_only():
     config = Path(__file__).parents[1] / "configs" / "survivor_adaptive_12520_v1.yaml"
     _, cfg, _, _ = _load(config)

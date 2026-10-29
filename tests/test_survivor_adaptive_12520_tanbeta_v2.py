@@ -8,8 +8,12 @@ from dhb.survivor_adaptive_campaign import _history_score, _load, _new_root_leav
 
 
 CONFIG = Path(__file__).parents[1] / "campaigns" / "survivor_adaptive_12520_tanbeta_v2" / "campaign.yaml"
+# _load needs the built sibling evaluator (dihiggs_root in the config) and the local archive manifests.
+EVALUATOR = Path(__file__).parents[2] / "dihiggs" / "dihiggs" / "app" / "DihiggsPointV2Evaluator"
+needs_evaluator = pytest.mark.skipif(not EVALUATOR.is_file(), reason="canonical evaluator not built: %s" % EVALUATOR)
 
 
+@needs_evaluator
 def test_v2_slices_and_quotas_are_exact_and_deterministic():
     _, cfg, _, _ = _load(CONFIG)
     expected = [10 ** (2 + 5 * i / 7) for i in range(8)]
@@ -20,6 +24,7 @@ def test_v2_slices_and_quotas_are_exact_and_deterministic():
     assert sum(quotas.values()) * cfg["profile"]["batch_size"] == cfg["mesh"]["new_evaluation_cap"] == 100_000
 
 
+@needs_evaluator
 def test_v2_root_and_cap_are_fresh_and_hard_bounded():
     _, cfg, _, _ = _load(CONFIG)
     leaves = _new_root_leaves(cfg)
@@ -28,6 +33,7 @@ def test_v2_root_and_cap_are_fresh_and_hard_bounded():
     assert all(quota >= 20 * 20 for quota in slice_batch_quotas(cfg).values())
 
 
+@needs_evaluator
 def test_v2_rejects_any_cap_that_is_not_exactly_100k(tmp_path):
     bad = yaml.safe_load(CONFIG.read_text())
     bad["dihiggs_root"] = str(Path(__file__).parents[2] / "dihiggs")
