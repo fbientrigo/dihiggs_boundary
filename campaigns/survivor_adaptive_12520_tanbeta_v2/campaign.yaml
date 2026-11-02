@@ -27,10 +27,10 @@ mesh:
   max_depth: 6
   max_cells_per_axis: 640
   new_evaluation_cap: 100000
-historical_hint:
-  manifest: /home/fabian/atlas_dihiggs_archive/20260831_pre_madgraph_reset/runs/adaptive_m2_boundary_v1_mh12513_historical_copy/manifest.json
-  state: /home/fabian/atlas_dihiggs_archive/20260831_pre_madgraph_reset/runs/adaptive_m2_boundary_v1_mh12513_historical_copy/mesh_state.json
-  archive_manifest: /home/fabian/atlas_dihiggs_archive/20260831_pre_madgraph_reset/runs/adaptive_m2_boundary_v1_mh12513_historical_copy/ARCHIVE_MANIFEST.json
+historical_hint:  # vendored from ~/atlas_dihiggs_archive/.../adaptive_m2_boundary_v1_mh12513_historical_copy; SHA256SUMS.tsv keeps only these two rows (full one is 106 MB)
+  manifest: historical_hint/manifest.json
+  state: historical_hint/mesh_state.json
+  archive_manifest: historical_hint/ARCHIVE_MANIFEST.json
 runtime:
   timeout_s: 120
   max_workers: 2

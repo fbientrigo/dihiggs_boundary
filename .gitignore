@@ -71,3 +71,5 @@ campaigns/*
 !campaigns/*/
 campaigns/*/*
 !campaigns/*/campaign.yaml
+# survivor v2's historical geometry hint (checksum-verified by dhb): vendored so a fresh clone runs it
+!campaigns/survivor_adaptive_12520_tanbeta_v2/historical_hint/

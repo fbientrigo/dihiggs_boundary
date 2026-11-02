@@ -37,6 +37,7 @@ def test_v2_root_and_cap_are_fresh_and_hard_bounded():
 def test_v2_rejects_any_cap_that_is_not_exactly_100k(tmp_path):
     bad = yaml.safe_load(CONFIG.read_text())
     bad["dihiggs_root"] = str(Path(__file__).parents[2] / "dihiggs")
+    bad["historical_hint"] = {k: str(CONFIG.parent / v) for k, v in bad["historical_hint"].items()}
     bad["mesh"]["new_evaluation_cap"] = 99_999
     path = tmp_path / "bad.yaml"; path.write_text(yaml.safe_dump(bad))
     with pytest.raises(ValueError, match="exact per-slice batch quotas"):

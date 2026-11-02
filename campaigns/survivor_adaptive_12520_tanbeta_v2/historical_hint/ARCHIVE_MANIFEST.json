@@ -1,0 +1,13 @@
+{
+  "acquired_at_utc": "2026-09-15T23:24:02.726396+00:00",
+  "archive_path": "/home/fabian/atlas_dihiggs_archive/20260831_pre_madgraph_reset/runs/adaptive_m2_boundary_v1_mh12513_historical_copy",
+  "convention": {
+    "id": "mh_125p13_pdg_2026_historical_replay",
+    "m_h_GeV": "125.13",
+    "status": "historical_only"
+  },
+  "policy": "Historical geometry may schedule fresh 125.20 work but its rows, fractions, intervals, and survivor classifications are never pooled.",
+  "schema": "dihiggs.historical_archive.v1",
+  "sha256_inventory": "SHA256SUMS.tsv",
+  "source_path": "/home/fabian/atlas_dihiggs/dihiggs_boundary/data/runs/adaptive_m2_boundary_v1"
+}
