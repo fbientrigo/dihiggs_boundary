@@ -25,10 +25,10 @@ mesh:
   # With 20 root cells, level 5 is the requested 640x640-equivalent ceiling.
   max_cells_per_axis: 640
   new_evaluation_cap: 600000
-historical_hint:
-  manifest: /home/fabian/atlas_dihiggs_archive/20260831_pre_madgraph_reset/runs/adaptive_m2_boundary_v1_mh12513_historical_copy/manifest.json
-  state: /home/fabian/atlas_dihiggs_archive/20260831_pre_madgraph_reset/runs/adaptive_m2_boundary_v1_mh12513_historical_copy/mesh_state.json
-  archive_manifest: /home/fabian/atlas_dihiggs_archive/20260831_pre_madgraph_reset/runs/adaptive_m2_boundary_v1_mh12513_historical_copy/ARCHIVE_MANIFEST.json
+historical_hint:  # vendored copy of the archive (byte-identical; see that dir's SHA256SUMS.tsv)
+  manifest: ../campaigns/survivor_adaptive_12520_tanbeta_v2/historical_hint/manifest.json
+  state: ../campaigns/survivor_adaptive_12520_tanbeta_v2/historical_hint/mesh_state.json
+  archive_manifest: ../campaigns/survivor_adaptive_12520_tanbeta_v2/historical_hint/ARCHIVE_MANIFEST.json
 runtime:
   timeout_s: 120
   max_workers: 4

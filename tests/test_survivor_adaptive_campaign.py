@@ -50,7 +50,7 @@ def test_historical_hint_is_a_tie_breaker_not_a_survivor():
 def test_production_config_uses_the_historical_archive_only():
     config = Path(__file__).parents[1] / "configs" / "survivor_adaptive_12520_v1.yaml"
     _, cfg, _, _ = _load(config)
-    assert "/atlas_dihiggs_archive/" in cfg["historical_hint"]["manifest"]
+    assert "/historical_hint/" in cfg["historical_hint"]["manifest"]
     assert json.loads(Path(cfg["historical_hint"]["archive_manifest"]).read_text())["convention"]["status"] == "historical_only"
 
 
