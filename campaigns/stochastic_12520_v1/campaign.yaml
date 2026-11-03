@@ -1,0 +1,28 @@
+# MH / PSO stochastic search (dhb.stochastic_search). physics, slices, profile ranges, mesh bounds and runtime are
+# survivor_adaptive_12520_tanbeta_v2's (tests/test_stochastic_search.py checks they stay equal); only point choice differs.
+schema_version: dhb.stochastic_12520.v1
+campaign_id: stochastic_12520_v1
+dihiggs_root: ../../../dihiggs
+evaluator: dihiggs/app/DihiggsPointV2Evaluator
+physics:
+  mh_GeV: 125.20
+  mass_convention_id: mh_125p20_active_2026
+  yukawa_type: 1
+  sin_beta_minus_alpha: 1.0
+  lambda7: 0.0
+tan_beta_slices: [100.0, 517.9474679231213, 2682.6957952797275, 13894.95494373136, 71968.56730011529, 372759.3720314938, 1930697.7288832497, 10000000.0]
+profile:
+  batch_size: 16  # MH chains / PSO particles
+  X_lambda6_times_tan_beta: {min: 1.0e-5, max: 1.0, scale: log}
+  lambda6_hard_envelope: {min: 1.0e-12, max: 1.0e-2}
+  Delta_heavy_GeV: {min: 150.0, max: 500.0, scale: linear}
+mesh:  # bounds of the search box, and the root cells that name a point outside every explored leaf
+  min_GeV: 130.0
+  max_GeV: 350.0
+  root_cells: 20
+stochastic:
+  evaluation_cap: 2048  # exact evaluations (= fresh rows) per run
+  epsilon: 0.05  # MH target eps + 1[theory_ok]
+runtime:
+  timeout_s: 120
+  max_workers: 2
