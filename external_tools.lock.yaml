@@ -5,7 +5,7 @@
 # versions each repo builds against, so version drift is detectable instead of
 # hidden in directory names and build scripts. The declared versions must AGREE
 # across the three manifests -- that agreement is the cross-repo "version pin".
-# tests/test_external_tools.py enforces the versions and the convention SHA-256 pin.
+# ../scripts/check_workspace.py (root) enforces the versions and the convention SHA-256 pin.
 schema_version: external_tools_v1
 
 # The convention file lives only in dihiggs (conventions/physics_conventions.yaml).
